@@ -1,0 +1,405 @@
+{
+	"name": "Mithral Armor (+0,+1,+2,+3)",
+	"referenceSources": [
+		"DrDe-FWtVC"
+	],
+	"type": "GV|XDMG",
+	"requires": [
+		{
+			"type": "MA|XPHB"
+		},
+		{
+			"type": "HA|XPHB"
+		}
+	],
+	"excludes": {
+		"name": "Hide Armor"
+	},
+	"inherits": {
+		"namePrefix": "Mithral ",
+		"source": "XDMG",
+		"page": 279,
+		"srd52": true,
+		"basicRules2024": true,
+		"rarity": "uncommon",
+		"entries": [
+			"Mithral is a light, flexible metal. A mithral chain shirt or breastplate can be worn under normal clothes.",
+			"If the armor normally imposes disadvantage on Dexterity ({@skill Stealth|XPHB}) checks or has a Strength requirement, the mithral version of the armor doesn't."
+		],
+		"lootTables": [
+			"Arcana - Uncommon|XDMG",
+			"Armaments - Uncommon|XDMG"
+		]
+	},
+	"source": "XDMG",
+	"page": 279,
+	"srd52": true,
+	"basicRules2024": true,
+	"rarity": "uncommon",
+	"lootTables": [
+		"Arcana - Uncommon|XDMG",
+		"Armaments - Uncommon|XDMG"
+	],
+	"entries": [
+		"Mithral is a light, flexible metal. A mithral chain shirt or breastplate can be worn under normal clothes.",
+		"If the armor normally imposes disadvantage on Dexterity ({@skill Stealth|XPHB}) checks or has a Strength requirement, the mithral version of the armor doesn't."
+	],
+	"variants": [
+		{
+			"base": {
+				"name": "Breastplate",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"referenceSources": [
+					"DrDe-TFV",
+					"HotB"
+				],
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "none",
+				"weight": 20,
+				"value": 40000,
+				"ac": 14,
+				"armor": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Breastplate",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "uncommon",
+				"weight": 20,
+				"ac": 14,
+				"armor": true,
+				"entries": [],
+				"baseItem": "breastplate|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Chain Mail",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "none",
+				"weight": 55,
+				"value": 7500,
+				"ac": 16,
+				"strength": "13",
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Chain Mail",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "uncommon",
+				"weight": 55,
+				"ac": 16,
+				"strength": "13",
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "chain mail|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Chain Shirt",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "none",
+				"weight": 20,
+				"value": 5000,
+				"ac": 13,
+				"armor": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Chain Shirt",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "uncommon",
+				"weight": 20,
+				"ac": 13,
+				"armor": true,
+				"entries": [],
+				"baseItem": "chain shirt|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Half Plate Armor",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "none",
+				"weight": 40,
+				"value": 75000,
+				"ac": 15,
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Half Plate Armor",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "uncommon",
+				"weight": 40,
+				"ac": 15,
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "half plate armor|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Plate Armor",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "none",
+				"weight": 65,
+				"value": 150000,
+				"ac": 18,
+				"strength": "15",
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Plate Armor",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "uncommon",
+				"weight": 65,
+				"ac": 18,
+				"strength": "15",
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "plate armor|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Ring Mail",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "none",
+				"weight": 40,
+				"value": 3000,
+				"ac": 14,
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Ring Mail",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "uncommon",
+				"weight": 40,
+				"ac": 14,
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "ring mail|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Scale Mail",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"referenceSources": [
+					"FFotR"
+				],
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "none",
+				"weight": 45,
+				"value": 5000,
+				"ac": 14,
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Scale Mail",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "MA|XPHB",
+				"rarity": "uncommon",
+				"weight": 45,
+				"ac": 14,
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "scale mail|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		},
+		{
+			"base": {
+				"name": "Splint Armor",
+				"source": "XPHB",
+				"page": 219,
+				"srd52": true,
+				"basicRules2024": true,
+				"referenceSources": [
+					"HotB"
+				],
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "none",
+				"weight": 60,
+				"value": 20000,
+				"ac": 17,
+				"strength": "15",
+				"armor": true,
+				"stealth": true,
+				"hasFluffImages": true,
+				"entries": []
+			},
+			"specificVariant": {
+				"name": "Mithral Splint Armor",
+				"source": "XDMG",
+				"edition": "one",
+				"type": "HA|XPHB",
+				"rarity": "uncommon",
+				"weight": 60,
+				"ac": 17,
+				"strength": "15",
+				"armor": true,
+				"stealth": true,
+				"entries": [],
+				"baseItem": "splint armor|xphb",
+				"page": 279,
+				"srd52": true,
+				"basicRules2024": true,
+				"lootTables": [
+					"Arcana - Uncommon|XDMG",
+					"Armaments - Uncommon|XDMG"
+				],
+				"genericVariant": {
+					"name": "Mithral Armor",
+					"source": "XDMG"
+				}
+			}
+		}
+	]
+}

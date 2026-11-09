@@ -1,0 +1,147 @@
+{
+	"name": "Werewyvern",
+	"source": "FRAiF",
+	"page": 284,
+	"size": [
+		"M"
+	],
+	"type": {
+		"type": "dragon",
+		"tags": [
+			"lycanthrope"
+		]
+	},
+	"alignment": [
+		"C",
+		"E"
+	],
+	"ac": [
+		16
+	],
+	"hp": {
+		"average": 152,
+		"formula": "16d8 + 80"
+	},
+	"speed": {
+		"walk": 30,
+		"fly": {
+			"number": 40,
+			"condition": "(wyvern or hybrid form only)"
+		}
+	},
+	"initiative": {
+		"proficiency": 1
+	},
+	"str": 19,
+	"dex": 15,
+	"con": 20,
+	"int": 10,
+	"wis": 12,
+	"cha": 12,
+	"save": {
+		"dex": "+5",
+		"wis": "+4"
+	},
+	"skill": {
+		"perception": "+4",
+		"stealth": "+5"
+	},
+	"senses": [
+		"Darkvision 120 ft."
+	],
+	"passive": 14,
+	"languages": [
+		"Common",
+		"Draconic (can't speak in wyvern form)"
+	],
+	"cr": "8",
+	"gear": [
+		{
+			"item": "javelin|xphb",
+			"quantity": 6
+		}
+	],
+	"trait": [
+		{
+			"name": "Flyby (Wyvern or Hybrid Form Only)",
+			"entries": [
+				"The werewyvern doesn't provoke an {@action Opportunity Attack|XPHB} action when it flies out of an enemy's reach."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack",
+			"entries": [
+				"The werewyvern makes three attacks, using Javelin or Rend in any combination. It can replace one of these attacks with one Stinger attack."
+			]
+		},
+		{
+			"name": "Javelin (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atkr m,r} {@hit 7}, reach 5 ft. or range 30/120 ft. {@h}18 ({@damage 4d6 + 4}) Piercing damage."
+			]
+		},
+		{
+			"name": "Rend",
+			"entries": [
+				"{@atkr m} {@hit 7}, reach 5 ft. {@h}18 ({@damage 4d6 + 4}) Slashing damage."
+			]
+		},
+		{
+			"name": "Stinger (Wyvern or Hybrid Form Only)",
+			"entries": [
+				"{@atkr m} {@hit 7}, reach 5 ft. {@h}7 ({@damage 1d6 + 4}) Piercing damage plus 16 ({@damage 3d10}) Poison damage, and the target has the {@condition Poisoned|XPHB} condition until the start of the werewyvern's next turn. If the target is a Humanoid, it is subjected to the following effect. {@actSave con} {@dc 16}. {@actSaveFail} The target is cursed. If the cursed target drops to 0 {@variantrule Hit Points|XPHB}, it instead becomes a Werewyvern under the DM's control and has 20 {@variantrule Hit Points|XPHB}. {@actSaveSuccess} The target is immune to this werewyvern's curse for 24 hours."
+			]
+		}
+	],
+	"bonus": [
+		{
+			"name": "Shape-Shift",
+			"entries": [
+				"The werewyvern shape-shifts into a Medium wyvern-humanoid hybrid or a Large wyvern, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed."
+			]
+		}
+	],
+	"environment": [
+		"hill",
+		"mountain"
+	],
+	"treasure": [
+		"individual"
+	],
+	"traitTags": [
+		"Flyby"
+	],
+	"senseTags": [
+		"SD"
+	],
+	"actionTags": [
+		"Multiattack"
+	],
+	"languageTags": [
+		"C",
+		"CS",
+		"DR"
+	],
+	"damageTags": [
+		"I",
+		"P",
+		"S"
+	],
+	"miscTags": [
+		"MA",
+		"MLW",
+		"RA",
+		"THW"
+	],
+	"conditionInflict": [
+		"poisoned"
+	],
+	"savingThrowForced": [
+		"constitution"
+	],
+	"hasToken": true,
+	"hasFluff": true,
+	"hasFluffImages": true
+}

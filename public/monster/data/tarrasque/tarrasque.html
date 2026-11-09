@@ -1,0 +1,109 @@
+<div class="item-detail active">
+    
+    <!-- MENU DE ABAS -->
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'tab-statblock')">Ficha do Monstro</button>
+        <button class="tab-btn" onclick="openTab(this, 'tab-info')">Lore & Ecologia</button>
+    </div>
+
+    <!-- ABA 1: STAT BLOCK (Teste de Stress de Layout) -->
+    <div class="tab-content tab-statblock active">
+        <div class="page-container">
+
+            <!-- Se não tiver um token específico para o Tarrasque, pode usar um placeholder ou uma URL da web -->
+            <div class="token-container">
+                <img src="https://media-waterdeep.cursecdn.com/avatars/thumbnails/0/13/1000/1000/636238871021469342.jpeg" alt="Token do Tarrasque" class="token-image">
+            </div>
+
+            <!-- FICHA OFICIAL (Estilo 5etools adaptado ao nosso CSS) -->
+            <div class="monster-card">
+                <h1>Tarrasque</h1>
+                <div class="subtitle">Gargantuan monstrosity (titan), unaligned</div>
+
+                <hr class="red-line">
+
+                <div class="stats-line"><span class="label">Armor Class</span> 25 (armadura natural)</div>
+                <div class="stats-line"><span class="label">Hit Points</span> 676 (33d20 + 330)</div>
+                <div class="stats-line"><span class="label">Speed</span> 40 ft. (12m)</div>
+
+                <hr class="red-line">
+
+                <table class="abilities">
+                    <tr>
+                        <th>STR</th>
+                        <th>DEX</th>
+                        <th>CON</th>
+                        <th>INT</th>
+                        <th>WIS</th>
+                        <th>CHA</th>
+                    </tr>
+                    <tr>
+                        <td>30 (+10)</td>
+                        <td>11 (+0)</td>
+                        <td>30 (+10)</td>
+                        <td>3 (-4)</td>
+                        <td>11 (+0)</td>
+                        <td>11 (+0)</td>
+                    </tr>
+                </table>
+
+                <hr class="red-line">
+
+                <div class="stats-line">
+                    <span class="label">Saving Throws</span> Int +5, Wis +9, Cha +9
+                </div>
+                <div class="stats-line">
+                    <span class="label">Damage Immunities</span> fire, poison; bludgeoning, piercing, and slashing from nonmagical attacks
+                </div>
+                <div class="stats-line">
+                    <span class="label">Condition Immunities</span> charmed, frightened, paralyzed, poisoned
+                </div>
+                <div class="stats-line">
+                    <span class="label">Senses</span> blindsight 120 ft., passive Perception 10
+                </div>
+                <div class="stats-line">
+                    <span class="label">Languages</span> —
+                </div>
+                <div class="stats-line">
+                    <span class="challenge">Challenge</span> 30 (155,000 XP) &nbsp;&nbsp;&nbsp; <span class="label">Proficiency Bonus</span> +9
+                </div>
+
+                <hr class="red-line">
+
+                <p><span class="trait-title">Resistência Lendária (3/Dia).</span> Se o tarrasque falhar num teste de resistência, ele pode escolher ser bem-sucedido no teste.</p>
+                <p><span class="trait-title">Resistência à Magia.</span> O tarrasque possui vantagem em testes de resistência contra magias e outros efeitos mágicos.</p>
+                <p><span class="trait-title">Carapaça Reflexiva.</span> Sempre que o tarrasque for alvo de uma magia de linha, uma magia que exija uma jogada de ataque à distância ou a magia <em>míssil mágico</em>, role um d6. De 1 a 5, o tarrasque não é afetado. Num 6, o tarrasque não é afetado e o efeito é refletido de volta ao conjurador como se tivesse origem no tarrasque.</p>
+                <p><span class="trait-title">Monstro de Cerco.</span> O tarrasque causa o dobro de dano a objetos e estruturas.</p>
+
+                <div class="section-title">Actions</div>
+
+                <p><span class="trait-title">Multiataque.</span> O tarrasque pode usar sua Presença Aterradora. Em seguida, ele faz cinco ataques: um com a mordida, dois com as garras, um com os chifres e um com a cauda. Ele pode usar Engolir no lugar da mordida.</p>
+                <p><span class="trait-title">Mordida.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 10 ft. (3m), um alvo. Acerto: 36 (4d12 + 10) de dano perfurante. Se o alvo for uma criatura, ele fica agarrado (CD 20 para escapar). Até o agarrão terminar, o alvo fica contido e o tarrasque não pode morder outro alvo.</p>
+                <p><span class="trait-title">Garra.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 15 ft. (4,5m), um alvo. Acerto: 28 (4d8 + 10) de dano cortante.</p>
+                <p><span class="trait-title">Chifres.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 10 ft. (3m), um alvo. Acerto: 32 (4d10 + 10) de dano perfurante.</p>
+                <p><span class="trait-title">Cauda.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 20 ft. (6m), um alvo. Acerto: 24 (4d6 + 10) de dano contundente. Se o alvo for uma criatura, deve ser bem-sucedido num teste de Força CD 20 ou ficará caído.</p>
+                <p><span class="trait-title">Presença Aterradora.</span> Cada criatura a até 120 ft. (36m) do tarrasque, e consciente dele, deve ser bem-sucedida num teste de Sabedoria CD 17 ou ficará amedrontada por 1 minuto.</p>
+                <p><span class="trait-title">Engolir.</span> O tarrasque faz um ataque de mordida contra uma criatura Grande ou menor que esteja a agarrar. Se o ataque atingir, a criatura sofre o dano da mordida, é engolida e o agarrão termina. A criatura engolida fica cega, contida, tem cobertura total contra ataques e sofre 56 (16d6) de dano de ácido no início de cada turno do tarrasque.</p>
+
+                <div class="section-title">Legendary Actions</div>
+
+                <p>O tarrasque tem 3 ações lendárias. Só pode usar uma de cada vez e apenas no fim do turno de outra criatura.</p>
+                <p><span class="trait-title">Ataque.</span> O tarrasque faz um ataque de garra ou cauda.</p>
+                <p><span class="trait-title">Mover.</span> O tarrasque move-se até metade do seu deslocamento.</p>
+                <p><span class="trait-title">Mastigar (Custa 2 Ações).</span> O tarrasque faz um ataque de mordida ou usa Engolir.</p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: INFO -->
+    <div class="tab-content tab-info">
+        <div class="info-container">
+            <h2 class="info-title">A Calamidade Bípede</h2>
+            <p class="info-text">
+                O lendário Tarrasque é possivelmente a fera mais temida no Plano Material. É amplamente creditado que apenas um existe, repousando adormecido no núcleo do mundo durante décadas ou séculos antes de acordar. Quando surge, devora cidades inteiras e altera a geografia antes de voltar a dormir.
+            </p>
+        </div>
+    </div>
+
+</div>

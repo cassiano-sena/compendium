@@ -1,0 +1,156 @@
+{
+	"name": "Werejaguar",
+	"source": "TftYP",
+	"page": 79,
+	"referenceSources": [
+		"TftYP-THSoT"
+	],
+	"speed": {
+		"walk": {
+			"number": 30,
+			"condition": "(40 ft. in jaguar form)"
+		}
+	},
+	"languages": [
+		"Common (can't speak in jaguar form)"
+	],
+	"hasToken": true,
+	"group": [
+		"Lycanthropes"
+	],
+	"size": [
+		"M"
+	],
+	"type": {
+		"type": "humanoid",
+		"tags": [
+			"human",
+			"shapechanger"
+		]
+	},
+	"alignment": [
+		"N"
+	],
+	"ac": [
+		12
+	],
+	"hp": {
+		"average": 120,
+		"formula": "16d8 + 48"
+	},
+	"str": 17,
+	"dex": 15,
+	"con": 16,
+	"int": 10,
+	"wis": 13,
+	"cha": 11,
+	"skill": {
+		"perception": "+5",
+		"stealth": "+4"
+	},
+	"senses": [
+		"darkvision 60 ft."
+	],
+	"passive": 15,
+	"immune": [
+		{
+			"immune": [
+				"bludgeoning",
+				"piercing",
+				"slashing"
+			],
+			"note": "from nonmagical attacks that aren't silvered",
+			"cond": true
+		}
+	],
+	"cr": "4",
+	"trait": [
+		{
+			"name": "Shapechanger",
+			"entries": [
+				"The werejaguar can use its action to polymorph into a jaguar-humanoid hybrid or into a jaguar, or back into its true form, which is humanoid. Its statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies."
+			]
+		},
+		{
+			"name": "Keen Hearing and Smell",
+			"entries": [
+				"The werejaguar has advantage on Wisdom ({@skill Perception}) checks that rely on hearing or smell."
+			]
+		},
+		{
+			"name": "Pounce (Jaguar or Hybrid Form Only)",
+			"entries": [
+				"If the werejaguar moves at least 15 feet straight toward a creature and then hits it with a claw attack on the same turn, that target must succeed on a {@dc 14} Strength saving throw or be knocked {@condition prone}. If the target is {@condition prone}, the werejaguar can make one bite attack against it as a bonus action."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"In humanoid form, the werejaguar makes two scimitar attacks or two longbow attacks. In hybrid form, it can attack like a humanoid or make two claw attacks."
+			]
+		},
+		{
+			"name": "Bite (Jaguar or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}8 ({@damage 1d10 + 3}) piercing damage. If the target is a humanoid, it must succeed on a {@dc 13} Constitution saving throw or be cursed with werejaguar {@variantrule Player Characters as Lycanthropes|MM|lycanthropy}."
+			]
+		},
+		{
+			"name": "Claw (Jaguar or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}7 ({@damage 1d8 + 3}) slashing damage."
+			]
+		},
+		{
+			"name": "Scimitar (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 3}) slashing damage."
+			]
+		},
+		{
+			"name": "Longbow (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atk rw} {@hit 4} to hit, range 150/600 ft., one target. {@h}6 ({@damage 1d8 + 2}) piercing damage."
+			]
+		}
+	],
+	"attachedItems": [
+		"longbow|phb",
+		"scimitar|phb"
+	],
+	"traitTags": [
+		"Keen Senses",
+		"Pounce",
+		"Shapechanger"
+	],
+	"senseTags": [
+		"D"
+	],
+	"actionTags": [
+		"Multiattack"
+	],
+	"languageTags": [
+		"C",
+		"CS"
+	],
+	"damageTags": [
+		"P",
+		"S"
+	],
+	"miscTags": [
+		"CUR",
+		"MLW",
+		"MW",
+		"RNG",
+		"RW"
+	],
+	"conditionInflict": [
+		"prone"
+	],
+	"savingThrowForced": [
+		"constitution",
+		"strength"
+	]
+}

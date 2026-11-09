@@ -1,0 +1,158 @@
+{
+	"name": "Werebat",
+	"group": [
+		"Lycanthropes"
+	],
+	"source": "WDMM",
+	"page": 317,
+	"size": [
+		"S"
+	],
+	"type": {
+		"type": "humanoid",
+		"tags": [
+			"goblinoid",
+			"shapechanger"
+		]
+	},
+	"alignment": [
+		"N",
+		"E"
+	],
+	"ac": [
+		13
+	],
+	"hp": {
+		"average": 24,
+		"formula": "7d6"
+	},
+	"speed": {
+		"walk": {
+			"number": 30,
+			"condition": "(climb 30 ft. fly 60 ft. in bat or hybrid form)"
+		}
+	},
+	"str": 8,
+	"dex": 17,
+	"con": 10,
+	"int": 10,
+	"wis": 12,
+	"cha": 8,
+	"skill": {
+		"perception": "+3",
+		"stealth": "+5"
+	},
+	"senses": [
+		"darkvision 60 ft."
+	],
+	"passive": 13,
+	"immune": [
+		{
+			"immune": [
+				"bludgeoning",
+				"piercing",
+				"slashing"
+			],
+			"note": "from nonmagical attacks that aren't silvered",
+			"cond": true
+		}
+	],
+	"languages": [
+		"Goblin (can't speak in bat form)"
+	],
+	"cr": "2",
+	"trait": [
+		{
+			"name": "Shapechanger",
+			"entries": [
+				"The werebat can use its action to polymorph into a Medium bat-humanoid hybrid, or into a Large giant bat, or back into its true form, which is humanoid. Its statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its true form if it dies."
+			]
+		},
+		{
+			"name": "Echolocation (Bat or Hybrid Form Only)",
+			"entries": [
+				"The werebat has blindsight out to a range of 60 feet as long as it's not {@condition deafened}."
+			]
+		},
+		{
+			"name": "Keen Hearing",
+			"entries": [
+				"The werebat has advantage on Wisdom ({@skill Perception}) checks that rely on hearing."
+			]
+		},
+		{
+			"name": "Nimble Escape (Humanoid Form Only)",
+			"entries": [
+				"The werebat can take the {@action Disengage} or {@action Hide} action as a bonus action on each of its turns."
+			]
+		},
+		{
+			"name": "Sunlight Sensitivity",
+			"entries": [
+				"While in sunlight, the werebat has disadvantage on attack rolls, as well as on Wisdom ({@skill Perception}) checks that rely on sight."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"In humanoid form, the werebat makes two scimitar attacks or two shortbow attacks. In hybrid form, it can make one bite attack and one scimitar attack."
+			]
+		},
+		{
+			"name": "Bite (Bat or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one creature. {@h}6 ({@damage 1d6 + 3}) piercing damage, and the werebat gains temporary hit points equal to the damage dealt. If the target is a humanoid, it must succeed on a {@dc 10} Constitution saving throw or be cursed with werebat {@variantrule Player Characters as Lycanthropes|MM|lycanthropy}."
+			]
+		},
+		{
+			"name": "Scimitar (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 3}) slashing damage."
+			]
+		},
+		{
+			"name": "Shortbow (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atk rw} {@hit 5} to hit, range 80/320 ft., one target. {@h}6 ({@damage 1d6 + 3}) piercing damage."
+			]
+		}
+	],
+	"attachedItems": [
+		"scimitar|phb",
+		"shortbow|phb"
+	],
+	"traitTags": [
+		"Keen Senses",
+		"Shapechanger",
+		"Sunlight Sensitivity"
+	],
+	"senseTags": [
+		"D"
+	],
+	"actionTags": [
+		"Multiattack"
+	],
+	"languageTags": [
+		"CS",
+		"GO"
+	],
+	"damageTags": [
+		"P",
+		"S"
+	],
+	"miscTags": [
+		"CUR",
+		"MLW",
+		"MW",
+		"RNG",
+		"RW"
+	],
+	"savingThrowForced": [
+		"constitution"
+	],
+	"hasToken": true,
+	"hasFluff": true,
+	"hasFluffImages": true
+}

@@ -1,0 +1,24 @@
+.session-part { max-width: 1180px; margin: 0 auto; color: #d8d0c0; }
+.session-part .part-header { padding: 24px 28px; margin-bottom: 18px; border: 1px solid #333; border-top: 7px solid #b58212; background: linear-gradient(145deg, #24201b, #151515); }
+.session-part .part-kicker { color: #d49a37; font-size: 12px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+.session-part h1, .session-part h2, .session-part h3 { font-family: Georgia, "Times New Roman", serif; }
+.session-part h1 { margin: 6px 0 4px; color: #f4dfaf; font-size: clamp(28px, 5vw, 44px); font-variant: small-caps; }
+.session-part h2 { margin: 0 0 10px; color: #d49a37; font-size: 22px; font-variant: small-caps; }
+.session-part h3 { margin: 15px 0 5px; padding-bottom: 3px; border-bottom: 1px solid #5b342e; color: #d59b91; font-size: 18px; }
+.session-part .part-subtitle { margin: 0; color: #c6bda9; font: italic 17px Georgia, "Times New Roman", serif; }
+.session-part .part-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.session-part .part-panel { padding: 20px; border: 1px solid #333; background: linear-gradient(145deg, #24201b, #151515); line-height: 1.55; }
+.session-part .part-panel.wide { grid-column: 1 / -1; }
+.session-part .part-panel p { margin: 8px 0; }
+.session-part .part-panel strong, .session-part .label { color: #ead7a7; }
+.session-part .part-panel em { color: #e0b2a5; }
+.session-part .part-panel ul { margin: 0; padding-left: 20px; }
+.session-part .part-panel li::marker { color: #b58212; }
+.session-part .part-callout { margin-top: 12px; padding: 12px 14px; border-left: 4px solid #b58212; background: rgba(181, 130, 18, .1); }
+.session-part .part-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.session-part .part-table th, .session-part .part-table td { padding: 8px; border-bottom: 1px solid #3a3027; text-align: left; vertical-align: top; }
+.session-part .part-table th { color: #d49a37; font-size: 13px; text-transform: uppercase; }
+.session-part .part-table td { color: #d8d0c0; }
+.session-part .part-roll { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0; padding: 9px 11px; border: 1px solid #4a3c28; background: #191611; }
+.session-part .part-roll code { color: #f0c96b; font-weight: bold; white-space: nowrap; }
+@media (max-width: 760px) { .session-part .part-grid { grid-template-columns: 1fr; } .session-part .part-panel.wide { grid-column: auto; } .session-part .part-table { display: block; overflow-x: auto; } }

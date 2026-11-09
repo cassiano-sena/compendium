@@ -1,0 +1,166 @@
+<div class="item-detail active">
+    
+    <!-- MENU DE ABAS -->
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'tab-statblock')">Stat Block</button>
+        <button class="tab-btn" onclick="openTab(this, 'tab-info')">Info</button>
+        <button class="tab-btn" onclick="openTab(this, 'tab-images')">Imagens</button>
+    </div>
+
+    <!-- ABA 1: STAT BLOCK (Sua ficha principal) -->
+    <div class="tab-content tab-statblock active">
+        <div class="page-container">
+
+            <!-- Seção do Token da Criatura -->
+            <div class="token-container">
+                <img src="./monster/data/herald/hadar_butcher.png" alt="Token do Arauto da Aniquilação" class="token-image">
+            </div>
+
+            <!-- Seção da Ficha -->
+            <div class="monster-card">
+                <h1>Arauto da Aniquilação</h1>
+                <div class="subtitle">Large aberration, up to Huge aberration (titan), chaotic neutral</div>
+
+                <hr class="red-line">
+
+                <div class="stats-line"><span class="label">Armor Class</span> 25 (armadura natural)</div>
+                <div class="stats-line"><span class="label">Hit Points</span> 750 (35d20 + 385)</div>
+                <div class="stats-line"><span class="label">Speed</span> 12m, voo 18m, natação 12m</div>
+                <div class="stats-line"><span class="label">Initiative</span> +12</div>
+
+                <hr class="red-line">
+
+                <table class="abilities">
+                    <tr>
+                        <th>STR</th>
+                        <th>DEX</th>
+                        <th>CON</th>
+                        <th>INT</th>
+                        <th>WIS</th>
+                        <th>CHA</th>
+                    </tr>
+                    <tr>
+                        <td>30 (+10)</td>
+                        <td>16 (+3)</td>
+                        <td>28 (+9)</td>
+                        <td>28 (+9)</td>
+                        <td>22 (+6)</td>
+                        <td>20 (+5)</td>
+                    </tr>
+                </table>
+
+                <hr class="red-line">
+
+                <div class="stats-line">
+                    <span class="label">Saving Throws</span> Str +19, Con +18, Int +18, Wis +15, Cha +14
+                </div>
+                <div class="stats-line">
+                    <span class="label">Skills</span> Athletics +19, Arcana +18, Perception +15
+                </div>
+                <div class="stats-line">
+                    <span class="label">Damage Resistances</span> acid, lightning, fire, force, necrotic; bludgeoning, piercing, and slashing from nonmagical attacks
+                </div>
+                <div class="stats-line">
+                    <span class="label">Damage Immunities</span> cold, psychic, poison
+                </div>
+                <div class="stats-line">
+                    <span class="label">Condition Immunities</span> frightened, charmed, prone, poisoned, exhaustion
+                </div>
+                <div class="stats-line">
+                    <span class="label">Senses</span> truesight 120 ft., blindsight 60 ft., darkvision 60 ft., passive Perception 25
+                </div>
+                <div class="stats-line">
+                    <span class="label">Languages</span> Todas, Telepatia 120 ft.
+                </div>
+                <div class="stats-line">
+                    <span class="challenge">Challenge</span> 30 (155000 XP) &nbsp;&nbsp;&nbsp; <span class="label">Proficiency Bonus</span> +9
+                </div>
+
+                <hr class="red-line">
+
+                <p><span class="trait-title">Instinto Predatório do Vazio (Iniciativa).</span> O Arauto adiciona seu bônus de proficiência às suas rolagens de iniciativa.</p>
+                <p><span class="trait-title">Arqui-Inimigo (Matador de Titãs).</span> A fúria de O Arauto foi moldada para subjugar as feras mais resilientes da criação. O Arauto possui vantagem nas jogadas de ataque contra criaturas de tamanho Imensurável (Gargantuan) e seus ataques físicos ignoram qualquer resistência a dano. Além disso, nenhuma criatura é imune à condição Agarrado ou Contido imposta pelos tentáculos de O Arauto, não importando seu tamanho ou imunidades inatas.</p>
+                <p><span class="trait-title">Resistência Lendária (4/Dia).</span> Se O Arauto falhar em um teste de resistência, ele pode escolher ser bem-sucedido.</p>
+                <p><span class="trait-title">Controle Corporal.</span> O Arauto consegue deformar, esticar e comprimir seu corpo à vontade.</p>
+                <p><em>Amorfo.</em> O Arauto pode atravessar uma abertura de até 1,5 m sem se espremer.</p>
+                <p><em>Tamanho.</em> O tamanho mínimo da criatura é Large (2m), podendo alterar livremente até Huge (9.0m).</p>
+                <p><em>Imóvel.</em> O Arauto tem vantagem em testes e testes de resistência feitos para evitar ser empurrado, puxado, derrubado ou movido contra sua vontade.</p>
+                <p><em>Alcance Prodigioso.</em> Como ação bônus, O Arauto pode aumentar o alcance de um de seus ataques corpo a corpo para até 90 metros até o final de seu turno.</p>
+                <p><span class="trait-title">Regeneração.</span> O Arauto recupera 40 pontos de vida no início de cada um de seus turnos. Se O Arauto sofrer dano radiante, sua regeneração será reduzida para 20 até o início de seu próximo turno. Se começar seu turno com 0 pontos de vida enquanto sua regeneração estiver ativa, ele não morre e recupera 40 pontos de vida.</p>
+                <p><span class="trait-title">Mente Insondável.</span> Qualquer criatura que tente estabelecer contato mental com O Arauto deve realizar um teste de resistência de Inteligência CD 26. Em caso de falha, sofre 26 (4d12) de dano psíquico e fica atordoada até o final do próximo turno de O Arauto.</p>
+                <p><span class="trait-title">Magia Inata (Psionismo).</span> Inteligência é o atributo de conjuração (CD 26, +18 para atingir). Não requer componentes:</p>
+                <p class="spell-list"><strong>À vontade:</strong> detect thoughts, dream, sending, feeblemind</p>
+                <p class="spell-list"><strong>3/dia cada:</strong> counterspell, darkness, suggestion, hunger of Hadar</p>
+                <p class="spell-list"><strong>1/dia:</strong> disintegrate, gate, wish (apenas duplicar efeitos de magias)</p>
+
+                <div class="section-title">Actions</div>
+
+                <p><span class="trait-title">Multiataque.</span> O Arauto usa Presença Aterradora. Em seguida, realiza quatro ataques: escolhendo livremente entre Garra, Tentáculo e Espada de Hadar.</p>
+                <p><span class="trait-title">Garra.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 9 m. Acerto: 19 (2d8 + 10) de dano cortante mais 9 (2d8) de dano necrótico.</p>
+                <p><span class="trait-title">Tentáculo.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 4,5 m. Acerto: 43 (6d10 + 10) de dano contundente. O alvo fica Agarrado (CD 26 para escapar), independente do tamanho, e Contido. O Arauto pode agarrar até 6 criaturas simultaneamente.</p>
+                <p><span class="trait-title">Espada de Hadar.</span> Ataque Corpo a Corpo: +19 para atingir, alcance 6 m. Acerto: 43 (6d10 + 10) de dano cortante mais 27 (6d8) de dano necrótico. Se o alvo estiver Agarrado, Contido ou Amedrontado, sofre mais 13 (3d8) de dano psíquico. <strong>Crítico:</strong> 18 (4d8) de dano de força adicional por abrir uma fissura no espaço.</p>
+                <p><span class="trait-title">Presença Aterradora.</span> Criaturas a até 90 metros fazem Sabedoria CD 26 ou ficam Amedrontadas por 1 minuto (teste no final do turno para encerrar).</p>
+                <p><span class="trait-title">Deflagração de Hadar — Recarga 5–6.</span> Raio de 9m num ponto a até 36m. Destreza CD 26. <strong>Falha:</strong> 54 (12d8) dano necrótico + 44 (8d10) dano psíquico e ganha a condição <em>Faminta</em>. (Sucesso: metade do dano).</p>
+                <p><span class="trait-title">Faminta.</span> Não pode curar mais da metade da vida máxima. Ao curar, O Arauto recupera 50% do valor curado. Se morrer, O Arauto recupera 50 PV.</p>
+
+                <div class="section-title">Reactions</div>
+
+                <p><span class="trait-title">Destruir Magia.</span> Usa <em>counterspell</em> (sem gastar carga inata) numa criatura a até 36m. Se interromper, O Arauto cura 20 PV.</p>
+
+                <div class="section-title">Legendary Actions</div>
+
+                <p>O Arauto tem 3 ações lendárias (usadas 1 por vez no fim do turno de outra criatura e recuperadas no seu turno):</p>
+                <p><span class="trait-title">Ataque Rápido.</span> Usa Garra ou Tentáculo.</p>
+                <p><span class="trait-title">Golpe Colossal (2 Ações).</span> Usa a Espada de Hadar.</p>
+                <p><span class="trait-title">Repelir a Matéria (2 Ações).</span> Força uma criatura a até 4,5m a fazer teste de Força CD 26. Na falha, é arremessada 18m e cai Caída.</p>
+                <p><span class="trait-title">Teleportar.</span> Se teletransporta para um local que possa ver dentro de 36 metros.</p>
+
+                <div class="section-title">Mythic Actions</div>
+
+                <p>O Arauto consegue uma ação mítica quando seu requisito mítico é completado:</p>
+                <p><span class="trait-title">Ataque Rápido.</span> Usa Garra ou Tentáculo.</p>
+
+                <div class="section-title">Lair Actions & Regional Effects</div>
+                
+                <div class="lair-box">
+                    <p><strong>Ações de Covil:</strong> Na contagem 20 da iniciativa (perdendo empates), O Arauto pode realizar uma ação de covil para causar um dos seguintes efeitos. Ele não pode usar o mesmo efeito duas rodadas seguidas:</p>
+                    <ul>
+                        <li><strong>Anomalia Gravitacional:</strong> A gravidade aumenta vertiginosamente num raio de 18 metros ao redor de O Arauto. Qualquer criatura na área deve ser bem-sucedida num teste de Força CD 26 ou seu deslocamento é reduzido a 0 até a próxima contagem 20 da iniciativa.</li>
+                        <li><strong>Tentáculos do Vazio:</strong> Fendas negras se abrem no chão e paredes. O Arauto realiza um ataque de Tentáculo contra até três criaturas diferentes em qualquer lugar dentro de 36 metros dele.</li>
+                        <li><strong>Silêncio das Estrelas Mortas:</strong> O Arauto escolhe um ponto que possa ver. Um globo de escuridão mágica e silêncio anula toda luz e som num raio de 12 metros, durando até a próxima contagem 20 da iniciativa. Nenhuma magia que requeira componente verbal pode ser conjurada ali.</li>
+                    </ul>
+                    <p><strong>Efeitos Regionais:</strong> A região em até 10 km do Arauto é distorcida pela aproximação de Hadar, criando os seguintes efeitos:</p>
+                    <ul>
+                        <li>Magias de cura conjuradas na região têm seus dados rolados com desvantagem (ou curam o valor mínimo possível nos dados).</li>
+                        <li>O céu noturno sempre apresenta uma estrela negra cintilante que suga a luz das estrelas vizinhas. Olhar para ela por mais de um minuto causa náusea e tontura (equivalente à condição <em>Envenenado</em>).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: INFO (Lore e descrições) -->
+    <div class="tab-content tab-info">
+        <div class="info-container">
+            <h2 class="info-title">
+                Arauto da Aniquilação
+                <span class="info-source">BOSS <sub>p.1</sub></span>
+            </h2>
+            <p class="info-text">
+                A forma superior de um emissário das estrelas negras é uma abominação destrutiva. O Arauto da Aniquilação, Carniceiro de Hadar, outrora conhecido como Kael Varhen, é uma amálgama massiva de carne distorcida infectada pelo Vazio e pelas vozes cósmicas de Hadar. 
+            </p>
+            <p class="info-text">
+                A sua existência é focada puramente no abate de feras colossais e de titãs, sendo o predador natural concebido para subjugar seres outrora inabaláveis, como o Tarrasque. A presença do Arauto devora a luz, deforma a gravidade e consome as próprias esperanças de ressurreição, alimentando-se da magia curativa daqueles que ousam desafiá-lo. Apenas obliterando cada célula contaminada por Hadar se consegue derrotar verdadeiramente esta calamidade.
+            </p>
+        </div>
+    </div>
+
+    <!-- ABA 3: IMAGENS (Galeria) -->
+    <div class="tab-content tab-images">
+        <div class="images-container">
+            <!-- Utiliza a mesma imagem do token para a arte completa -->
+            <img src="./monster/herald/hadar_butcher.png" alt="Arauto da Aniquilação Artwork" class="full-artwork">
+        </div>
+    </div>
+
+</div>

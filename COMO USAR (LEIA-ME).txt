@@ -1,0 +1,54 @@
+====================================================================
+              COMPÊNDIO ÉPICO DE RPG - GUIA RÁPIDO
+====================================================================
+
+Você NÃO precisa saber programar nem mexer em código para usar este app!
+
+--------------------------------------------------------------------
+1. COMO ABRIR O COMPÊNDIO
+--------------------------------------------------------------------
+1. Dê dois cliques no arquivo "Iniciar Compendio.bat".
+2. Uma janela preta vai abrir e o seu navegador abrirá automaticamente
+   no endereço: http://localhost:8080
+3. Mantenha a janela preta aberta enquanto estiver usando o Compêndio
+   (é ela que salva tudo automaticamente no seu computador!).
+
+--------------------------------------------------------------------
+2. COMO ADICIONAR NOVOS MONSTROS, ITENS, NPCS, MAPAS E SESSÕES
+--------------------------------------------------------------------
+Dentro do site, clique no botão dourado "+ Nova Página" no menu esquerdo.
+
+Você terá 4 formas super fáceis de criar conteúdo (com pré-visualização
+em tempo real na direita!):
+
+  A) COLAR JSON DO 5ETOOLS:
+     - Copie o JSON de qualquer monstro ou item do 5etools e cole na caixa
+       (ou clique em "Abrir arquivo .json").
+     - Se quiser alterar algum texto ou atributo depois de colar, basta
+       clicar no botão "Editar no Criador Visual"!
+     - Você também pode anexar uma imagem de Token e Arte direto do seu PC.
+
+  B) FICHA DE MONSTRO / NPC (CRIADOR VISUAL):
+     - Preencha os campos normalmente (Nome, CA, Vida, Atributos, Perícias)
+       e clique em "+ Adicionar Traço" ou "+ Adicionar Ação".
+     - Não precisa escrever uma linha de código!
+
+  C) CRIAR ITEM MÁGICO:
+     - Escolha o Nome, Raridade, se precisa de Sintonização e escreva os
+       efeitos do item.
+
+  D) MAPA / SESSÃO / LORE:
+     - Escolha "Mapa" para enviar uma imagem (.png/.jpg) com zoom interativo.
+     - Escolha "Plano de Sessão" ou "Artigo / Lore" para criar páginas de
+       história, cenas, encontros e anotações do mestre.
+
+Ao clicar em "Salvar no Compêndio", o sistema cria a pasta, salva as
+imagens/arquivos e atualiza o índice (dados.js) sozinho!
+
+--------------------------------------------------------------------
+3. COMO EDITAR OU EXCLUIR UMA PÁGINA
+--------------------------------------------------------------------
+Ao abrir qualquer página, você verá no canto superior direito os botões:
+  - "Editar esta Página": abre os dados atuais para você alterar.
+  - "Excluir": remove a página da lista.
+

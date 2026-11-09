@@ -1,0 +1,178 @@
+{
+  "name": "Blackguard",
+  "source": "MPMM",
+  "page": 63,
+  "otherSources": [
+    {
+      "source": "VGM",
+      "page": 211
+    }
+  ],
+  "size": [
+    "M"
+  ],
+  "type": {
+    "type": "humanoid",
+    "tags": [
+      "paladin"
+    ]
+  },
+  "alignment": [
+    "N",
+    "E"
+  ],
+  "alignmentPrefix": "Typically ",
+  "ac": [
+    {
+      "ac": 18,
+      "from": [
+        "{@item plate armor|PHB|plate}"
+      ]
+    }
+  ],
+  "hp": {
+    "average": 119,
+    "formula": "14d8 + 56"
+  },
+  "speed": {
+    "walk": 30
+  },
+  "str": 18,
+  "dex": 11,
+  "con": 18,
+  "int": 11,
+  "wis": 14,
+  "cha": 15,
+  "save": {
+    "wis": "+5",
+    "cha": "+5"
+  },
+  "skill": {
+    "athletics": "+7",
+    "deception": "+5",
+    "intimidation": "+5"
+  },
+  "passive": 12,
+  "languages": [
+    "any one language (usually Common)"
+  ],
+  "cr": "8",
+  "spellcasting": [
+    {
+      "name": "Spellcasting",
+      "type": "spellcasting",
+      "headerEntries": [
+        "The blackguard casts one of the following spells, using Charisma as the spellcasting ability (spell save {@dc 13}):"
+      ],
+      "daily": {
+        "2e": [
+          "{@spell command}",
+          "{@spell dispel magic}",
+          "{@spell find steed}"
+        ]
+      },
+      "ability": "cha",
+      "displayAs": "action"
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiattack",
+      "entries": [
+        "The blackguard makes three attacks, using Glaive, Shortbow, or both."
+      ]
+    },
+    {
+      "name": "Glaive",
+      "entries": [
+        "{@atk mw} {@hit 7} to hit, reach 10 ft., one target. {@h}9 ({@damage 1d10 + 4}) slashing damage plus 9 ({@damage 2d8}) necrotic damage."
+      ]
+    },
+    {
+      "name": "Shortbow",
+      "entries": [
+        "{@atk rw} {@hit 3} to hit, range 80/320 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage."
+      ]
+    },
+    {
+      "name": "Dreadful Aspect (Recharges after a Short or Long Rest)",
+      "entries": [
+        "Each enemy within 30 feet of the blackguard must succeed on a {@dc 13} Wisdom saving throw or be {@condition frightened} of the blackguard for 1 minute. If a {@condition frightened} target ends its turn more than 30 feet away from the blackguard, the target can repeat the saving throw, ending the effect on itself on a success."
+      ]
+    }
+  ],
+  "bonus": [
+    {
+      "name": "Smite",
+      "entries": [
+        "Immediately after the blackguard hits a target with an attack roll, the blackguard can force that target to make a {@dc 13} Constitution saving throw. On a failed save, the target suffers one of the following effects of the blackguard's choice:"
+      ]
+    },
+    {
+      "name": "Blind",
+      "entries": [
+        "The target is {@condition blinded} for 1 minute. The {@condition blinded} target can repeat the save at the end of each of its turns, ending the effect on itself on a success."
+      ]
+    },
+    {
+      "name": "Shove",
+      "entries": [
+        "The target is pushed up to 10 feet away and knocked {@condition prone}."
+      ]
+    }
+  ],
+  "environment": [
+    "underdark",
+    "urban"
+  ],
+  "soundClip": {
+    "type": "internal",
+    "path": "bestiary/blackguard.opus"
+  },
+  "attachedItems": [
+    "glaive|phb",
+    "shortbow|phb"
+  ],
+  "actionTags": [
+    "Multiattack"
+  ],
+  "languageTags": [
+    "C",
+    "X"
+  ],
+  "damageTags": [
+    "N",
+    "P",
+    "S"
+  ],
+  "spellcastingTags": [
+    "O"
+  ],
+  "miscTags": [
+    "MLW",
+    "MW",
+    "RCH",
+    "RNG",
+    "RW"
+  ],
+  "conditionInflict": [
+    "blinded",
+    "frightened",
+    "prone"
+  ],
+  "conditionInflictSpell": [
+    "prone"
+  ],
+  "savingThrowForced": [
+    "constitution",
+    "wisdom"
+  ],
+  "savingThrowForcedSpell": [
+    "wisdom"
+  ],
+  "hasToken": true,
+  "hasFluff": true,
+  "hasFluffImages": true,
+  "customToken": "./monster/data/blackguard/blackguard.webp",
+  "customArt": "./monster/data/blackguard/blackguard-art.webp"
+}

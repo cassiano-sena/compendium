@@ -1,0 +1,127 @@
+{
+	"name": "Werevulture",
+	"source": "BMT",
+	"page": 184,
+	"size": [
+		"M"
+	],
+	"type": "fiend",
+	"alignment": [
+		"C",
+		"E"
+	],
+	"alignmentPrefix": "typically ",
+	"ac": [
+		12
+	],
+	"hp": {
+		"average": 75,
+		"formula": "10d8 + 30"
+	},
+	"speed": {
+		"walk": 30,
+		"alternate": {
+			"walk": [
+				{
+					"number": 10,
+					"condition": "in vulture form"
+				},
+				{
+					"number": 30,
+					"condition": "in hybrid form"
+				}
+			],
+			"fly": [
+				{
+					"number": 60,
+					"condition": "in vulture or hybrid form"
+				}
+			]
+		}
+	},
+	"str": 16,
+	"dex": 14,
+	"con": 17,
+	"int": 11,
+	"wis": 13,
+	"cha": 8,
+	"skill": {
+		"perception": "+5"
+	},
+	"passive": 15,
+	"languages": [
+		"Common (can't speak in vulture form)"
+	],
+	"cr": "4",
+	"trait": [
+		{
+			"name": "Regeneration",
+			"entries": [
+				"The werevulture regains 10 hit points at the start of its turn. If the werevulture takes radiant damage, this trait doesn't function at the start of the werevulture's next turn. The werevulture dies only if it starts its turn with 0 hit points and doesn't regenerate."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack",
+			"entries": [
+				"The werevulture makes two Talon attacks, or it makes a Beak attack and a Talon attack."
+			]
+		},
+		{
+			"name": "Beak (Vulture or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}10 ({@damage 2d6 + 3}) piercing damage. If the target is a Humanoid, it must succeed on a {@dc 13} Constitution saving throw or be cursed until targeted by the {@spell Remove Curse} spell or a similar effect. If the cursed target drops to 0 hit points, it becomes a werevulture under the DM's control and regains 10 hit points."
+			]
+		},
+		{
+			"name": "Talon",
+			"entries": [
+				"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}13 ({@damage 4d4 + 3}) slashing damage."
+			]
+		},
+		{
+			"name": "Longbow (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atk rw} {@hit 4} to hit, range 150/600 ft., one target. {@h}11 ({@damage 2d8 + 2}) piercing damage."
+			]
+		}
+	],
+	"bonus": [
+		{
+			"name": "Change Shape",
+			"entries": [
+				"The werevulture polymorphs into a vulture-humanoid hybrid, into a vulture, or back into its humanoid form. Its game statistics, other than its speed, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its humanoid form if it dies."
+			]
+		}
+	],
+	"attachedItems": [
+		"longbow|phb"
+	],
+	"traitTags": [
+		"Regeneration"
+	],
+	"actionTags": [
+		"Multiattack",
+		"Shapechanger"
+	],
+	"languageTags": [
+		"C",
+		"CS"
+	],
+	"damageTags": [
+		"P",
+		"S"
+	],
+	"miscTags": [
+		"CUR",
+		"MW",
+		"RW"
+	],
+	"savingThrowForced": [
+		"constitution"
+	],
+	"hasToken": true,
+	"hasFluff": true,
+	"hasFluffImages": true
+}

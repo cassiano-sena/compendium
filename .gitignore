@@ -1,0 +1,5 @@
+# Perfil isolado do navegador (Edge)
+perfil-app/
+
+# Logs do servidor
+*.log

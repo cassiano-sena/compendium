@@ -1,0 +1,126 @@
+{
+	"name": "Wereraven",
+	"source": "RHW",
+	"page": 280,
+	"size": [
+		"S",
+		"M"
+	],
+	"type": {
+		"type": "monstrosity",
+		"tags": [
+			"lycanthrope"
+		]
+	},
+	"alignment": [
+		"N",
+		"G"
+	],
+	"ac": [
+		12
+	],
+	"hp": {
+		"average": 54,
+		"formula": "12d8"
+	},
+	"speed": {
+		"walk": 30,
+		"fly": {
+			"number": 50,
+			"condition": "(raven or hybrid form only)"
+		}
+	},
+	"str": 10,
+	"dex": 15,
+	"con": 11,
+	"int": 13,
+	"wis": 15,
+	"cha": 14,
+	"skill": {
+		"insight": "+4",
+		"perception": "+6"
+	},
+	"passive": 16,
+	"languages": [
+		"Common plus one other language"
+	],
+	"cr": "2",
+	"gear": [
+		"shortbow|xphb"
+	],
+	"trait": [
+		{
+			"name": "Mimicry",
+			"entries": [
+				"The wereraven can mimic voices and animal sounds. A creature that hears this mimicry can tell it is an imitation only with a successful {@dc 12} Wisdom ({@skill Insight|XPHB}) check."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack",
+			"entries": [
+				"The wereraven makes two attacks, using Scratch or Shortbow in any combination. It can replace one attack with a Beak attack."
+			]
+		},
+		{
+			"name": "Beak (Raven or Hybrid Form Only)",
+			"entries": [
+				"{@atkr m} {@hit 4}, reach 5 ft. {@h}11 ({@damage 2d8 + 2}) Piercing damage. If the target is a Humanoid, it is subjected to the following effect. {@actSave con} {@dc 10}. {@actSaveFail} The target is cursed. If the cursed target drops to 0 {@variantrule Hit Points|XPHB}, it instead becomes a Wereraven under the DM's control and has 10 {@variantrule Hit Points|XPHB}. {@actSaveSuccess} The target is immune to this wereraven's curse for 24 hours."
+			]
+		},
+		{
+			"name": "Scratch",
+			"entries": [
+				"{@atkr m} {@hit 4}, reach 5 ft. {@h}7 ({@damage 2d4 + 2}) Slashing damage."
+			]
+		},
+		{
+			"name": "Shortbow (Humanoid or Hybrid Form Only)",
+			"entries": [
+				"{@atkr r} {@hit 4}, range 80/320 ft. {@h}9 ({@damage 2d6 + 2}) Piercing damage."
+			]
+		}
+	],
+	"bonus": [
+		{
+			"name": "Shape-Shift",
+			"entries": [
+				"The wereraven shape-shifts into a Medium raven-humanoid hybrid or a Small raven, or it returns to its true humanoid form. Its game statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed."
+			]
+		}
+	],
+	"environment": [
+		"forest",
+		"urban"
+	],
+	"treasure": [
+		"individual"
+	],
+	"traitTags": [
+		"Mimicry"
+	],
+	"actionTags": [
+		"Multiattack"
+	],
+	"languageTags": [
+		"C",
+		"X"
+	],
+	"damageTags": [
+		"P",
+		"S"
+	],
+	"miscTags": [
+		"CUR",
+		"MA",
+		"RA",
+		"RNG"
+	],
+	"savingThrowForced": [
+		"constitution"
+	],
+	"hasToken": true,
+	"hasFluff": true,
+	"hasFluffImages": true
+}

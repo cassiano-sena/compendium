@@ -1,0 +1,127 @@
+{
+	"name": "Young Wereraven",
+	"source": "CoS",
+	"page": 98,
+	"size": [
+		"S"
+	],
+	"alignment": [
+		"L",
+		"G"
+	],
+	"hp": {
+		"average": 7,
+		"formula": "2d6"
+	},
+	"tokenCustom": true,
+	"hasToken": true,
+	"group": [
+		"Lycanthropes"
+	],
+	"type": {
+		"type": "humanoid",
+		"tags": [
+			"human",
+			"shapechanger"
+		]
+	},
+	"ac": [
+		12
+	],
+	"speed": {
+		"walk": {
+			"number": 30,
+			"condition": "(fly 50 ft. in raven and hybrid forms)"
+		}
+	},
+	"str": 10,
+	"dex": 15,
+	"con": 11,
+	"int": 13,
+	"wis": 15,
+	"cha": 14,
+	"skill": {
+		"insight": "+4",
+		"perception": "+6"
+	},
+	"passive": 16,
+	"languages": [
+		"Common (can't speak in raven form)"
+	],
+	"cr": "2",
+	"trait": [
+		{
+			"name": "Shapechanger",
+			"entries": [
+				"The wereraven can use its action to polymorph into a raven-humanoid hybrid or into a raven, or back into its human form. Its statistics, other than its size, are the same in each form. Any equipment it is wearing or carrying isn't transformed. It reverts to its human form if it dies."
+			]
+		},
+		{
+			"name": "Mimicry",
+			"entries": [
+				"The wereraven can mimic simple sounds it has heard, such as a person whispering, a baby crying, or an animal chittering. A creature that hears the sounds can tell they are imitations with a successful {@dc 10} Wisdom ({@skill Insight}) check."
+			]
+		},
+		{
+			"name": "Regeneration",
+			"entries": [
+				"The wereraven regains 10 hit points at the start of its turn. If the wereraven takes damage from a silvered weapon or a spell, this trait doesn't function at the start of the wereraven's next turn. The wereraven dies only if it starts its turn with 0 hit points and doesn't regenerate."
+			]
+		}
+	],
+	"action": [
+		{
+			"name": "Multiattack (Human or Hybrid Form Only)",
+			"entries": [
+				"The wereraven makes two weapon attacks, one of which can be with its hand crossbow."
+			]
+		},
+		{
+			"name": "Beak (Raven or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}1 piercing damage in raven form, or 4 ({@damage 1d4 + 2}) piercing damage in hybrid form. If the target is humanoid, it must succeed on a {@dc 10} Constitution saving throw or be cursed with wereraven {@variantrule Player Characters as Lycanthropes|MM|lycanthropy}."
+			]
+		},
+		{
+			"name": "Shortsword (Human or Hybrid Form Only)",
+			"entries": [
+				"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage."
+			]
+		},
+		{
+			"name": "Hand Crossbow (Human or Hybrid Form Only)",
+			"entries": [
+				"{@atk rw} {@hit 4} to hit, range 30/120 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage."
+			]
+		}
+	],
+	"attachedItems": [
+		"hand crossbow|phb",
+		"shortsword|phb"
+	],
+	"traitTags": [
+		"Mimicry",
+		"Regeneration",
+		"Shapechanger"
+	],
+	"actionTags": [
+		"Multiattack"
+	],
+	"languageTags": [
+		"C",
+		"CS"
+	],
+	"damageTags": [
+		"P"
+	],
+	"miscTags": [
+		"CUR",
+		"MLW",
+		"MW",
+		"RNG",
+		"RW"
+	],
+	"savingThrowForced": [
+		"constitution"
+	]
+}
