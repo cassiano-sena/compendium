@@ -6,14 +6,35 @@
 
 ---
 
+## ⚙️ Requisitos e Tecnologias / Requirements & Tech Stack
+
+| Componente / Component | Tecnologia / Technology | Observação / Note |
+| :--- | :--- | :--- |
+| **Frontend** | HTML5, CSS3, Vanilla JS | Zero bibliotecas externas / Zero external libraries |
+| **Servidor Principal / Main Server** | **Node.js** (`>= 18.x`) | Usa apenas módulos nativos (`http`, `fs`, `path`) |
+| **Modo Janela de App / App Mode** | **Microsoft Edge** + **PowerShell** | Abre o Compêndio como aplicativo dedicado no Windows |
+| **Alternativas / Alternatives** | **PowerShell 5.1+** ou **Docker** | Funciona mesmo sem Node.js (`server.ps1` ou `docker compose`) |
+
+### Instalação Rápida dos Requisitos / Quick Requirements Setup
+
+Para verificar e baixar automaticamente o **Node.js LTS** e dependências no Windows, execute no PowerShell:
+*(To automatically check and install **Node.js LTS** and dependencies on Windows, run in PowerShell:)*
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\instalar-requisitos.ps1
+```
+
+---
+
 ## 🇧🇷 Português (Brasil)
 
 ### Como Executar
 
 - **Modo App no Windows (Recomendado):** Dê dois cliques em `Iniciar Compendio.vbs`. O servidor iniciará oculto e abrirá o Compêndio em uma janela dedicada. Ao fechar a janela, o servidor é encerrado automaticamente.
-- **Via Node.js:**
+- **Via Node.js / NPM:**
   ```bash
-  node server.js
+  npm start
+  # ou: node server.js
   ```
   Acesse `http://localhost:8080`.
 - **Via PowerShell (sem Node.js):**
@@ -38,9 +59,10 @@
 ### How to Run
 
 - **Windows App Mode (Recommended):** Double-click `Iniciar Compendio.vbs`. It starts the local server in the background and opens the Compendium in a dedicated app window. Closing the window automatically stops the server.
-- **Using Node.js:**
+- **Using Node.js / NPM:**
   ```bash
-  node server.js
+  npm start
+  # or: node server.js
   ```
   Open `http://localhost:8080`.
 - **Using PowerShell (no Node.js required):**

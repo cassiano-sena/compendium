@@ -1,0 +1,14 @@
+{
+  "name": "rpg-compendium",
+  "version": "1.0.0",
+  "description": "Compêndio Épico de RPG (D&D 5e) - Aplicação web local para fichas, itens, mapas e sessões.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup": "powershell -ExecutionPolicy Bypass -File ./instalar-requisitos.ps1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {}
+}
