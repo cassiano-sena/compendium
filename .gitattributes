@@ -1,0 +1,29 @@
+# Normaliza fins de linha automaticamente para arquivos de texto
+* text=auto
+
+# Scripts Windows devem manter CRLF para funcionar corretamente no Windows Script Host / PowerShell
+*.vbs text eol=crlf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Arquivos web e código com LF consistente
+*.js text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.svg text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+
+# Arquivos binários (imagens e mídia)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.mp3 binary
+*.ogg binary
+*.opus binary
