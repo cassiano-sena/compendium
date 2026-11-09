@@ -1,5 +1,19 @@
 # Perfil isolado do navegador (Edge)
 perfil-app/
 
-# Logs do servidor
+# Logs do servidor e de depuração
 *.log
+npm-debug.log*
+
+# Dependências e variáveis de ambiente (caso instaladas no futuro)
+node_modules/
+.env
+.env.*
+
+# Arquivos temporários do sistema operacional e editores
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
