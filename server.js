@@ -46,13 +46,49 @@ function sendJson(res, status, obj) {
     res.end(payload);
 }
 
+let sessionState = {
+    sessionId: 'local-session',
+    players: [],
+    characters: [],
+    tabletop: null,
+    knowledge: {},
+    updatedAt: Date.now()
+};
+
 const server = http.createServer((req, res) => {
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const pathname = decodeURIComponent(parsedUrl.pathname);
 
     // API: Status do Servidor Local
     if (req.method === 'GET' && pathname === '/api/status') {
-        return sendJson(res, 200, { ok: true, mode: 'node', writable: true });
+        return sendJson(res, 200, { ok: true, mode: 'node', writable: true, multiplayerReady: true });
+    }
+
+    // API Base para Sessão Multiplayer Local / LAN (Identidade, Personagens e Tabletop)
+    if (req.method === 'GET' && pathname === '/api/session') {
+        return sendJson(res, 200, { ok: true, session: sessionState });
+    }
+
+    if (req.method === 'POST' && pathname === '/api/session') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk;
+            if (body.length > 10 * 1024 * 1024) req.destroy();
+        });
+        req.on('end', () => {
+            try {
+                const incoming = JSON.parse(body);
+                if (Array.isArray(incoming.players)) sessionState.players = incoming.players;
+                if (Array.isArray(incoming.characters)) sessionState.characters = incoming.characters;
+                if (incoming.tabletop && typeof incoming.tabletop === 'object') sessionState.tabletop = incoming.tabletop;
+                if (incoming.knowledge && typeof incoming.knowledge === 'object') sessionState.knowledge = incoming.knowledge;
+                sessionState.updatedAt = Date.now();
+                return sendJson(res, 200, { ok: true, updatedAt: sessionState.updatedAt });
+            } catch (err) {
+                return sendJson(res, 400, { ok: false, error: err.message });
+            }
+        });
+        return;
     }
 
     // API: Salvar arquivos e atualizar dados.js

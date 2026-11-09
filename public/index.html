@@ -119,6 +119,221 @@
         background: linear-gradient(180deg, #355678 0%, #21374f 100%);
     }
 
+    /* -------------------------------------------
+       DIRETÓRIOS / MÓDULOS DA SIDEBAR & IDENTIDADE
+       ------------------------------------------- */
+    .identity-bar {
+        padding: 8px 10px;
+        background: #191a20;
+        border-bottom: 2px groove var(--border-color);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 11px;
+    }
+    .identity-bar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
+    }
+    .identity-select {
+        flex: 1;
+        background: #121317;
+        color: var(--accent-gold-hover);
+        border: 1px inset #5a5d6b;
+        border-radius: 4px;
+        padding: 4px 6px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .sidebar-modules-scroll {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 6px;
+        gap: 6px;
+    }
+
+    .module-dir-group {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #3c3e4a;
+        border-radius: 6px;
+        background: #23242b;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .module-dir-btn {
+        width: 100%;
+        padding: 10px 12px;
+        background: var(--stone-btn);
+        color: var(--text-light);
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 13px;
+        border: 2px outset var(--border-bevel-light);
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-shadow: 1px 1px 1px #000;
+        text-align: left;
+    }
+    .module-dir-btn:hover {
+        background: var(--stone-btn-hover);
+        color: #fff;
+    }
+    .module-dir-btn.active {
+        background: linear-gradient(90deg, #4b3d24 0%, #2d271c 100%);
+        color: var(--accent-gold-hover);
+        border: 2px inset var(--accent-gold);
+    }
+    .module-dir-chevron {
+        font-size: 10px;
+        opacity: 0.8;
+        transition: transform 0.15s ease;
+    }
+    .module-dir-content {
+        display: none;
+        flex-direction: column;
+        background: #1e1f26;
+        border-top: 1px solid #3c3e4a;
+        padding-bottom: 4px;
+    }
+    .module-dir-content.open {
+        display: flex;
+    }
+
+    /* -------------------------------------------
+       ESTILOS DO TABLETOP TÁTICO 2D (LOCAL / LAN STUB)
+       ------------------------------------------- */
+    .tabletop-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: calc(100vh - 45px);
+        min-height: 540px;
+    }
+    .tabletop-toolbar {
+        background: var(--bg-panel);
+        border: 2px outset var(--border-bevel-light);
+        border-radius: 6px;
+        padding: 8px 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+    .tabletop-board-viewport {
+        flex: 1;
+        background: #101115;
+        border: 3px inset var(--border-color);
+        border-radius: 6px;
+        overflow: auto;
+        position: relative;
+        user-select: none;
+    }
+    .tabletop-stage {
+        position: relative;
+        width: 1600px;
+        height: 1000px;
+        background-color: #16181f;
+        background-size: cover;
+        background-position: top left;
+        background-repeat: no-repeat;
+        transform-origin: 0 0;
+    }
+    .tabletop-grid-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+            linear-gradient(to right, rgba(216, 180, 103, 0.22) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(216, 180, 103, 0.22) 1px, transparent 1px);
+    }
+    .tt-token {
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid #d8b467;
+        background: #252730;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: grab;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.75);
+        z-index: 5;
+        background-size: cover;
+        background-position: center;
+    }
+    .tt-token:active { cursor: grabbing; }
+    .tt-token.monster-token { border-color: #d94338; }
+    .tt-token.npc-token { border-color: #a864e8; }
+    .tt-token.item-token { border-color: #3cc8e8; border-radius: 10px; }
+    .tt-token.selected-token {
+        box-shadow: 0 0 0 3px #fff, 0 4px 12px rgba(0,0,0,0.9);
+        z-index: 15;
+    }
+
+    .gm-visibility-bar {
+        background: linear-gradient(90deg, #272217 0%, #1c1d24 100%);
+        border: 2px outset #8f7541;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+    }
+    .knowledge-seal-box {
+        background: #211f1b;
+        border: 2px ridge #8f7541;
+        border-radius: 8px;
+        padding: 18px;
+        margin: 14px 0;
+        color: #e3dccb;
+        text-align: center;
+    }
+    .tt-token-hp {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(15, 16, 20, 0.9);
+        border: 1px solid #5a5d6b;
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 10px;
+        white-space: nowrap;
+        color: #8df596;
+        pointer-events: none;
+    }
+    .tt-token-label {
+        position: absolute;
+        bottom: -17px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(15, 16, 20, 0.88);
+        border-radius: 3px;
+        padding: 1px 5px;
+        font-size: 10px;
+        white-space: nowrap;
+        color: #f2cf83;
+        pointer-events: none;
+    }
+
     .nav-list { 
         list-style: none; 
         padding: 4px; 
@@ -126,8 +341,6 @@
         display: flex; 
         flex-direction: column; 
         gap: 2px;
-        flex: 1; 
-        overflow-y: auto;
         transform: translateZ(0);
     }
     .nav-item { 
@@ -1172,29 +1385,72 @@
 </head>
 <body onload="initCompendium()">
 
-    <!-- BARRA LATERAL (Categorias) -->
+    <!-- BARRA LATERAL (Módulos / Diretórios Principais) -->
     <aside class="sidebar">
         <div class="sidebar-header">⚔️ Compêndio RPG</div>
 
-        <div class="sidebar-cta">
-            <button class="btn-new-page" type="button" onclick="openStudioModal()">
-                <span>＋</span> Nova Página
-            </button>
-            <button class="btn-new-page btn-unified-code" type="button" onclick="openUnifiedCodeModal()" title="Importar ou Exportar Monstros, Mapas, Quests e Sessão em um único código">
-                <span>⚡</span> Código Único
-            </button>
+        <!-- Identidade Local do Jogador (Base para futura autenticação LAN/P2P/Servidor) -->
+        <div class="identity-bar">
+            <div class="identity-bar-row">
+                <span style="color:#a0a4b8;">👤 Perfil / Login:</span>
+                <div style="display:flex; gap:3px;">
+                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 5px;" onclick="configureActivePlayerPin()" title="Definir ou alterar PIN de segurança deste perfil">🔐 PIN</button>
+                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 5px;" onclick="promptAddPlayerIdentity()" title="Cadastrar novo jogador">＋ Jogador</button>
+                </div>
+            </div>
+            <div class="identity-bar-row">
+                <select id="active-player-select" class="identity-select" onchange="onPlayerIdentityChange(this.value)"></select>
+            </div>
+            <input type="file" id="universal-sheet-import-input" accept=".json,.pdf,.html,.htm" style="display:none" onchange="handleUniversalCharacterImport(event)">
         </div>
 
-        <ul class="nav-list">
-            <li class="nav-item active" data-cat="monsters" onclick="navigateCategory('monsters', this)"><span>🐉 Monstros</span></li>
-            <li class="nav-item" data-cat="npcs" onclick="navigateCategory('npcs', this)"><span>🧙‍♂️ NPCs</span></li>
-            <li class="nav-item" data-cat="maps" onclick="navigateCategory('maps', this)"><span>🗺️ Mapas</span></li>
-            <li class="nav-item" data-cat="items" onclick="navigateCategory('items', this)"><span>⚔️ Itens</span></li>
-            <li class="nav-item" data-cat="curio" onclick="navigateCategory('curio', this)"><span>📜 Curiosidades</span></li>
-            <li class="nav-item" data-cat="session" onclick="navigateCategory('session', this)"><span>📖 Planos de Sessão</span></li>
-            <li class="nav-item" data-cat="quests" onclick="navigateCategory('quests', this)"><span>🎯 Quests & Objetivos</span></li>
-            <li class="nav-item" data-cat="hitdice" onclick="navigateCategory('hitdice', this)"><span>🎲 Dados de Vida</span></li>
-        </ul>
+        <!-- Seção de Botões / Diretórios Principais -->
+        <div class="sidebar-modules-scroll">
+            <!-- DIRETÓRIO 1: COMPÊNDIO (Contém Nova Página, Código Único e Categorias) -->
+            <div class="module-dir-group">
+                <button type="button" class="module-dir-btn active" id="btn-dir-compendium" onclick="toggleCompendiumDirectory()">
+                    <span>📚 Compêndio</span>
+                    <span class="module-dir-chevron" id="chevron-dir-compendium">▼</span>
+                </button>
+                <div class="module-dir-content open" id="sidebar-compendium-dir">
+                    <div class="sidebar-cta">
+                        <button class="btn-new-page" type="button" onclick="openStudioModal()">
+                            <span>＋</span> Nova Página
+                        </button>
+                        <button class="btn-new-page btn-unified-code" type="button" onclick="openUnifiedCodeModal()" title="Importar ou Exportar Monstros, Mapas, Quests e Sessão em um único código">
+                            <span>⚡</span> Código Único
+                        </button>
+                    </div>
+
+                    <ul class="nav-list">
+                        <li class="nav-item active" data-cat="monsters" onclick="navigateCategory('monsters', this)"><span>🐉 Monstros</span></li>
+                        <li class="nav-item" data-cat="npcs" onclick="navigateCategory('npcs', this)"><span>🧙‍♂️ NPCs</span></li>
+                        <li class="nav-item" data-cat="maps" onclick="navigateCategory('maps', this)"><span>🗺️ Mapas</span></li>
+                        <li class="nav-item" data-cat="items" onclick="navigateCategory('items', this)"><span>⚔️ Itens</span></li>
+                        <li class="nav-item" data-cat="curio" onclick="navigateCategory('curio', this)"><span>📜 Curiosidades</span></li>
+                        <li class="nav-item" data-cat="session" onclick="navigateCategory('session', this)"><span>📖 Planos de Sessão</span></li>
+                        <li class="nav-item" data-cat="quests" onclick="navigateCategory('quests', this)"><span>🎯 Quests & Objetivos</span></li>
+                        <li class="nav-item" data-cat="hitdice" onclick="navigateCategory('hitdice', this)"><span>🎲 Dados de Vida</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- DIRETÓRIO / MÓDULO 2: PERSONAGEM (Individual por Jogador) -->
+            <div class="module-dir-group">
+                <button type="button" class="module-dir-btn" id="btn-dir-character" onclick="switchMainModule('character')">
+                    <span>🛡️ Personagem</span>
+                    <span class="module-dir-chevron">▸</span>
+                </button>
+            </div>
+
+            <!-- DIRETÓRIO / MÓDULO 3: TABLETOP (Mapa Multiplayer / Local com Tokens) -->
+            <div class="module-dir-group">
+                <button type="button" class="module-dir-btn" id="btn-dir-tabletop" onclick="switchMainModule('tabletop')">
+                    <span>🎲 Tabletop</span>
+                    <span class="module-dir-chevron">▸</span>
+                </button>
+            </div>
+        </div>
 
         <div class="sidebar-footer">
             <div class="server-status" id="server-status-indicator">
@@ -1206,9 +1462,14 @@
                 <button class="btn-mini" type="button" onclick="document.getElementById('import-backup-input').click()" title="Restaurar cópia de segurança">⬆ Restaurar</button>
                 <input type="file" id="import-backup-input" accept=".json" style="display:none" onchange="importBackup(event)">
             </div>
-            <button class="btn-mini danger" type="button" onclick="nukeAllFoldersAndDocs()" title="Apagar todas as pastas, documentos, fichas e listas de uma só vez">
-                💀 Expurgar Tudo (Reset)
-            </button>
+            <div style="display:flex; gap:4px; width:100%;">
+                <button class="btn-mini" style="flex:1;" type="button" onclick="resetToDefaultDirectoryData()" title="Restaurar todos os dados padrão existentes no diretório public/">
+                    🔄 Restaurar Padrão
+                </button>
+                <button class="btn-mini danger" style="flex:1;" type="button" onclick="nukeAllFoldersAndDocs()" title="Apagar todas as pastas, documentos, fichas e listas de uma só vez">
+                    💀 Expurgar
+                </button>
+            </div>
         </div>
     </aside>
 
@@ -1219,8 +1480,8 @@
             <div class="list-header">
                 <span id="dynamic-list-title">Lista</span>
                 <div style="display:flex; gap:4px;">
-                    <button class="btn-mini" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="openStudioModal()" title="Adicionar página nesta categoria">＋</button>
-                    <button class="btn-mini danger" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="clearCurrentCategory()" title="Excluir todas as pastas e documentos desta categoria">🗑️</button>
+                    <button class="btn-mini" id="btn-header-add" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="onHeaderAddClick()" title="Adicionar nesta seção">＋</button>
+                    <button class="btn-mini danger" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="clearCurrentCategory()" title="Excluir registros desta seção">🗑️</button>
                 </div>
             </div>
             <div class="search-box-wrap">
@@ -1339,12 +1600,12 @@
                                 </div>
                                 <div class="form-group full">
                                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
-                                        <label>Cole abaixo o JSON do 5etools (Monstro, Item, Magia...) ou envie um arquivo .json</label>
+                                        <label>Cole o JSON (5etools/Foundry/Compêndio) ou importe um arquivo .JSON, .PDF ou .HTML</label>
                                         <div style="display:flex; gap:6px;">
-                                            <button type="button" class="btn-mini" onclick="document.getElementById('json-file-upload').click()">📂 Abrir .json</button>
+                                            <button type="button" class="btn-mini" onclick="document.getElementById('json-file-upload').click()">📂 Importar .JSON / .PDF / .HTML</button>
                                             <button type="button" class="btn-mini" onclick="convertJsonToVisualForm()" title="Carrega os dados deste JSON no formulário visual para editar facilmente">✏️ Editar Visual</button>
                                         </div>
-                                        <input type="file" id="json-file-upload" accept=".json" style="display:none" onchange="handleJsonFileUpload(event)">
+                                        <input type="file" id="json-file-upload" accept=".json,.pdf,.html,.htm" style="display:none" onchange="handleJsonFileUpload(event)">
                                     </div>
                                     <textarea id="json-raw-input" class="form-control code-area" placeholder='Cole o JSON aqui (ex: { "name": "Goblin", "source": "MM", "size": ["S"], ... })' oninput="onRawJsonInput()"></textarea>
                                 </div>
@@ -1645,6 +1906,7 @@
          SCRIPTS MESTRES DE LÓGICA E NAVEGAÇÃO
          ------------------------------------------- -->
     <script>
+        let activeModule = 'compendium';
         let currentCategory = 'monsters';
         let currentListView = null;
         let activeItemContext = null;
@@ -1654,24 +1916,486 @@
         let studioImages = { token: null, art: null, map: null };
         let editingExistingKey = null;
 
-        const STORAGE_KEY_DATA = 'compendio_rpg_custom_data_v1';
-        const STORAGE_KEY_FILES = 'compendio_rpg_virtual_files_v1';
-        const STORAGE_KEY_CARDS = 'compendio_rpg_combat_cards_v1';
-        const STORAGE_KEY_QUESTS = 'compendio_rpg_quests_v1';
-        const STORAGE_KEY_HITDICE = 'compendio_rpg_hitdice_v1';
+        const STORAGE_KEY_DATA = 'compendio_rpg_custom_data_v2';
+        const STORAGE_KEY_FILES = 'compendio_rpg_virtual_files_v2';
+        const STORAGE_KEY_CARDS = 'compendio_rpg_combat_cards_v2';
+        const STORAGE_KEY_QUESTS = 'compendio_rpg_quests_v2';
+        const STORAGE_KEY_HITDICE = 'compendio_rpg_hitdice_v2';
+        const STORAGE_KEY_PLAYERS = 'compendio_rpg_players_v2';
+        const STORAGE_KEY_ACTIVE_PLAYER = 'compendio_rpg_active_player_v2';
+        const STORAGE_KEY_CHARACTERS = 'compendio_rpg_characters_v2';
+        const STORAGE_KEY_TABLETOP = 'compendio_rpg_tabletop_v2';
+        const STORAGE_KEY_KNOWLEDGE = 'compendio_rpg_knowledge_v2';
 
         let virtualFiles = {};
         let combatCards = [];
         let dockCollapsed = true;
-        let questsData = [];
-        let hitDiceData = [];
         let questStatusFilter = 'ALL';
+
+        let playersData = [
+            { id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', authKey: 'local-gm-key' },
+            { id: 'player-1', name: 'Jogador 1 (Kael)', role: 'player', pin: '', authKey: 'local-p1-key' },
+            { id: 'player-2', name: 'Jogador 2 (Kiriton)', role: 'player', pin: '', authKey: 'local-p2-key' },
+            { id: 'player-3', name: 'Jogador 3 (Auxiz)', role: 'player', pin: '', authKey: 'local-p3-key' },
+            { id: 'player-4', name: 'Jogador 4 (La Loba)', role: 'player', pin: '', authKey: 'local-p4-key' }
+        ];
+        let activePlayerId = 'gm-master';
+
+        let questsData = [
+            {
+                id: 'quest-death-house',
+                title: 'A Casa da Morte (Família Durst)',
+                giver: 'Rose & Thorn Durst',
+                location: 'Mansão Durst (D1–D38)',
+                status: 'ACTIVE',
+                summary: 'Investigar os lamentos na mansão de quatro andares, descobrir o destino de Walter Durst no sótão e sobreviver ao altar subterrâneo.',
+                objectives: 'Encontrar a chave do sótão na biblioteca secreta (D9)\nAcalmar os espíritos de Rose e Thorn (D20)\nEnfrentar ou escapar do Lorghoth, o Decaidro, na Câmara do Altar (D35)\nFugir pelas Haunted Zones até a floresta de Baróvia',
+                reward: 'Avanço para o Nível 3 + Relíquias da Família Durst'
+            },
+            {
+                id: 'quest-casa-varhen',
+                title: 'O Sangue da Casa Varhen',
+                giver: 'Astel Vhalzar Varhen',
+                location: 'Vila e Mansão Varhen',
+                status: 'ACTIVE',
+                summary: 'Proteger a linhagem Varhen contra a maldição licantrópica de Verenkar e a invasão dos Sacerdotes de Osybus.',
+                objectives: 'Defender os portões da Vila Varhen\nImpedir o ritual do Arauto de Sangue\nConfrontar Verenkar na Mansão Varhen',
+                reward: 'Bênção Ancestral da Casa Varhen'
+            }
+        ];
+
+        let hitDiceData = [
+            { id: 'hd-kael', name: 'Kael Varhen', charClass: 'Eldritch Knight 13', dieType: 10, max: 13, current: 13, conMod: 3, notes: 'Second Wind, Action Surge, Indomitable' },
+            { id: 'hd-kiriton', name: 'Kiriton', charClass: 'Mago 1', dieType: 6, max: 1, current: 1, conMod: 2, notes: 'Recuperação Arcana' },
+            { id: 'hd-auxiz', name: 'Auxiz', charClass: 'Ladino (Rogue) 1', dieType: 8, max: 1, current: 1, conMod: 1, notes: 'Ataque Furtivo 1d6, Cthonic Tiefling' },
+            { id: 'hd-laloba', name: 'La Loba (Tanya)', charClass: 'Precognition Barbarian 22', dieType: 12, max: 22, current: 22, conMod: 9, notes: 'Fúria Implacável, ArchDemon' },
+            { id: 'hd-astel', name: 'Astel Vhalzar Varhen', charClass: 'Hexblade / Paladino 20', dieType: 10, max: 20, current: 20, conMod: 2, notes: 'Soberano de Sangue, Shadar-Kai' },
+            { id: 'hd-connor', name: 'Connor Smith', charClass: 'Caçador de Sangue / Bruxo 20', dieType: 10, max: 20, current: 20, conMod: 3, notes: 'Rito Carmesim, Marca de Maldição' }
+        ];
+
+        let charactersData = [
+            {
+                id: 'char-kael-varhen',
+                name: 'Kael Varhen',
+                ownerId: 'player-1',
+                ownerName: 'Jogador 1 (Kael)',
+                race: 'Aasimar (Nobre da Casa Varhen)',
+                classLevel: 'Fighter (Eldritch Knight) 13',
+                ac: 20,
+                hpCurrent: 158,
+                hpMax: 165,
+                hpTemp: 0,
+                speed: '30ft (9m)',
+                initiativeBonus: 4,
+                passivePerceptionBonus: 5,
+                hitDieType: 10,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 20, dex: 10, con: 20, int: 18, wis: 10, cha: 8 },
+                inventory: '• Greatsword +2 (Weapon Mastery: Graze, +12 atk, 2d6+7 slashing)\n• Longsword +1 (Sap, +11 atk, 1d8+6)\n• Javelin (+10 atk, 1d6+5)\n• Plate Armor (CA 20)\n• Magias Preparadas: Shield, Absorb Elements, Misty Step, Counterspell, Fireball, Spirit Shroud, Haste',
+                notes: 'Ficha padrão importada de public/import-tests/kael-varhen-ek-13-v2.pdf.\nHabilidades: Second Wind, Action Surge, War Bond, Eldritch Strike, Arcane Charge, Indomitable (2x), Three Extra Attacks.',
+                tokenImg: './npc/kael/bucket-head.png'
+            },
+            {
+                id: 'char-kiriton',
+                name: 'Kiriton',
+                ownerId: 'player-2',
+                ownerName: 'Jogador 2 (Kiriton)',
+                race: 'Elf, High (Farmer)',
+                classLevel: 'Mago 1',
+                ac: 13,
+                hpCurrent: 9,
+                hpMax: 9,
+                hpTemp: 0,
+                speed: '30ft (9m)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 2,
+                hitDieType: 8,
+                hitDieCurrent: 1,
+                hitDieMax: 1,
+                stats: { str: 8, dex: 15, con: 13, int: 17, wis: 12, cha: 10 },
+                inventory: '• Cajado Arcano (Foco)\n• Adaga (+4 atk, 1d4+2 perfurante)\n• Grimório & Componentes\n• Truques & Magias de 1º Círculo (D&D 2024 PT-BR)',
+                notes: 'Ficha padrão importada de public/import-tests/kiriton.pdf (D&D 2024 PT-BR).\nTalento de Origem: Tough / Iniciado em Magia.\nTraços de Alto Elfo: Visão no Escuro 18m, Ancestralidade Feérica, Transe, Passo Nebuloso.',
+                tokenImg: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
+            },
+            {
+                id: 'char-auxiz',
+                name: 'Auxiz',
+                ownerId: 'player-3',
+                ownerName: 'Jogador 3 (Auxiz)',
+                race: 'Tiefling Cthonic (Merchant)',
+                classLevel: 'Rogue 1',
+                ac: 13,
+                hpCurrent: 9,
+                hpMax: 9,
+                hpTemp: 0,
+                speed: '30ft (9m)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 2,
+                hitDieType: 8,
+                hitDieCurrent: 1,
+                hitDieMax: 1,
+                stats: { str: 8, dex: 15, con: 10, int: 10, wis: 14, cha: 16 },
+                inventory: '• Shortsword (+4 atk, 1d6+2 piercing, Vex)\n• Dagger x2 (+4 atk, 1d4+2 piercing, Nick)\n• Shortbow (+4 atk, 1d6+2 piercing, Vex, 20 flechas)\n• Leather Armor (CA 13)\n• Thieves\' Tools, Merchant\'s Scale',
+                notes: 'Ficha padrão importada de public/import-tests/character-sheet.pdf.\nHabilidades: Expertise, Sneak Attack (1d6), Thieves\' Cant, Weapon Mastery, Cthonic Legacy.',
+                tokenImg: './npc/zaltherion/zaltherion-act-2-profile.png'
+            },
+            {
+                id: 'char-la-loba',
+                name: 'La Loba (Tanya)',
+                ownerId: 'player-4',
+                ownerName: 'Jogador 4 (La Loba)',
+                race: 'ArchDemon',
+                classLevel: 'Barbarian (Precognition) 22',
+                ac: 30,
+                hpCurrent: 320,
+                hpMax: 320,
+                hpTemp: 0,
+                speed: '45ft (13,5m)',
+                initiativeBonus: 5,
+                passivePerceptionBonus: 8,
+                hitDieType: 12,
+                hitDieCurrent: 22,
+                hitDieMax: 22,
+                stats: { str: 20, dex: 26, con: 24, int: 18, wis: 16, cha: 20 },
+                inventory: '• Claws of the Abyss\n• Unarmored Defense (CA 30)\n• Relíquias Abissais Sintonizadas',
+                notes: 'Ficha padrão importada de public/import-tests/La Loba.pdf.\nHabilidades: Rage, Unarmored Defense, Reckless Attack, Danger Sense, Extra Attack, Brutal Critical, Relentless Rage, Primal Champion, Precognition Foresight.',
+                tokenImg: './npc/aetheron/aetheron.png'
+            },
+            {
+                id: 'char-astel-varhen',
+                name: 'Astel Vhalzar Varhen',
+                ownerId: 'player-1',
+                ownerName: 'Jogador 1 (Astel)',
+                race: 'Humano (Casa Varhen)',
+                classLevel: 'Cleric (Hadar) · ND 30',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m, voo 9m, natação 9m',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 10,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Saving Throws: Str +19, Con +18, Int +18, Wis +15, Cha +14\n• Skills: Athletics +19, Arcana +18, Perception +15\n• Resistências: Necrotic, Radiant',
+                notes: 'Ficha padrão sincronizada de public/import-tests/astel.html e public/npc/astel/astel.html.\nTraços: Instinto, Multiataque.',
+                tokenImg: './npc/kael/bucket-head.png'
+            },
+            {
+                id: 'char-connor-smith',
+                name: 'Connor Smith',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Humano',
+                classLevel: 'Level 10 Battle Smith (Artificer)',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m (30 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 10,
+                hitDieCurrent: 10,
+                hitDieMax: 10,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Steel Defender & Armas Rúnicas de Artífice (Battle Smith)',
+                notes: 'Ficha padrão sincronizada de public/npc/connor/connor.html.',
+                tokenImg: './npc/connor/connor-smith.png'
+            },
+            {
+                id: 'char-aetheron',
+                name: 'Aetheron',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Construct (Humanoid)',
+                classLevel: 'Battle Smith',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m (30 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 10,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Núcleo Arcano & Armadura de Constructo (CA 20)',
+                notes: 'Ficha padrão sincronizada de public/npc/aetheron/aetheron.html.',
+                tokenImg: './npc/aetheron/aetheron.png'
+            },
+            {
+                id: 'char-lyra-bloodseeker',
+                name: 'Lyra Bloodseeker',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Human Lycanthrope',
+                classLevel: 'Beast Barbarian / Champion',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m (30 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 12,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Garras Bestiais Licantrópicas & Fúria Sanguinária',
+                notes: 'Ficha padrão sincronizada de public/npc/lyra/lyra.html.',
+                tokenImg: './monster/data/werewolf/token.png'
+            },
+            {
+                id: 'char-mustang',
+                name: 'Mustang',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Inverted Centaur',
+                classLevel: 'HORSE (Deer) Totem Barbarian',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '12m (40 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 12,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Totem Espiritual & Investida Implacável',
+                notes: 'Ficha padrão sincronizada de public/npc/mustang/mustang.html.',
+                tokenImg: './npc/mustang/mustang.png'
+            },
+            {
+                id: 'char-willick',
+                name: 'Willick Wolfgang Blackthorn III',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Owlin',
+                classLevel: 'Abjurer (Wizard)',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m, voo 9m',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 6,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Grimório de Abjuração Blackthorn & Proteção Arcana',
+                notes: 'Ficha padrão sincronizada de public/npc/willick/willick.html.',
+                tokenImg: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
+            },
+            {
+                id: 'char-zaltherion',
+                name: 'Zaltherion Vindicator',
+                ownerId: 'gm-master',
+                ownerName: 'Mestre (GM)',
+                race: 'Tiefling',
+                classLevel: 'Devotion Paladin',
+                ac: 20,
+                hpCurrent: 140,
+                hpMax: 140,
+                hpTemp: 0,
+                speed: '9m (30 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 3,
+                hitDieType: 10,
+                hitDieCurrent: 13,
+                hitDieMax: 13,
+                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
+                inventory: '• Arma Sagrada (Sacred Weapon) & Armadura de Devoção',
+                notes: 'Ficha padrão sincronizada de public/npc/zaltherion/zaltherion.html.',
+                tokenImg: './npc/zaltherion/zaltherion-act-2-profile.png'
+            }
+        ];
+        let activeCharacterId = 'char-kael-varhen';
+        let entityKnowledge = {}; // { "category:key": { globalLevel: 'hidden'|'sighted'|'studied', playerLevels: { [playerId]: 'sighted'|'studied' } } }
+        let tabletopState = {
+            sessionId: 'local-session',
+            networkMode: 'local', // 'local' | 'lan-ws' | 'p2p'
+            mapPath: './map/d_terreo.svg',
+            gridSize: 56,
+            zoom: 100,
+            snapToGrid: true,
+            tokens: [
+                {
+                    id: 'tok-kael-default',
+                    refId: 'char-kael-varhen',
+                    name: 'Kael Varhen',
+                    type: 'pc',
+                    category: 'character',
+                    itemKey: 'char-kael-varhen',
+                    groupKey: '',
+                    ownerId: 'player-1',
+                    x: 112,
+                    y: 168,
+                    hpCurrent: 158,
+                    hpMax: 165,
+                    ac: 20,
+                    imgSrc: './npc/kael/bucket-head.png'
+                },
+                {
+                    id: 'tok-kiriton-default',
+                    refId: 'char-kiriton',
+                    name: 'Kiriton',
+                    type: 'pc',
+                    category: 'character',
+                    itemKey: 'char-kiriton',
+                    groupKey: '',
+                    ownerId: 'player-2',
+                    x: 168,
+                    y: 168,
+                    hpCurrent: 9,
+                    hpMax: 9,
+                    ac: 13,
+                    imgSrc: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
+                },
+                {
+                    id: 'tok-auxiz-default',
+                    refId: 'char-auxiz',
+                    name: 'Auxiz',
+                    type: 'pc',
+                    category: 'character',
+                    itemKey: 'char-auxiz',
+                    groupKey: '',
+                    ownerId: 'player-3',
+                    x: 224,
+                    y: 168,
+                    hpCurrent: 9,
+                    hpMax: 9,
+                    ac: 13,
+                    imgSrc: './npc/zaltherion/zaltherion-act-2-profile.png'
+                },
+                {
+                    id: 'tok-armor-default',
+                    refId: 'monsters:animated-armor',
+                    name: 'Armadura Animada',
+                    type: 'monster',
+                    category: 'monsters',
+                    groupKey: 'constructos_feras_abissoes',
+                    itemKey: 'animated-armor',
+                    ownerId: 'gm-master',
+                    x: 336,
+                    y: 168,
+                    hpCurrent: 33,
+                    hpMax: 33,
+                    ac: 18,
+                    imgSrc: './monster/data/animated-armor/token.png'
+                }
+            ]
+        };
+        let selectedTabletopTokenId = null;
+
+        /* =========================================================
+           ADAPTADOR DE REDE E IDENTIDADE (BASE LOCAL -> LAN / P2P)
+           ========================================================= */
+        const CompendioNetAdapter = {
+            mode: 'local',
+            channel: (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('compendio_rpg_net_sync_v1') : null,
+            init() {
+                if (this.channel) {
+                    this.channel.onmessage = (ev) => {
+                        const msg = ev.data;
+                        if (!msg || !msg.type) return;
+                        if (msg.type === 'TABLETOP_SYNC' && msg.state) {
+                            tabletopState = msg.state;
+                            localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
+                            if (activeModule === 'tabletop') renderTabletopModule();
+                        } else if (msg.type === 'CHARACTERS_SYNC' && Array.isArray(msg.characters)) {
+                            charactersData = msg.characters;
+                            localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(charactersData));
+                            if (activeModule === 'character') renderCharacterModule();
+                        } else if (msg.type === 'KNOWLEDGE_SYNC' && msg.knowledge) {
+                            entityKnowledge = msg.knowledge;
+                            localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
+                            if (activeModule === 'compendium' && activeItemContext) {
+                                loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
+                            } else if (activeModule === 'tabletop') {
+                                renderTabletopModule();
+                            }
+                        } else if (msg.type === 'STUDY_REQUEST') {
+                            const activeP = getActivePlayer();
+                            if (activeP && activeP.role === 'gm') {
+                                showToast(`🔍 ${msg.playerName} usou "Estudar" em "${msg.entityTitle}"!`);
+                            }
+                        }
+                    };
+                }
+            },
+            verifyIdentity(playerId) {
+                const p = playersData.find(x => x.id === playerId);
+                return p ? { verified: true, player: p, mode: this.mode } : { verified: false, player: null, mode: this.mode };
+            },
+            canControlEntity(ownerId) {
+                const activePlayer = getActivePlayer();
+                if (!activePlayer) return true;
+                if (activePlayer.role === 'gm') return true;
+                return activePlayer.id === ownerId;
+            },
+            broadcastTabletop() {
+                if (this.channel) {
+                    this.channel.postMessage({ type: 'TABLETOP_SYNC', senderId: activePlayerId, state: tabletopState });
+                }
+                this.syncServerSession();
+            },
+            broadcastCharacters() {
+                if (this.channel) {
+                    this.channel.postMessage({ type: 'CHARACTERS_SYNC', senderId: activePlayerId, characters: charactersData });
+                }
+                this.syncServerSession();
+            },
+            broadcastKnowledge() {
+                if (this.channel) {
+                    this.channel.postMessage({ type: 'KNOWLEDGE_SYNC', senderId: activePlayerId, knowledge: entityKnowledge });
+                }
+                this.syncServerSession();
+            },
+            sendStudyRequest(entityKey, entityTitle) {
+                const p = getActivePlayer();
+                if (this.channel) {
+                    this.channel.postMessage({
+                        type: 'STUDY_REQUEST',
+                        playerId: activePlayerId,
+                        playerName: p ? p.name : 'Jogador',
+                        entityKey,
+                        entityTitle
+                    });
+                }
+                showToast(`🔍 Pedido de "Estudar" (${entityTitle}) enviado ao Mestre!`);
+            },
+            async syncServerSession() {
+                if (!serverWritable) return;
+                try {
+                    await fetch('/api/session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            players: playersData,
+                            characters: charactersData,
+                            tabletop: tabletopState,
+                            knowledge: entityKnowledge
+                        })
+                    });
+                } catch (e) {}
+            }
+        };
 
         async function initCompendium() {
             if (typeof compendioData === 'undefined') {
                 window.compendioData = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
             }
             loadLocalPersistence();
+            CompendioNetAdapter.init();
+            renderPlayerIdentitySelector();
             await checkServerStatus();
             renderCombatHand();
             navigateCategory('monsters', document.querySelector('.nav-item[data-cat="monsters"]'));
@@ -1748,10 +2472,44 @@
                 if (savedCards) combatCards = JSON.parse(savedCards) || [];
 
                 const savedQuests = localStorage.getItem(STORAGE_KEY_QUESTS);
-                if (savedQuests) questsData = JSON.parse(savedQuests) || [];
+                if (savedQuests) {
+                    const parsedQuests = JSON.parse(savedQuests);
+                    if (Array.isArray(parsedQuests) && parsedQuests.length > 0) questsData = parsedQuests;
+                }
 
                 const savedHD = localStorage.getItem(STORAGE_KEY_HITDICE);
-                if (savedHD) hitDiceData = JSON.parse(savedHD) || [];
+                if (savedHD) {
+                    const parsedHD = JSON.parse(savedHD);
+                    if (Array.isArray(parsedHD) && parsedHD.length > 0) hitDiceData = parsedHD;
+                }
+
+                const savedPlayers = localStorage.getItem(STORAGE_KEY_PLAYERS);
+                if (savedPlayers) {
+                    const parsedPlayers = JSON.parse(savedPlayers);
+                    if (Array.isArray(parsedPlayers) && parsedPlayers.length > 0) playersData = parsedPlayers;
+                }
+                const savedActivePlayer = localStorage.getItem(STORAGE_KEY_ACTIVE_PLAYER);
+                if (savedActivePlayer && playersData.some(p => p.id === savedActivePlayer)) {
+                    activePlayerId = savedActivePlayer;
+                }
+
+                const savedChars = localStorage.getItem(STORAGE_KEY_CHARACTERS);
+                if (savedChars) {
+                    const parsedChars = JSON.parse(savedChars);
+                    if (Array.isArray(parsedChars) && parsedChars.length > 0) charactersData = parsedChars;
+                }
+
+                const savedTT = localStorage.getItem(STORAGE_KEY_TABLETOP);
+                if (savedTT) {
+                    const parsedTT = JSON.parse(savedTT);
+                    if (parsedTT && typeof parsedTT === 'object') Object.assign(tabletopState, parsedTT);
+                }
+
+                const savedKnow = localStorage.getItem(STORAGE_KEY_KNOWLEDGE);
+                if (savedKnow) {
+                    const parsedKnow = JSON.parse(savedKnow);
+                    if (parsedKnow && typeof parsedKnow === 'object') entityKnowledge = parsedKnow;
+                }
 
                 const savedData = localStorage.getItem(STORAGE_KEY_DATA);
                 if (savedData) {
@@ -1792,6 +2550,11 @@
                 localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(combatCards));
                 localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(questsData));
                 localStorage.setItem(STORAGE_KEY_HITDICE, JSON.stringify(hitDiceData));
+                localStorage.setItem(STORAGE_KEY_PLAYERS, JSON.stringify(playersData));
+                localStorage.setItem(STORAGE_KEY_ACTIVE_PLAYER, activePlayerId);
+                localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(charactersData));
+                localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
+                localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
             } catch (e) {
                 console.warn('Cache local cheio ou indisponível:', e);
             }
@@ -1844,6 +2607,23 @@
             });
         }
 
+        function resetToDefaultDirectoryData() {
+            if (!confirm('Restaurar todos os dados padrão existentes no diretório (Monstros, NPCs, Mapas, Itens, Sessões e Personagens)?')) return;
+            [
+                STORAGE_KEY_DATA,
+                STORAGE_KEY_FILES,
+                STORAGE_KEY_CARDS,
+                STORAGE_KEY_QUESTS,
+                STORAGE_KEY_HITDICE,
+                STORAGE_KEY_PLAYERS,
+                STORAGE_KEY_ACTIVE_PLAYER,
+                STORAGE_KEY_CHARACTERS,
+                STORAGE_KEY_TABLETOP,
+                STORAGE_KEY_KNOWLEDGE
+            ].forEach(k => localStorage.removeItem(k));
+            window.location.reload();
+        }
+
         async function nukeAllFoldersAndDocs() {
             if (!confirm('ATENÇÃO: Deseja EXPURGAR TODAS as pastas, documentos, fichas, mapas, itens, quests e cartas de uma só vez?')) return;
             const allPaths = [];
@@ -1864,6 +2644,24 @@
         }
 
         async function clearCurrentCategory() {
+            if (activeModule === 'character') {
+                if (!confirm('Deseja limpar os personagens visíveis?')) return;
+                const activePlayer = getActivePlayer();
+                if (activePlayer && activePlayer.role === 'gm') {
+                    charactersData = [];
+                } else {
+                    charactersData = charactersData.filter(c => c.ownerId !== activePlayerId);
+                }
+                activeCharacterId = null;
+                saveLocalPersistence();
+                CompendioNetAdapter.broadcastCharacters();
+                renderCharacterModule();
+                return;
+            }
+            if (activeModule === 'tabletop') {
+                clearTabletopTokens();
+                return;
+            }
             if (currentCategory === 'quests') {
                 if (!confirm('Deseja limpar todas as Quests?')) return;
                 questsData = [];
@@ -1901,6 +2699,77 @@
             showToast(`🗑️ "${title || key}" removido!`);
         }
 
+        /* =========================================================
+           SISTEMA DE CONHECIMENTO ASSIMÉTRICO ("ESTUDAR" & SEGREDOS)
+           ========================================================= */
+        function getEntityKnowledgeKey(category, itemKey) {
+            return `${category}:${itemKey}`;
+        }
+
+        function getEntityKnowledgeRecord(category, itemKey) {
+            const k = getEntityKnowledgeKey(category, itemKey);
+            if (!entityKnowledge[k]) {
+                const defaultGlobal = (category === 'session') ? 'hidden' : 'sighted';
+                entityKnowledge[k] = { globalLevel: defaultGlobal, playerLevels: {} };
+            }
+            return entityKnowledge[k];
+        }
+
+        function getEffectiveKnowledgeLevel(category, itemKey, playerId = activePlayerId) {
+            const p = playersData.find(x => x.id === playerId) || getActivePlayer();
+            if (p && p.role === 'gm') return 'gm';
+            const rec = getEntityKnowledgeRecord(category, itemKey);
+            const rank = { hidden: 0, sighted: 1, studied: 2 };
+            const gLvl = rec.globalLevel || 'sighted';
+            const pLvl = (rec.playerLevels && rec.playerLevels[playerId]) || 'hidden';
+            return (rank[pLvl] > rank[gLvl]) ? pLvl : gLvl;
+        }
+
+        function setEntityGlobalKnowledge(category, itemKey, level) {
+            const p = getActivePlayer();
+            if (!p || p.role !== 'gm') return;
+            const rec = getEntityKnowledgeRecord(category, itemKey);
+            rec.globalLevel = level;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastKnowledge();
+            if (activeModule === 'compendium' && activeItemContext) {
+                loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
+            } else if (activeModule === 'tabletop') {
+                renderTabletopModule();
+            }
+            showToast(`👁️ Visibilidade global alterada para: ${level.toUpperCase()}`);
+        }
+
+        function togglePlayerStudiedKnowledge(category, itemKey, targetPlayerId) {
+            const p = getActivePlayer();
+            if (!p || p.role !== 'gm') return;
+            const rec = getEntityKnowledgeRecord(category, itemKey);
+            if (!rec.playerLevels) rec.playerLevels = {};
+            const current = rec.playerLevels[targetPlayerId];
+            rec.playerLevels[targetPlayerId] = (current === 'studied') ? 'sighted' : 'studied';
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastKnowledge();
+            if (activeModule === 'compendium' && activeItemContext) {
+                loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
+            } else if (activeModule === 'tabletop') {
+                renderTabletopModule();
+            }
+            const tp = playersData.find(x => x.id === targetPlayerId);
+            showToast(`📖 Conhecimento de ${tp ? tp.name : targetPlayerId}: ${rec.playerLevels[targetPlayerId].toUpperCase()}`);
+        }
+
+        function describeQualitativeHealth(hpCurrent, hpMax, type = 'monster') {
+            if (type === 'item' || type === 'object') return '📦 Objeto / Item';
+            const cur = Number(hpCurrent) || 0;
+            const max = Math.max(1, Number(hpMax) || 1);
+            const ratio = cur / max;
+            if (cur <= 0) return '💀 Derrotado';
+            if (ratio >= 0.95) return '🟢 Intacto';
+            if (ratio >= 0.5) return '🟡 Ferido';
+            if (ratio >= 0.2) return '🟠 Gravemente Ferido';
+            return '🔴 À Beira da Morte';
+        }
+
         function renderList(items, listTitle, collection, autoLoad = true, parentView = null, groupKey = '') {
             const listContainer = document.getElementById('dynamic-item-list');
             const displayArea = document.getElementById('dynamic-display-area');
@@ -1908,6 +2777,7 @@
             const searchInput = document.getElementById('list-search-input');
             if (searchInput) searchInput.value = '';
 
+            const isGm = getActivePlayer()?.role === 'gm';
             const listView = { items, listTitle, collection, parentView, groupKey };
             currentListView = listView;
             listContainer.innerHTML = '';
@@ -1919,6 +2789,10 @@
 
             for (const [key, data] of Object.entries(items)) {
                 if (!data) continue;
+                if (!data.children && !isGm) {
+                    const effLvl = getEffectiveKnowledgeLevel(currentCategory, key);
+                    if (effLvl === 'hidden') continue;
+                }
                 if (!firstItemKey) firstItemKey = key;
 
                 const li = document.createElement('li');
@@ -1938,14 +2812,24 @@
                     badge.className = 'list-item-folder-badge';
                     badge.textContent = `📁 ${Object.keys(data.children).length}`;
                     rightWrap.appendChild(badge);
+                } else if (isGm) {
+                    const rec = getEntityKnowledgeRecord(currentCategory, key);
+                    const visIcon = rec.globalLevel === 'hidden' ? '🔒' : (rec.globalLevel === 'studied' ? '📖' : '👁️');
+                    const visBadge = document.createElement('span');
+                    visBadge.className = 'list-item-folder-badge';
+                    visBadge.title = `Visibilidade p/ Jogadores: ${rec.globalLevel}`;
+                    visBadge.textContent = visIcon;
+                    rightWrap.appendChild(visBadge);
                 }
 
-                const delBtn = document.createElement('button');
-                delBtn.className = 'btn-quick-del';
-                delBtn.textContent = '✕';
-                delBtn.title = 'Excluir pasta ou documento';
-                delBtn.onclick = (e) => deleteSingleListEntry(key, collection, data.title || key, e);
-                rightWrap.appendChild(delBtn);
+                if (isGm) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'btn-quick-del';
+                    delBtn.textContent = '✕';
+                    delBtn.title = 'Excluir pasta ou documento';
+                    delBtn.onclick = (e) => deleteSingleListEntry(key, collection, data.title || key, e);
+                    rightWrap.appendChild(delBtn);
+                }
 
                 li.appendChild(rightWrap);
 
@@ -1971,14 +2855,14 @@
                     displayArea.innerHTML = `
                         <div class="info-container">
                             <h2 class="info-title">${listTitle}</h2>
-                            <p class="info-text">Selecione uma pasta ou item na barra lateral à esquerda, ou clique em <strong>"＋ Nova Página"</strong>.</p>
+                            <p class="info-text">Selecione uma pasta ou item na barra lateral à esquerda.</p>
                         </div>`;
                 }
             } else {
                 displayArea.innerHTML = `
                     <div class="info-container">
-                        <h2 class="info-title">Nenhum Registro nesta Categoria</h2>
-                        <p class="info-text">Clique em <strong>"＋ Nova Página"</strong> ou <strong>"⚡ Código Único"</strong> no menu lateral para adicionar conteúdo.</p>
+                        <h2 class="info-title">Nenhum Registro Visível nesta Categoria</h2>
+                        <p class="info-text">${isGm ? 'Clique em "＋ Nova Página" ou "⚡ Código Único" no menu lateral para adicionar conteúdo.' : 'O Mestre ainda não revelou registros nesta seção para o seu personagem.'}</p>
                     </div>`;
             }
         }
@@ -1998,6 +2882,8 @@
         }
 
         function navigateCategory(categoryName, element) {
+            activeModule = 'compendium';
+            updateMainModuleButtonsUI();
             document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
             if (element) element.classList.add('active');
             
@@ -2041,6 +2927,952 @@
             }
 
             renderList(items, categoryTitles[categoryName] || ('Lista de ' + categoryName), items, false, null, '');
+        }
+
+        /* =========================================================
+           NAVEGAÇÃO DE DIRETÓRIOS / MÓDULOS DA SIDEBAR & IDENTIDADE
+           ========================================================= */
+        function updateMainModuleButtonsUI() {
+            const btnComp = document.getElementById('btn-dir-compendium');
+            const btnChar = document.getElementById('btn-dir-character');
+            const btnTT = document.getElementById('btn-dir-tabletop');
+            if (btnComp) btnComp.classList.toggle('active', activeModule === 'compendium');
+            if (btnChar) btnChar.classList.toggle('active', activeModule === 'character');
+            if (btnTT) btnTT.classList.toggle('active', activeModule === 'tabletop');
+
+            const isGm = getActivePlayer()?.role === 'gm';
+            const ctaEl = document.querySelector('.sidebar-cta');
+            if (ctaEl) ctaEl.style.display = isGm ? 'flex' : 'none';
+            const sessNav = document.querySelector('.nav-item[data-cat="session"]');
+            if (sessNav) sessNav.style.display = isGm ? 'flex' : 'none';
+        }
+
+        function toggleCompendiumDirectory() {
+            const dirEl = document.getElementById('sidebar-compendium-dir');
+            const chevEl = document.getElementById('chevron-dir-compendium');
+            if (activeModule !== 'compendium') {
+                activeModule = 'compendium';
+                if (dirEl && !dirEl.classList.contains('open')) {
+                    dirEl.classList.add('open');
+                    if (chevEl) chevEl.textContent = '▼';
+                }
+                updateMainModuleButtonsUI();
+                const activeNav = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
+                navigateCategory(currentCategory, activeNav);
+                return;
+            }
+            if (dirEl) {
+                const isOpen = dirEl.classList.toggle('open');
+                if (chevEl) chevEl.textContent = isOpen ? '▼' : '▸';
+            }
+        }
+
+        function switchMainModule(moduleName) {
+            activeModule = moduleName;
+            updateMainModuleButtonsUI();
+            document.getElementById('session-back').style.display = 'none';
+            if (moduleName === 'character') {
+                renderCharacterModule();
+            } else if (moduleName === 'tabletop') {
+                renderTabletopModule();
+            } else {
+                const activeNav = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
+                navigateCategory(currentCategory, activeNav);
+            }
+        }
+
+        function onHeaderAddClick() {
+            if (activeModule === 'character') {
+                createNewCharacterForActivePlayer();
+            } else if (activeModule === 'tabletop') {
+                addActiveCharacterToTabletop();
+            } else {
+                if (getActivePlayer()?.role !== 'gm') {
+                    showToast('🔒 Apenas o Mestre pode criar páginas no Compêndio.');
+                    return;
+                }
+                openStudioModal();
+            }
+        }
+
+        function getActivePlayer() {
+            return playersData.find(p => p.id === activePlayerId) || playersData[0];
+        }
+
+        function renderPlayerIdentitySelector() {
+            const sel = document.getElementById('active-player-select');
+            if (!sel) return;
+            sel.innerHTML = playersData.map(p => {
+                const badge = p.role === 'gm' ? '👑' : '🎮';
+                const lock = p.pin ? ' 🔒' : '';
+                return `<option value="${escapeHtmlText(p.id)}" ${p.id === activePlayerId ? 'selected' : ''}>${badge} ${escapeHtmlText(p.name)}${lock}</option>`;
+            }).join('');
+            updateMainModuleButtonsUI();
+        }
+
+        function onPlayerIdentityChange(newPlayerId) {
+            const check = CompendioNetAdapter.verifyIdentity(newPlayerId);
+            if (!check.verified) return;
+            const targetPlayer = check.player;
+            if (targetPlayer.pin && targetPlayer.id !== activePlayerId) {
+                const entered = prompt(`🔐 Digite o PIN de acesso para entrar como "${targetPlayer.name}":`);
+                if (entered !== targetPlayer.pin) {
+                    showToast('❌ PIN incorreto! Acesso negado.');
+                    renderPlayerIdentitySelector();
+                    return;
+                }
+            }
+            activePlayerId = newPlayerId;
+            saveLocalPersistence();
+            renderPlayerIdentitySelector();
+            if (activeModule === 'character') renderCharacterModule();
+            else if (activeModule === 'tabletop') renderTabletopModule();
+            else {
+                if (currentCategory === 'session' && targetPlayer.role !== 'gm') {
+                    currentCategory = 'monsters';
+                }
+                navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
+            }
+            showToast(`👤 Perfil ativo: ${targetPlayer.name}`);
+        }
+
+        function configureActivePlayerPin() {
+            const p = getActivePlayer();
+            if (!p) return;
+            if (p.pin) {
+                const oldPin = prompt(`Digite o PIN atual de "${p.name}" para alterá-lo:`);
+                if (oldPin !== p.pin) {
+                    showToast('❌ PIN atual incorreto.');
+                    return;
+                }
+            }
+            const newPin = prompt(`Defina um novo PIN/Senha para "${p.name}" (deixe vazio para remover o PIN):`, p.pin || '');
+            if (newPin === null) return;
+            p.pin = newPin.trim();
+            saveLocalPersistence();
+            renderPlayerIdentitySelector();
+            showToast(p.pin ? `🔐 PIN protegido configurado para "${p.name}"!` : `🔓 PIN removido de "${p.name}".`);
+        }
+
+        function promptAddPlayerIdentity() {
+            const name = prompt('Nome do novo jogador (ex: Bruno, Sofia):');
+            if (!name || !name.trim()) return;
+            const cleanName = name.trim();
+            const pin = prompt(`Opcional: Defina um PIN de acesso para "${cleanName}" (ou deixe em branco):`, '') || '';
+            const id = 'player-' + Date.now().toString(36);
+            playersData.push({
+                id,
+                name: cleanName,
+                role: 'player',
+                pin: pin.trim(),
+                authKey: 'local-' + id
+            });
+            activePlayerId = id;
+            saveLocalPersistence();
+            renderPlayerIdentitySelector();
+            if (activeModule === 'character') renderCharacterModule();
+            else if (activeModule === 'tabletop') renderTabletopModule();
+            else navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
+            showToast(`✅ Jogador "${cleanName}" adicionado e selecionado!`);
+        }
+
+        /* =========================================================
+           MÓDULO 2: PERSONAGEM (INDIVIDUAL POR JOGADOR + IMPORT JSON/PDF)
+           ========================================================= */
+        function calcAbilityMod(score) {
+            return Math.floor(((Number(score) || 10) - 10) / 2);
+        }
+
+        function formatSigned(val) {
+            const n = Number(val) || 0;
+            return n >= 0 ? `+${n}` : `${n}`;
+        }
+
+        function canAccessFullCharacterSheet(charObj) {
+            if (!charObj) return false;
+            const player = getActivePlayer();
+            if (!player || player.role === 'gm') return true;
+            return charObj.ownerId === player.id;
+        }
+
+        function getVisibleCharactersForActivePlayer() {
+            return charactersData;
+        }
+
+        function createNewCharacterForActivePlayer() {
+            const player = getActivePlayer();
+            const ownerId = (player && player.role !== 'gm') ? player.id : (playersData.find(p => p.role === 'player')?.id || player.id);
+            const ownerObj = playersData.find(p => p.id === ownerId) || player;
+            const newChar = {
+                id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+                name: 'Novo Aventureiro',
+                ownerId: ownerObj.id,
+                ownerName: ownerObj.name,
+                race: 'Humano',
+                classLevel: 'Guerreiro 1',
+                ac: 16,
+                hpCurrent: 12,
+                hpMax: 12,
+                hpTemp: 0,
+                speed: '9m (30 ft)',
+                initiativeBonus: 0,
+                passivePerceptionBonus: 0,
+                hitDieType: 10,
+                hitDieCurrent: 1,
+                hitDieMax: 1,
+                stats: { str: 15, dex: 13, con: 14, int: 10, wis: 12, cha: 8 },
+                inventory: '',
+                notes: '',
+                tokenImg: ''
+            };
+            charactersData.push(newChar);
+            activeCharacterId = newChar.id;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            renderCharacterModule();
+            showToast(`🛡️ Personagem criado para ${ownerObj.name}!`);
+        }
+
+        function selectCharacter(charId) {
+            activeCharacterId = charId;
+            renderCharacterModule();
+        }
+
+        function exportCharacterJson(charId) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c) return;
+            const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `personagem-${slugify(c.name || 'ficha')}.json`;
+            a.click();
+            showToast(`📤 Ficha de "${c.name}" exportada em JSON!`);
+        }
+
+        function renderCharacterModule() {
+            const player = getActivePlayer();
+            const isGm = player && player.role === 'gm';
+            const allChars = charactersData;
+            const listTitleEl = document.getElementById('dynamic-list-title');
+            if (listTitleEl) {
+                listTitleEl.textContent = isGm
+                    ? `Personagens (Todos: ${allChars.length})`
+                    : `Grupo (${player ? player.name : 'Jogador'})`;
+            }
+
+            if (!activeCharacterId || !allChars.some(c => c.id === activeCharacterId)) {
+                const ownChar = allChars.find(c => c.ownerId === activePlayerId);
+                activeCharacterId = (ownChar || allChars[0])?.id || null;
+            }
+
+            const listEl = document.getElementById('dynamic-item-list');
+            if (listEl) {
+                listEl.innerHTML = allChars.map(c => {
+                    const isAct = c.id === activeCharacterId ? 'active' : '';
+                    const isMine = canAccessFullCharacterSheet(c);
+                    const statusBadge = isMine
+                        ? `<span class="list-item-folder-badge" style="color:#8df596;">${c.hpCurrent}/${c.hpMax} PV</span>`
+                        : `<span class="list-item-folder-badge" style="color:#f2cf83;">${describeQualitativeHealth(c.hpCurrent, c.hpMax, 'pc')}</span>`;
+                    return `
+                        <li class="list-item ${isAct}" data-title="${escapeHtmlText(c.name.toLowerCase())}" onclick="selectCharacter('${c.id}')">
+                            <span>${isMine ? '🛡️' : '👁️'} ${escapeHtmlText(c.name)}</span>
+                            <div class="list-item-right">
+                                <span class="list-item-folder-badge">${escapeHtmlText(c.ownerName || 'Jogador')}</span>
+                                ${statusBadge}
+                            </div>
+                        </li>
+                    `;
+                }).join('') || '<li class="list-item" style="color:#828699;">Nenhum personagem cadastrado</li>';
+            }
+
+            const displayArea = document.getElementById('dynamic-display-area');
+            const activeChar = allChars.find(c => c.id === activeCharacterId);
+
+            const testFilesDropdown = `
+                <select class="form-control" style="width:auto; max-width:225px; padding:4px 8px; font-size:11.5px; border-color:#d8b467;" onchange="if(this.value){importTestFileFromPublic(this.value); this.value='';}" title="Testar importação direta dos arquivos da pasta public/import-tests/">
+                    <option value="">🧪 Testar Pasta import-tests/...</option>
+                    <option value="kael-varhen-ek-13-v2.pdf">📄 kael-varhen-ek-13-v2.pdf (EN)</option>
+                    <option value="kiriton.pdf">📄 kiriton.pdf (PT-BR)</option>
+                    <option value="character-sheet.pdf">📄 character-sheet.pdf (Auxiz)</option>
+                    <option value="La Loba.pdf">📄 La Loba.pdf (Lvl 22)</option>
+                    <option value="DnD_2024_Character-Sheet (PT-BR).pdf">📄 DnD_2024_Character-Sheet (PT-BR).pdf</option>
+                    <option value="astel.html">🌐 astel.html (Ficha HTML)</option>
+                    <option value="animated-armor.json">📋 animated-armor.json (5etools)</option>
+                </select>
+            `;
+
+            if (!activeChar) {
+                displayArea.innerHTML = `
+                    <div class="info-container">
+                        <h2 class="info-title">🛡️ Personagens (${escapeHtmlText(player ? player.name : '')})</h2>
+                        <p class="info-text">Nenhum personagem cadastrado ainda. Crie uma ficha do zero ou importe um arquivo <strong>.JSON</strong>, <strong>.PDF</strong> ou <strong>.HTML</strong>.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="createNewCharacterForActivePlayer()">＋ Criar Ficha de Personagem</button>
+                            <button type="button" class="btn-action-bar" style="padding:10px 18px;" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
+                            ${testFilesDropdown}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!canAccessFullCharacterSheet(activeChar)) {
+                displayArea.innerHTML = `
+                    <div class="info-container" style="max-width:720px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:2px groove var(--border-color); padding-bottom:10px; margin-bottom:14px;">
+                            <div>
+                                <h2 class="info-title" style="margin:0; border:none; padding:0;">👁️ ${escapeHtmlText(activeChar.name)} (Visão Pública de Grupo)</h2>
+                                <div style="font-size:12px; color:#a0a4b8; margin-top:4px;">
+                                    Personagem controlado por: <strong>${escapeHtmlText(activeChar.ownerName)}</strong>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                                <button type="button" class="btn-summon-card" onclick="createNewCharacterForActivePlayer()">＋ Criar Meu Personagem</button>
+                                <button type="button" class="btn-action-bar" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
+                                ${testFilesDropdown}
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <p style="font-size:14px; margin:6px 0;"><strong>Raça / Origem:</strong> ${escapeHtmlText(activeChar.race || 'Desconhecido')}</p>
+                            <p style="font-size:14px; margin:6px 0;"><strong>Classe / Arquétipo:</strong> ${escapeHtmlText(activeChar.classLevel || 'Aventureiro')}</p>
+                            <p style="font-size:14px; margin:6px 0;"><strong>Estado Aparente:</strong> ${describeQualitativeHealth(activeChar.hpCurrent, activeChar.hpMax, 'pc')}</p>
+                        </div>
+                        <div class="knowledge-seal-box">
+                            <strong>🔒 Ficha Privada de Outro Jogador</strong>
+                            <p style="font-size:12.5px; margin:6px 0 0 0; color:#b8b2a6;">
+                                Atributos exatos, pontos de vida numéricos, inventário e anotações pessoais pertencem apenas a <strong>${escapeHtmlText(activeChar.ownerName)}</strong> e ao <strong>Mestre (GM)</strong>.
+                            </p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const stats = activeChar.stats || { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+            const dexMod = calcAbilityMod(stats.dex);
+            const wisMod = calcAbilityMod(stats.wis);
+            const totalInit = dexMod + (Number(activeChar.initiativeBonus) || 0);
+            const passivePerception = 10 + wisMod + (Number(activeChar.passivePerceptionBonus) || 0);
+
+            const ownerOptions = playersData.map(p =>
+                `<option value="${escapeHtmlText(p.id)}" ${p.id === activeChar.ownerId ? 'selected' : ''}>${escapeHtmlText(p.name)}</option>`
+            ).join('');
+
+            const statLabels = [
+                { key: 'str', label: 'FOR' },
+                { key: 'dex', label: 'DES' },
+                { key: 'con', label: 'CON' },
+                { key: 'int', label: 'INT' },
+                { key: 'wis', label: 'SAB' },
+                { key: 'cha', label: 'CAR' }
+            ];
+
+            displayArea.innerHTML = `
+                <div class="info-container" style="max-width:920px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:2px groove var(--border-color); padding-bottom:10px; margin-bottom:14px;">
+                        <div>
+                            <h2 class="info-title" style="margin:0; border:none; padding:0;">🛡️ ${escapeHtmlText(activeChar.name)}</h2>
+                            <div style="font-size:11px; color:#a0a4b8; margin-top:2px;">
+                                Jogador Responsável: <strong>${escapeHtmlText(activeChar.ownerName)}</strong> (${escapeHtmlText(activeChar.ownerId)})
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            ${testFilesDropdown}
+                            <button type="button" class="btn-action-bar" onclick="document.getElementById('universal-sheet-import-input').click()" title="Importar ficha de personagem via arquivo .JSON, .PDF ou .HTML">📥 Importar (.JSON / .PDF / .HTML)</button>
+                            <button type="button" class="btn-action-bar" onclick="exportCharacterJson('${activeChar.id}')" title="Baixar ficha em formato .JSON">📤 Exportar .JSON</button>
+                            <button type="button" class="btn-summon-card" onclick="sendCharacterToTabletop('${activeChar.id}')">🎲 Enviar ao Tabletop</button>
+                            <button type="button" class="btn-action-bar" onclick="shortRestCharacter('${activeChar.id}')" title="Gasta 1 Dado de Vida e recupera PV">⛺ Descanso Curto</button>
+                            <button type="button" class="btn-action-bar" onclick="longRestCharacter('${activeChar.id}')" title="Recupera PV máximo e 50% dos Dados de Vida">🌙 Descanso Longo</button>
+                            <button type="button" class="btn-action-bar danger" onclick="deleteCharacter('${activeChar.id}')">🗑️ Excluir</button>
+                        </div>
+                    </div>
+
+                    <!-- Identificação & Dados Básicos -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Dados do Personagem & Identidade do Jogador</h3>
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Nome do Personagem</label>
+                                <input type="text" class="form-control" value="${escapeHtmlText(activeChar.name)}" onchange="updateCharacterField('${activeChar.id}', 'name', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Raça / Origem</label>
+                                <input type="text" class="form-control" value="${escapeHtmlText(activeChar.race || '')}" onchange="updateCharacterField('${activeChar.id}', 'race', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Classe & Nível</label>
+                                <input type="text" class="form-control" value="${escapeHtmlText(activeChar.classLevel || '')}" onchange="updateCharacterField('${activeChar.id}', 'classLevel', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Jogador Dono (Identidade)</label>
+                                <select class="form-control" ${isGm ? '' : 'disabled'} onchange="updateCharacterOwner('${activeChar.id}', this.value)">${ownerOptions}</select>
+                            </div>
+                            <div class="form-group">
+                                <label>Deslocamento</label>
+                                <input type="text" class="form-control" value="${escapeHtmlText(activeChar.speed || '9m')}" onchange="updateCharacterField('${activeChar.id}', 'speed', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Classe de Armadura (CA)</label>
+                                <input type="number" class="form-control" value="${Number(activeChar.ac) || 10}" onchange="updateCharacterField('${activeChar.id}', 'ac', Number(this.value))">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combate, Percepção Passiva, Iniciativa e Dados de Vida -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Vitalidade, Percepção Passiva, Iniciativa & Dados de Vida</h3>
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>PV Atual / PV Máximo</label>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" class="form-control" value="${Number(activeChar.hpCurrent) || 0}" onchange="updateCharacterField('${activeChar.id}', 'hpCurrent', Number(this.value))">
+                                    <span>/</span>
+                                    <input type="number" class="form-control" value="${Number(activeChar.hpMax) || 1}" onchange="updateCharacterField('${activeChar.id}', 'hpMax', Number(this.value))">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Iniciativa Total: <strong style="color:#f2cf83;">${formatSigned(totalInit)}</strong> (DES ${formatSigned(dexMod)} + Bônus)</label>
+                                <input type="number" class="form-control" value="${Number(activeChar.initiativeBonus) || 0}" title="Bônus extra de Iniciativa" onchange="updateCharacterField('${activeChar.id}', 'initiativeBonus', Number(this.value))">
+                            </div>
+                            <div class="form-group">
+                                <label>Percepção Passiva: <strong style="color:#8df596;">${passivePerception}</strong> (10 + SAB ${formatSigned(wisMod)} + Bônus)</label>
+                                <input type="number" class="form-control" value="${Number(activeChar.passivePerceptionBonus) || 0}" title="Bônus de Proficiência/Talento em Percepção" onchange="updateCharacterField('${activeChar.id}', 'passivePerceptionBonus', Number(this.value))">
+                            </div>
+                            <div class="form-group">
+                                <label>Dados de Vida (Atual / Máx)</label>
+                                <div style="display:flex; gap:6px; align-items:center;">
+                                    <input type="number" class="form-control" value="${Number(activeChar.hitDieCurrent) ?? 1}" onchange="updateCharacterField('${activeChar.id}', 'hitDieCurrent', Number(this.value))">
+                                    <span>/</span>
+                                    <input type="number" class="form-control" value="${Number(activeChar.hitDieMax) || 1}" onchange="updateCharacterField('${activeChar.id}', 'hitDieMax', Number(this.value))">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Dado de Vida</label>
+                                <select class="form-control" onchange="updateCharacterField('${activeChar.id}', 'hitDieType', Number(this.value))">
+                                    <option value="6" ${Number(activeChar.hitDieType) === 6 ? 'selected' : ''}>d6</option>
+                                    <option value="8" ${Number(activeChar.hitDieType) === 8 ? 'selected' : ''}>d8</option>
+                                    <option value="10" ${Number(activeChar.hitDieType) === 10 ? 'selected' : ''}>d10</option>
+                                    <option value="12" ${Number(activeChar.hitDieType) === 12 ? 'selected' : ''}>d12</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>PV Temporário</label>
+                                <input type="number" class="form-control" value="${Number(activeChar.hpTemp) || 0}" onchange="updateCharacterField('${activeChar.id}', 'hpTemp', Number(this.value))">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Atributos -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Atributos Principais</h3>
+                        <div class="form-grid-6">
+                            ${statLabels.map(st => {
+                                const val = Number(stats[st.key]) || 10;
+                                const mod = calcAbilityMod(val);
+                                return `
+                                    <div class="form-group" style="text-align:center; background:#18191f; padding:8px; border-radius:6px; border:1px solid #3c3e4a;">
+                                        <label style="font-size:12px; color:#f2cf83;">${st.label} (${formatSigned(mod)})</label>
+                                        <input type="number" class="form-control" style="text-align:center; font-weight:bold;" value="${val}" onchange="updateCharacterStat('${activeChar.id}', '${st.key}', Number(this.value))">
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Inventário e Notas -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Equipamentos, Magias & Anotações do Jogador</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Inventário / Recursos</label>
+                                <textarea class="form-control" style="min-height:110px;" placeholder="Armas, poções, ouro, sintonizações..." onchange="updateCharacterField('${activeChar.id}', 'inventory', this.value)">${escapeHtmlText(activeChar.inventory || '')}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Traços, Talentos & Notas da Sessão</label>
+                                <textarea class="form-control" style="min-height:110px;" placeholder="Habilidades de classe, anotações pessoais..." onchange="updateCharacterField('${activeChar.id}', 'notes', this.value)">${escapeHtmlText(activeChar.notes || '')}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCharacterField(charId, field, value) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c || !canAccessFullCharacterSheet(c)) return;
+            c[field] = value;
+            tabletopState.tokens.forEach(t => {
+                if (t.refId === charId) {
+                    if (field === 'name') t.name = value;
+                    if (field === 'hpCurrent') t.hpCurrent = value;
+                    if (field === 'hpMax') t.hpMax = value;
+                    if (field === 'ac') t.ac = value;
+                }
+            });
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            CompendioNetAdapter.broadcastTabletop();
+            renderCharacterModule();
+        }
+
+        function updateCharacterOwner(charId, newOwnerId) {
+            const c = charactersData.find(x => x.id === charId);
+            const p = playersData.find(x => x.id === newOwnerId);
+            if (!c || !p) return;
+            c.ownerId = p.id;
+            c.ownerName = p.name;
+            tabletopState.tokens.forEach(t => {
+                if (t.refId === charId) t.ownerId = p.id;
+            });
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            renderCharacterModule();
+        }
+
+        function updateCharacterStat(charId, statKey, value) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c || !canAccessFullCharacterSheet(c)) return;
+            if (!c.stats) c.stats = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+            c.stats[statKey] = value;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            renderCharacterModule();
+        }
+
+        function shortRestCharacter(charId) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c || !canAccessFullCharacterSheet(c)) return;
+            if ((c.hitDieCurrent || 0) <= 0) {
+                showToast('⚠️ Sem Dados de Vida restantes para Descanso Curto!');
+                return;
+            }
+            const die = Number(c.hitDieType) || 8;
+            const conMod = calcAbilityMod(c.stats?.con || 10);
+            const roll = Math.floor(Math.random() * die) + 1;
+            const heal = Math.max(1, roll + conMod);
+            c.hitDieCurrent = Math.max(0, (c.hitDieCurrent || 1) - 1);
+            c.hpCurrent = Math.min(c.hpMax, (Number(c.hpCurrent) || 0) + heal);
+            updateCharacterField(charId, 'hpCurrent', c.hpCurrent);
+            showToast(`⛺ Descanso Curto (${c.name}): 1d${die}(${roll}) ${formatSigned(conMod)} = +${heal} PV!`);
+        }
+
+        function longRestCharacter(charId) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c || !canAccessFullCharacterSheet(c)) return;
+            const recHD = Math.max(1, Math.floor((Number(c.hitDieMax) || 1) / 2));
+            c.hpCurrent = Number(c.hpMax) || 10;
+            c.hpTemp = 0;
+            c.hitDieCurrent = Math.min(Number(c.hitDieMax) || 1, (Number(c.hitDieCurrent) || 0) + recHD);
+            updateCharacterField(charId, 'hpCurrent', c.hpCurrent);
+            showToast(`🌙 Descanso Longo (${c.name}): PV restaurado e +${recHD} Dado(s) de Vida!`);
+        }
+
+        function deleteCharacter(charId) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c || !canAccessFullCharacterSheet(c) || !confirm(`Excluir a ficha de "${c.name}"?`)) return;
+            charactersData = charactersData.filter(x => x.id !== charId);
+            if (activeCharacterId === charId) activeCharacterId = null;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            renderCharacterModule();
+            showToast('🗑️ Personagem removido.');
+        }
+
+        function sendCharacterToTabletop(charId) {
+            const c = charactersData.find(x => x.id === charId);
+            if (!c) return;
+            let existing = tabletopState.tokens.find(t => t.refId === c.id);
+            if (!existing) {
+                const offset = (tabletopState.tokens.length % 8) * (tabletopState.gridSize || 56);
+                tabletopState.tokens.push({
+                    id: 'tok-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+                    refId: c.id,
+                    name: c.name,
+                    type: 'pc',
+                    category: 'character',
+                    itemKey: c.id,
+                    groupKey: '',
+                    ownerId: c.ownerId,
+                    x: 112 + offset,
+                    y: 112,
+                    hpCurrent: c.hpCurrent,
+                    hpMax: c.hpMax,
+                    ac: c.ac,
+                    imgSrc: c.tokenImg || ''
+                });
+                saveLocalPersistence();
+                CompendioNetAdapter.broadcastTabletop();
+            }
+            switchMainModule('tabletop');
+            showToast(`🎲 "${c.name}" posicionado no Tabletop!`);
+        }
+
+        /* =========================================================
+           MÓDULO 3: TABLETOP UNIVERSAL (TUDO É FICHA E TUDO É TOKEN)
+           ========================================================= */
+        function addActiveCharacterToTabletop() {
+            const ownChar = charactersData.find(c => c.ownerId === activePlayerId) || charactersData.find(c => c.id === activeCharacterId);
+            if (!ownChar) {
+                createNewCharacterForActivePlayer();
+            }
+            const target = charactersData.find(c => c.id === activeCharacterId) || charactersData[0];
+            if (target) sendCharacterToTabletop(target.id);
+        }
+
+        function addCatalogEntityToTabletop(selectVal) {
+            if (!selectVal) return;
+            const [cat, groupKey, itemKey, title] = selectVal.split('|');
+            spawnCompendiumEntityToken(cat, groupKey, itemKey, title);
+        }
+
+        function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle = '') {
+            if (cat === 'maps') {
+                const root = compendioData.maps || {};
+                const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
+                if (entry?.path) {
+                    tabletopState.mapPath = entry.path;
+                    saveLocalPersistence();
+                    CompendioNetAdapter.broadcastTabletop();
+                    switchMainModule('tabletop');
+                    showToast(`🗺️ Mapa "${entry.title || itemKey}" carregado no Tabletop!`);
+                    return;
+                }
+            }
+
+            const root = compendioData[cat] || {};
+            const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
+            const title = entry?.title || fallbackTitle || itemKey;
+
+            let hp = 30;
+            let ac = 14;
+            let imgSrc = '';
+            if (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedJson) {
+                const j = activeItemContext.loadedJson;
+                hp = Number(j.hp?.average) || Number(j.hp) || 30;
+                ac = Array.isArray(j.ac) ? (j.ac[0]?.ac || j.ac[0] || 14) : (Number(j.ac) || 14);
+                const paths = getResourcePaths(entry || {}, j);
+                if (j.customToken) imgSrc = virtualFiles[j.customToken] || j.customToken;
+                else if (paths.token && paths.token[0]) imgSrc = paths.token[0];
+            } else if (entry?.path && isImagePath(entry.path, entry.tipo)) {
+                imgSrc = resolveRenderableImageSrc(entry.path, entry.inlineContent);
+            }
+
+            const tokenType = cat === 'items' || cat === 'curio' ? 'item' : (cat === 'npcs' ? 'npc' : 'monster');
+            const offset = (tabletopState.tokens.length % 10) * (tabletopState.gridSize || 56);
+
+            const knowRec = getEntityKnowledgeRecord(cat, itemKey);
+            if (knowRec.globalLevel === 'hidden') knowRec.globalLevel = 'sighted';
+
+            tabletopState.tokens.push({
+                id: 'tok-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+                refId: `${cat}:${itemKey}`,
+                category: cat,
+                groupKey: groupKey || '',
+                itemKey,
+                name: title,
+                type: tokenType,
+                ownerId: 'gm-master',
+                x: 224 + offset,
+                y: 224,
+                hpCurrent: hp,
+                hpMax: hp,
+                ac,
+                imgSrc
+            });
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastKnowledge();
+            CompendioNetAdapter.broadcastTabletop();
+            switchMainModule('tabletop');
+            showToast(`🎲 Token "${title}" posicionado no Tabletop!`);
+        }
+
+        function canSeeTokenExactStats(tok) {
+            const p = getActivePlayer();
+            if (!p || p.role === 'gm') return true;
+            if (tok.ownerId === p.id) return true;
+            if (tok.category && tok.itemKey) {
+                return getEffectiveKnowledgeLevel(tok.category, tok.itemKey, p.id) === 'studied';
+            }
+            return false;
+        }
+
+        function openSheetFromTabletopToken(tokenId) {
+            const tok = tabletopState.tokens.find(t => t.id === tokenId);
+            if (!tok) return;
+            if (tok.type === 'pc' || tok.category === 'character') {
+                activeCharacterId = tok.refId;
+                switchMainModule('character');
+                return;
+            }
+            if (tok.category && tok.itemKey) {
+                activeModule = 'compendium';
+                updateMainModuleButtonsUI();
+                jumpToCatalogEntity(tok.category, tok.groupKey || '', tok.itemKey);
+            }
+        }
+
+        function renderTabletopModule() {
+            const player = getActivePlayer();
+            const isGm = player && player.role === 'gm';
+            const listTitleEl = document.getElementById('dynamic-list-title');
+            if (listTitleEl) {
+                listTitleEl.textContent = `Tokens na Mesa (${tabletopState.tokens.length})`;
+            }
+
+            const listEl = document.getElementById('dynamic-item-list');
+            if (listEl) {
+                listEl.innerHTML = tabletopState.tokens.map(t => {
+                    const isSel = t.id === selectedTabletopTokenId ? 'active' : '';
+                    const icon = t.type === 'pc' ? '🛡️' : (t.type === 'item' ? '⚔️' : (t.type === 'npc' ? '🧙‍♂️' : '🐉'));
+                    const showExact = canSeeTokenExactStats(t);
+                    const statusText = t.type === 'item'
+                        ? 'Item'
+                        : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type));
+                    const canDel = CompendioNetAdapter.canControlEntity(t.ownerId);
+                    return `
+                        <li class="list-item ${isSel}" data-title="${escapeHtmlText(t.name.toLowerCase())}" onclick="selectTabletopToken('${t.id}')">
+                            <span>${icon} ${escapeHtmlText(t.name)}</span>
+                            <div class="list-item-right">
+                                <span class="list-item-folder-badge" style="color:#8df596;">${statusText}</span>
+                                ${canDel ? `<button type="button" class="btn-quick-del" onclick="event.stopPropagation(); removeTabletopToken('${t.id}')" title="Remover token">✕</button>` : ''}
+                            </div>
+                        </li>
+                    `;
+                }).join('') || '<li class="list-item" style="color:#828699;">Mesa vazia (adicione tokens)</li>';
+            }
+
+            const allMaps = getAllCatalogEntities(['maps']);
+            const mapOptions = `<option value="">🗺️ Grade Tática Escura (Padrão)</option>` +
+                allMaps.map(m => {
+                    const root = compendioData.maps || {};
+                    const entry = m.groupKey ? root[m.groupKey]?.children?.[m.itemKey] : root[m.itemKey];
+                    const path = entry?.path || '';
+                    if (!path) return '';
+                    return `<option value="${escapeHtmlText(path)}" ${tabletopState.mapPath === path ? 'selected' : ''}>🗺️ ${escapeHtmlText(m.title)}</option>`;
+                }).join('');
+
+            const monsterEntities = getAllCatalogEntities(['monsters', 'npcs']);
+            const monsterOptions = `<option value="">＋ Monstro / NPC...</option>` +
+                monsterEntities.map(m => `<option value="${m.category}|${m.groupKey}|${m.itemKey}|${escapeHtmlText(m.title)}">🐉 ${escapeHtmlText(m.title)}</option>`).join('');
+
+            const itemEntities = getAllCatalogEntities(['items', 'curio']);
+            const itemOptions = `<option value="">＋ Item / Objeto...</option>` +
+                itemEntities.map(i => `<option value="${i.category}|${i.groupKey}|${i.itemKey}|${escapeHtmlText(i.title)}">⚔️ ${escapeHtmlText(i.title)}</option>`).join('');
+
+            const gridPx = Number(tabletopState.gridSize) || 56;
+            const zoomPct = Number(tabletopState.zoom) || 100;
+            const resolvedMapBg = tabletopState.mapPath ? resolveRenderableImageSrc(tabletopState.mapPath) : '';
+            const stageBgStyle = resolvedMapBg ? `background-image: url('${resolvedMapBg.replace(/'/g, "\\'")}');` : '';
+
+            const selectedTok = tabletopState.tokens.find(t => t.id === selectedTabletopTokenId);
+            let selectedTokBar = '';
+            if (selectedTok) {
+                const showExact = canSeeTokenExactStats(selectedTok);
+                const canCtrl = CompendioNetAdapter.canControlEntity(selectedTok.ownerId);
+                const hpDisplay = selectedTok.type === 'item'
+                    ? '📦 Objeto/Item'
+                    : (showExact ? `${selectedTok.hpCurrent}/${selectedTok.hpMax} PV (CA ${selectedTok.ac || '?'})` : describeQualitativeHealth(selectedTok.hpCurrent, selectedTok.hpMax, selectedTok.type));
+                const gmRevealBtn = (isGm && selectedTok.category && selectedTok.itemKey)
+                    ? `<button type="button" class="btn-mini" onclick="setEntityGlobalKnowledge('${selectedTok.category}', '${selectedTok.itemKey}', 'studied')" title="Revelar PV exato e Ficha completa para os jogadores">📖 Revelar Ficha/PV</button>`
+                    : '';
+                const playerStudyBtn = (!isGm && !showExact && selectedTok.category && selectedTok.itemKey)
+                    ? `<button type="button" class="btn-mini" onclick="CompendioNetAdapter.sendStudyRequest('${selectedTok.category}:${selectedTok.itemKey}', '${escapeHtmlText(selectedTok.name)}')">🔍 Estudar</button>`
+                    : '';
+
+                selectedTokBar = `
+                    <div style="display:flex; align-items:center; gap:5px; background:#18191f; padding:4px 8px; border-radius:5px; border:1px solid #5a5d6b; flex-wrap:wrap;">
+                        <strong style="color:#f2cf83; font-size:12px;">${escapeHtmlText(selectedTok.name)}: ${hpDisplay}</strong>
+                        <button type="button" class="btn-mini" onclick="openSheetFromTabletopToken('${selectedTok.id}')">📄 Abrir Ficha</button>
+                        ${gmRevealBtn}
+                        ${playerStudyBtn}
+                        ${(canCtrl && selectedTok.type !== 'item') ? `
+                            <button type="button" class="btn-mini" onclick="adjustTabletopTokenHp('${selectedTok.id}', -5)">-5</button>
+                            <button type="button" class="btn-mini" onclick="adjustTabletopTokenHp('${selectedTok.id}', -1)">-1</button>
+                            <button type="button" class="btn-mini" onclick="adjustTabletopTokenHp('${selectedTok.id}', 1)">+1</button>
+                            <button type="button" class="btn-mini" onclick="adjustTabletopTokenHp('${selectedTok.id}', 5)">+5</button>
+                        ` : ''}
+                        ${canCtrl ? `<button type="button" class="btn-mini danger" onclick="removeTabletopToken('${selectedTok.id}')">✕</button>` : ''}
+                    </div>
+                `;
+            }
+
+            const tokensHtml = tabletopState.tokens.map(t => {
+                const isSel = t.id === selectedTabletopTokenId ? 'selected-token' : '';
+                const typeCls = t.type === 'monster' ? 'monster-token' : (t.type === 'npc' ? 'npc-token' : (t.type === 'item' ? 'item-token' : ''));
+                const initials = String(t.name || '?').trim().slice(0, 2).toUpperCase();
+                const sz = gridPx - 6;
+                const canMove = CompendioNetAdapter.canControlEntity(t.ownerId);
+                const showExact = canSeeTokenExactStats(t);
+                const badgeText = t.type === 'item'
+                    ? '⚔️ Item'
+                    : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type));
+                const bgImgStyle = t.imgSrc ? `background-image:url('${t.imgSrc.replace(/'/g, "\\'")}');` : '';
+                return `
+                    <div class="tt-token ${typeCls} ${isSel}"
+                         style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${canMove ? '1' : '0.92'}; ${bgImgStyle}"
+                         onmousedown="startDragTabletopToken(event, '${t.id}')"
+                         ondblclick="openSheetFromTabletopToken('${t.id}')"
+                         title="${escapeHtmlText(t.name)} (Duplo-clique abre a Ficha)">
+                        <span class="tt-token-hp">${badgeText}</span>
+                        ${t.imgSrc ? '' : `<span>${escapeHtmlText(initials)}</span>`}
+                        <span class="tt-token-label">${escapeHtmlText(t.name)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const displayArea = document.getElementById('dynamic-display-area');
+            displayArea.innerHTML = `
+                <div class="tabletop-wrap">
+                    <div class="tabletop-toolbar">
+                        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                            ${isGm ? `<select class="form-control" style="width:auto; min-width:170px; padding:4px 8px;" onchange="onTabletopMapChange(this.value)">${mapOptions}</select>` : ''}
+                            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="addActiveCharacterToTabletop()">🛡️ + Meu Personagem</button>
+                            ${isGm ? `
+                                <select class="form-control" style="width:auto; max-width:165px; padding:4px 8px;" onchange="addCatalogEntityToTabletop(this.value); this.value='';">${monsterOptions}</select>
+                                <select class="form-control" style="width:auto; max-width:165px; padding:4px 8px;" onchange="addCatalogEntityToTabletop(this.value); this.value='';">${itemOptions}</select>
+                            ` : ''}
+                            <label style="display:flex; align-items:center; gap:4px; font-size:11px; color:#c2c6d6; cursor:pointer;">
+                                <input type="checkbox" ${tabletopState.snapToGrid ? 'checked' : ''} onchange="toggleTabletopSnap(this.checked)"> Grade (${gridPx}px)
+                            </label>
+                        </div>
+                        ${selectedTokBar}
+                        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                            <span style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px;" title="Sincronização local e via /api/session ativa">
+                                📡 ${escapeHtmlText(tabletopState.networkMode.toUpperCase())} | 👤 ${escapeHtmlText(player ? player.name : '')}
+                            </span>
+                            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="zoomTabletop(0.85)">➖</button>
+                            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="zoomTabletop(1, true)">${zoomPct}%</button>
+                            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="zoomTabletop(1.15)">➕</button>
+                            ${isGm ? `<button type="button" class="btn-mini danger" style="flex:0 0 auto;" onclick="clearTabletopTokens()" title="Limpar tokens da mesa">🗑️ Limpar</button>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="tabletop-board-viewport" id="tabletop-viewport">
+                        <div class="tabletop-stage" id="tabletop-stage" style="${stageBgStyle} transform: scale(${zoomPct / 100});">
+                            <div class="tabletop-grid-overlay" style="background-size: ${gridPx}px ${gridPx}px;"></div>
+                            ${tokensHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectTabletopToken(tokenId) {
+            selectedTabletopTokenId = tokenId;
+            renderTabletopModule();
+        }
+
+        function onTabletopMapChange(newMapPath) {
+            tabletopState.mapPath = newMapPath || '';
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastTabletop();
+            renderTabletopModule();
+        }
+
+        function toggleTabletopSnap(checked) {
+            tabletopState.snapToGrid = Boolean(checked);
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastTabletop();
+        }
+
+        function zoomTabletop(factor, reset = false) {
+            if (reset) {
+                tabletopState.zoom = 100;
+            } else {
+                tabletopState.zoom = Math.max(40, Math.min(220, Math.round((tabletopState.zoom || 100) * factor)));
+            }
+            saveLocalPersistence();
+            renderTabletopModule();
+        }
+
+        function adjustTabletopTokenHp(tokenId, delta) {
+            const tok = tabletopState.tokens.find(t => t.id === tokenId);
+            if (!tok) return;
+            if (!CompendioNetAdapter.canControlEntity(tok.ownerId)) {
+                showToast('⚠️ Apenas o jogador dono ou o Mestre pode alterar este token.');
+                return;
+            }
+            tok.hpCurrent = Math.max(0, Math.min(tok.hpMax, (Number(tok.hpCurrent) || 0) + delta));
+            const linkedChar = charactersData.find(c => c.id === tok.refId);
+            if (linkedChar) linkedChar.hpCurrent = tok.hpCurrent;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastTabletop();
+            CompendioNetAdapter.broadcastCharacters();
+            renderTabletopModule();
+        }
+
+        function removeTabletopToken(tokenId) {
+            const tok = tabletopState.tokens.find(t => t.id === tokenId);
+            if (!tok) return;
+            if (!CompendioNetAdapter.canControlEntity(tok.ownerId)) {
+                showToast('⚠️ Permissão negada para remover token de outro jogador.');
+                return;
+            }
+            tabletopState.tokens = tabletopState.tokens.filter(t => t.id !== tokenId);
+            if (selectedTabletopTokenId === tokenId) selectedTabletopTokenId = null;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastTabletop();
+            renderTabletopModule();
+        }
+
+        function clearTabletopTokens() {
+            if (!confirm('Remover todos os tokens do Tabletop?')) return;
+            tabletopState.tokens = [];
+            selectedTabletopTokenId = null;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastTabletop();
+            renderTabletopModule();
+        }
+
+        function startDragTabletopToken(e, tokenId) {
+            if (e.button !== 0) return;
+            e.stopPropagation();
+            const tok = tabletopState.tokens.find(t => t.id === tokenId);
+            if (!tok) return;
+            selectedTabletopTokenId = tokenId;
+
+            if (!CompendioNetAdapter.canControlEntity(tok.ownerId)) {
+                showToast(`🔒 Token pertence a outro jogador. Troque a Identidade na barra lateral ou use Mestre (GM).`);
+                renderTabletopModule();
+                return;
+            }
+
+            const stage = document.getElementById('tabletop-stage');
+            const tokenEl = e.currentTarget;
+            if (!stage || !tokenEl) return;
+
+            const scale = (Number(tabletopState.zoom) || 100) / 100;
+            const startMouseX = e.clientX;
+            const startMouseY = e.clientY;
+            const origX = Number(tok.x) || 0;
+            const origY = Number(tok.y) || 0;
+
+            function onMouseMove(moveEv) {
+                const dx = (moveEv.clientX - startMouseX) / scale;
+                const dy = (moveEv.clientY - startMouseY) / scale;
+                let nx = Math.max(0, Math.min(1540, origX + dx));
+                let ny = Math.max(0, Math.min(940, origY + dy));
+                tokenEl.style.left = nx + 'px';
+                tokenEl.style.top = ny + 'px';
+                tok.x = Math.round(nx);
+                tok.y = Math.round(ny);
+            }
+
+            function onMouseUp() {
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+                if (tabletopState.snapToGrid) {
+                    const g = Number(tabletopState.gridSize) || 56;
+                    tok.x = Math.round(tok.x / g) * g + 3;
+                    tok.y = Math.round(tok.y / g) * g + 3;
+                }
+                saveLocalPersistence();
+                CompendioNetAdapter.broadcastTabletop();
+                renderTabletopModule();
+            }
+
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
         }
 
         /* =========================================================
@@ -2743,18 +4575,155 @@
             `;
         }
 
+        function renderKnowledgeControlBarHtml(category, itemKey, itemTitle) {
+            const activePl = getActivePlayer();
+            const isGm = activePl && activePl.role === 'gm';
+            const rec = getEntityKnowledgeRecord(category, itemKey);
+
+            if (!isGm) return '';
+
+            const safeCat = String(category).replace(/'/g, "\\'");
+            const safeKey = String(itemKey).replace(/'/g, "\\'");
+            const nonGmPlayers = playersData.filter(p => p.role !== 'gm');
+
+            const playerPills = nonGmPlayers.map(p => {
+                const isStudied = (rec.playerLevels && rec.playerLevels[p.id] === 'studied') || (Array.isArray(rec.studiedBy) && rec.studiedBy.includes(p.id));
+                return `
+                    <button type="button" class="vis-pill ${isStudied ? 'active-studied' : ''}" onclick="togglePlayerEntityStudied('${safeCat}', '${safeKey}', '${p.id}')" title="Revelar/Ocultar Ficha Completa individualmente para ${escapeHtmlText(p.name)}">
+                        ${isStudied ? '📖' : '👁️'} ${escapeHtmlText(p.name)}
+                    </button>
+                `;
+            }).join('');
+
+            return `
+                <div class="gm-visibility-bar">
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                        <span class="gm-vis-label">👁️ Visibilidade Global (Fog of Knowledge):</span>
+                        <button type="button" class="vis-pill ${rec.globalLevel === 'hidden' ? 'active-hidden' : ''}" onclick="setGlobalEntityKnowledge('${safeCat}', '${safeKey}', 'hidden')">🔒 Oculto (Segredo GM)</button>
+                        <button type="button" class="vis-pill ${rec.globalLevel === 'sighted' ? 'active-sighted' : ''}" onclick="setGlobalEntityKnowledge('${safeCat}', '${safeKey}', 'sighted')">👁️ Avistado (Só Aparência/Token)</button>
+                        <button type="button" class="vis-pill ${rec.globalLevel === 'studied' ? 'active-studied' : ''}" onclick="setGlobalEntityKnowledge('${safeCat}', '${safeKey}', 'studied')">📖 Estudado (Ficha Liberada)</button>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                        <span class="gm-vis-label">🎯 Estudo Individual:</span>
+                        ${playerPills}
+                    </div>
+                </div>
+            `;
+        }
+
+        function setGlobalEntityKnowledge(category, itemKey, level) {
+            setEntityGlobalKnowledge(category, itemKey, level);
+            if (currentListView) {
+                renderList(currentListView.items, currentListView.listTitle, currentListView.collection, false, currentListView.parentView, currentListView.groupKey);
+            }
+        }
+
+        function togglePlayerEntityStudied(category, itemKey, playerId) {
+            togglePlayerStudiedKnowledge(category, itemKey, playerId);
+        }
+
+        function requestStudyActiveEntity() {
+            if (!activeItemContext) return;
+            const { category, key, itemData } = activeItemContext;
+            const title = itemData?.title || key;
+            CompendioNetAdapter.sendStudyRequest(`${category || currentCategory}:${key}`, title);
+        }
+
+        function exportActiveCompendiumEntryJson() {
+            if (!activeItemContext) return;
+            const { key, itemData, loadedJson, loadedText, loadedHtml, category } = activeItemContext;
+            const effLvl = getEffectiveKnowledgeLevel(category || currentCategory, key);
+            if (effLvl !== 'studied') {
+                showToast('🔒 Você precisa Estudar esta entidade antes de exportar a ficha completa.');
+                return;
+            }
+            const payload = loadedJson || {
+                compendiumEntry: true,
+                category: category || currentCategory,
+                key,
+                title: itemData?.title || key,
+                tipo: itemData?.tipo || 'json',
+                content: loadedText || loadedHtml || itemData?.inlineContent || ''
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `ficha-${slugify(itemData?.title || key)}.json`;
+            a.click();
+            showToast(`📤 Ficha de "${itemData?.title || key}" exportada em .JSON!`);
+        }
+
         function renderEntryToolbar(includeHtmlMonsterSpawner = false) {
             if (!activeItemContext) return '';
-            const extraSummon = includeHtmlMonsterSpawner
+            const isGm = getActivePlayer()?.role === 'gm';
+            const cat = activeItemContext.category || currentCategory;
+            const gKey = activeItemContext.groupKey || '';
+            const iKey = activeItemContext.key || '';
+            const effLvl = getEffectiveKnowledgeLevel(cat, iKey);
+
+            const extraSummon = (includeHtmlMonsterSpawner && isGm)
                 ? renderSummonSealHtml(activeItemContext.itemData?.title || 'Criatura', 80, '15')
                 : '<div></div>';
+
+            const safeCat = String(cat).replace(/'/g, "\\'");
+            const safeGrp = String(gKey).replace(/'/g, "\\'");
+            const safeKey = String(iKey).replace(/'/g, "\\'");
+
             return `
+                ${renderKnowledgeControlBarHtml(cat, iKey, activeItemContext.itemData?.title || iKey)}
                 <div class="entry-toolbar">
                     ${extraSummon}
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" class="btn-action-bar" onclick="openStudioModal()">＋ Nova Página</button>
-                        <button type="button" class="btn-action-bar" onclick="editActiveEntry()">✏️ Editar esta Página</button>
-                        <button type="button" class="btn-action-bar danger" onclick="deleteActiveEntry()">🗑️ Excluir</button>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn-summon-card" onclick="spawnCompendiumEntityToken('${safeCat}', '${safeGrp}', '${safeKey}')" title="Transformar esta Ficha em um Token posicionado no mapa Tabletop">🎲 Enviar ao Tabletop (Token)</button>
+                        ${effLvl === 'studied' ? `<button type="button" class="btn-action-bar" onclick="exportActiveCompendiumEntryJson()" title="Exportar esta ficha em formato .JSON">📤 Exportar .JSON</button>` : ''}
+                        ${isGm ? `
+                            <button type="button" class="btn-action-bar" onclick="openStudioModal()">＋ Nova Página</button>
+                            <button type="button" class="btn-action-bar" onclick="editActiveEntry()">✏️ Editar esta Página</button>
+                            <button type="button" class="btn-action-bar danger" onclick="deleteActiveEntry()">🗑️ Excluir</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSightedOnlyMaskHtml(itemTitle, category, itemData, rawJson = null) {
+            const typeBadge = rawJson
+                ? (rawJson.wondrous || rawJson.rarity ? '🎒 Item / Artefato Avistado' : `🐾 Criatura Avistada (${Array.isArray(rawJson.size) ? rawJson.size[0] : 'M'} · ${typeof rawJson.type === 'string' ? rawJson.type : (rawJson.type?.type || 'Desconhecido')})`)
+                : ({ monsters: '👹 Criatura Avistada', npcs: '🎭 NPC Avistado', items: '🎒 Item Avistado', curio: '📜 Conhecimento Parcial', maps: '🗺️ Local Avistado' }[category] || '👁️ Registro Avistado');
+
+            let visualHtml = '';
+            if (rawJson) {
+                const resHtml = renderResources(rawJson, itemData);
+                const paths = getResourcePaths(itemData, rawJson);
+                const customArtUrl = rawJson.customArt ? (virtualFiles[rawJson.customArt] || rawJson.customArt) : null;
+                const artHtml = (customArtUrl || (rawJson.hasFluffImages && paths.fluff.length))
+                    ? `<div class="images-container" style="max-width:340px; margin:10px auto;">${renderFallbackImage(customArtUrl ? [customArtUrl] : paths.fluff, itemTitle, 'full-artwork')}</div>`
+                    : '';
+                visualHtml = `<div style="display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin:14px 0;">${resHtml}${artHtml}</div>`;
+            }
+
+            const linkedTok = tabletopState.tokens.find(t => t.category === category && t.itemKey === activeItemContext?.key);
+            const qualLabel = linkedTok
+                ? describeQualitativeHealth(linkedTok.hpCurrent, linkedTok.hpMax, linkedTok.type)
+                : '🟢 Aparentemente Intacto';
+
+            return `
+                <div class="knowledge-seal-box">
+                    <span class="seal-badge">${typeBadge}</span>
+                    <h2 style="color:#f0c36d; margin:6px 0 4px 0; font-family:Georgia, serif;">👁️ ${escapeHtmlText(itemTitle)}</h2>
+                    ${ (category === 'monsters' || category === 'npcs') ? `
+                        <div style="margin:6px 0 12px 0; font-size:13px; color:#8df596; font-weight:bold;">
+                            Estado Físico Aparente: ${qualLabel} <span style="color:#8e94a8; font-weight:normal;">(PV exatos, CA e ações ocultos)</span>
+                        </div>
+                    ` : ''}
+                    ${visualHtml}
+                    <p style="color:#c5cae0; font-size:13px; max-width:560px; margin:10px auto 16px auto; line-height:1.5;">
+                        Seu personagem apenas <strong>avistou</strong> ou ouviu falar de <strong>${escapeHtmlText(itemTitle)}</strong>, mas ainda não conhece suas estatísticas exatas, pontos de vida totais, fraquezas ou propriedades ocultas.
+                    </p>
+                    <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn-summon-card" onclick="requestStudyActiveEntity()">
+                            🔍 Usar Ação "Estudar" (Solicitar ao Mestre)
+                        </button>
                     </div>
                 </div>
             `;
@@ -2776,6 +4745,20 @@
 
             activeItemContext = { key: itemKey, itemData, collection, groupKey, category: currentCategory };
 
+            const effKnowledge = getEffectiveKnowledgeLevel(currentCategory, itemKey);
+            if (effKnowledge === 'hidden') {
+                displayArea.innerHTML = `
+                    <div class="display-foreground">
+                        <div class="knowledge-seal-box">
+                            <span class="seal-badge">🔒 Segredo do Mestre</span>
+                            <h2 style="color:#ff8a80; margin:8px 0;">Informação Oculta</h2>
+                            <p style="color:#b8bdd0; font-size:13px;">Este registro ainda não foi descoberto pelo seu personagem.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             try {
                 displayArea.innerHTML = '<div style="text-align: center; padding: 50px; color: #828699;">Carregando registro...</div>';
 
@@ -2791,6 +4774,25 @@
                         effectivePath = extractedFromInline;
                         effectiveInline = '';
                     }
+                }
+
+                // Se o jogador apenas AVISTOU (sighted) um Monstro, NPC, Item ou Curiosidade, oculta os atributos/segredos até Estudar!
+                if (effKnowledge === 'sighted' && ['monsters', 'npcs', 'items', 'curio', 'session'].includes(currentCategory)) {
+                    let previewJson = null;
+                    if (isJsonPath(effectivePath, itemData.tipo)) {
+                        try {
+                            const rawText = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                            previewJson = parseJsonWithFallback(rawText, effectivePath);
+                            activeItemContext.loadedJson = previewJson;
+                        } catch (e) {}
+                    }
+                    displayArea.innerHTML = `
+                        <div class="display-foreground">
+                            ${renderEntryToolbar(false)}
+                            ${renderSightedOnlyMaskHtml(itemTitle, currentCategory, itemData, previewJson)}
+                        </div>
+                    `;
+                    return;
                 }
 
                 // 1. Se for Imagem ou SVG Singular (por extensão/tipo ou porque o conteúdo inline é um <svg> ou data:image/)
@@ -3980,9 +5982,835 @@
             reader.readAsText(file);
         }
 
-        function handleJsonFileUpload(event) {
+        /* =========================================================
+           IMPORTADOR UNIVERSAL DE FICHAS (.JSON, .PDF E .HTML)
+           Suporta:
+           - Fichas D&D 2024 (Inglês Text1..Text114 e PT-BR AcroForm com escapes #XX)
+           - Fichas D&D 5e Clássicas (AcroForm e Fluxo FlateDecode)
+           - Fichas HTML Estruturadas (ex: astel.html)
+           - Fichas JSON (Nativo, 5etools ex: animated-armor.json, Foundry VTT, D&D Beyond)
+           ========================================================= */
+        function decodePdfHexEscapes(str) {
+            if (!str || !str.includes('#')) return str;
+            try {
+                const bytes = [];
+                for (let i = 0; i < str.length; i++) {
+                    if (str[i] === '#' && /^[0-9A-Fa-f]{2}$/.test(str.slice(i + 1, i + 3))) {
+                        bytes.push(parseInt(str.slice(i + 1, i + 3), 16));
+                        i += 2;
+                    } else {
+                        bytes.push(str.charCodeAt(i) & 0xFF);
+                    }
+                }
+                return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(bytes));
+            } catch (e) {
+                return str;
+            }
+        }
+
+        function decodePdfStringToken(token) {
+            if (!token) return '';
+            const t = token.trim();
+            if (t.startsWith('<') && t.endsWith('>')) {
+                const hex = t.slice(1, -1).replace(/\s+/g, '');
+                const bytes = [];
+                for (let i = 0; i < hex.length; i += 2) {
+                    bytes.push(parseInt(hex.substr(i, 2).padEnd(2, '0'), 16));
+                }
+                if (bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) {
+                    let out = '';
+                    for (let i = 2; i + 1 < bytes.length; i += 2) {
+                        out += String.fromCharCode((bytes[i] << 8) | bytes[i + 1]);
+                    }
+                    return out.replace(/\u0000/g, '').trim();
+                }
+                return bytes.map(b => String.fromCharCode(b)).join('').replace(/\u0000/g, '').trim();
+            }
+            if (t.startsWith('(') && t.endsWith(')')) {
+                let inner = t.slice(1, -1);
+                inner = inner
+                    .replace(/\\\r?\n/g, '')
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\r/g, '\r')
+                    .replace(/\\t/g, '\t')
+                    .replace(/\\\(/g, '(')
+                    .replace(/\\\)/g, ')')
+                    .replace(/\\\\/g, '\\')
+                    .replace(/\\([0-7]{1,3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8)));
+                if (inner.length >= 2 && inner.charCodeAt(0) === 0xFE && inner.charCodeAt(1) === 0xFF) {
+                    return inner.slice(2).replace(/\u0000/g, '').trim();
+                }
+                return decodePdfHexEscapes(inner.replace(/\u0000/g, '')).trim();
+            }
+            if (t.startsWith('/')) return decodePdfHexEscapes(t.slice(1)).trim();
+            return t;
+        }
+
+        async function tryDecompressPdfStream(uint8Slice) {
+            if (typeof DecompressionStream === 'undefined' || !uint8Slice || uint8Slice.length < 4) return '';
+            // Verifica cabeçalho zlib (0x78) para não travar em streams de fonte/imagem binária
+            if (uint8Slice[0] !== 0x78) return '';
+            try {
+                const ds = new DecompressionStream('deflate');
+                const writer = ds.writable.getWriter();
+                writer.write(uint8Slice).catch(() => {});
+                writer.close().catch(() => {});
+                const resp = new Response(ds.readable);
+                const ab = await Promise.race([
+                    resp.arrayBuffer(),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 120))
+                ]);
+                return new TextDecoder('latin1').decode(new Uint8Array(ab));
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function extractTextOperatorsFromPdfChunk(chunkStr) {
+            if (!chunkStr || chunkStr.length > 180000) return '';
+            const pieces = [];
+            const tjRegex = /\(([^()]{1,240})\)\s*Tj/g;
+            let m;
+            while ((m = tjRegex.exec(chunkStr)) !== null) {
+                const s = decodePdfStringToken('(' + m[1] + ')');
+                if (s) pieces.push(s);
+            }
+            const tjArrRegex = /\[([^\][]{1,600})\]\s*TJ/g;
+            while ((m = tjArrRegex.exec(chunkStr)) !== null) {
+                const sub = m[1];
+                const strTokens = sub.match(/\([^()]{1,200}\)/g) || [];
+                const line = strTokens.map(decodePdfStringToken).join('');
+                if (line.trim()) pieces.push(line);
+            }
+            return pieces.join(' ');
+        }
+
+        async function extractTextAndFieldsFromPdf(arrayBuffer) {
+            const bytes = new Uint8Array(arrayBuffer);
+            const rawStr = new TextDecoder('latin1').decode(bytes);
+            const fields = {};
+
+            // 1. Extrai campos de formulário AcroForm (/T ... /V ...) removendo blocos stream..endstream antes
+            const dictOnlyStr = rawStr.replace(/stream\r?\n[\s\S]*?endstream/g, ' ');
+            const objBlocks = dictOnlyStr.split(/endobj/g);
+            for (const block of objBlocks) {
+                if (!block.includes('/T') || !block.includes('/V')) continue;
+                const tMatch = block.match(/\/T\s*(\((?:\\.|[^\\)])*\)|<[0-9A-Fa-f\s]+>)/);
+                const vMatch = block.match(/\/V\s*(\((?:\\.|[^\\)])*\)|<[0-9A-Fa-f\s]+>|\/[^\s/<>[\]()]+)/);
+                if (tMatch && vMatch) {
+                    const key = decodePdfHexEscapes(decodePdfStringToken(tMatch[1])).replace(/\u0000/g, '').trim();
+                    const val = decodePdfStringToken(vMatch[1]).replace(/\u0000/g, '').trim();
+                    if (key && val && val !== 'Off' && val !== 'No' && val !== 'Yes') {
+                        fields[key] = val;
+                        fields[key.toLowerCase()] = val;
+                    }
+                }
+            }
+
+            // 2. Extrai texto de streams (FlateDecode ou texto puro) caso o PDF não seja AcroForm
+            const textLines = [];
+            if (Object.keys(fields).length === 0 && !rawStr.includes('/AcroForm')) {
+                const streamRegex = /stream\r?\n/g;
+                let sm;
+                let streamCount = 0;
+                while ((sm = streamRegex.exec(rawStr)) !== null && streamCount < 15) {
+                    const startOffset = sm.index + sm[0].length;
+                    const endIdx = rawStr.indexOf('endstream', startOffset);
+                    if (endIdx === -1) break;
+                    let endOffset = endIdx;
+                    if (rawStr[endOffset - 1] === '\n') endOffset--;
+                    if (rawStr[endOffset - 1] === '\r') endOffset--;
+
+                    const sliceLen = endOffset - startOffset;
+                    if (sliceLen > 0 && sliceLen < 120000) {
+                        streamCount++;
+                        const slice = bytes.subarray(startOffset, endOffset);
+                        const decompressed = await tryDecompressPdfStream(slice);
+                        const sourceChunk = decompressed || rawStr.slice(startOffset, endOffset);
+                        const extracted = extractTextOperatorsFromPdfChunk(sourceChunk);
+                        if (extracted.trim()) textLines.push(extracted.trim());
+                    }
+                }
+            }
+
+            if (textLines.length === 0) {
+                const directText = extractTextOperatorsFromPdfChunk(rawStr);
+                if (directText.trim()) textLines.push(directText.trim());
+            }
+
+            const fullText = [
+                ...Object.entries(fields)
+                    .filter(([k]) => k !== k.toLowerCase() || !fields[k.toUpperCase()])
+                    .map(([k, v]) => `${k}: ${v}`),
+                ...textLines
+            ].join('\n');
+
+            return { fields, textLines, fullText };
+        }
+
+        function pickPdfFieldExact(fields, candidates, fallback = '') {
+            for (const c of candidates) {
+                if (fields[c] !== undefined && String(fields[c]).trim() !== '' && fields[c] !== 'Yes') {
+                    return String(fields[c]).trim();
+                }
+                const kl = String(c).toLowerCase();
+                if (fields[kl] !== undefined && String(fields[kl]).trim() !== '' && fields[kl] !== 'Yes') {
+                    return String(fields[kl]).trim();
+                }
+            }
+            return fallback;
+        }
+
+        function resolveDefaultOwnerInfo() {
+            const player = getActivePlayer();
+            const ownerId = (player && player.role !== 'gm')
+                ? player.id
+                : (playersData.find(p => p.role === 'player')?.id || (player ? player.id : 'player-1'));
+            const ownerObj = playersData.find(p => p.id === ownerId) || player || { id: 'player-1', name: 'Jogador 1' };
+            return { ownerId: ownerObj.id, ownerName: ownerObj.name };
+        }
+
+        function parseCharacterFromPdfData(pdfData, fileName = 'Ficha.pdf') {
+            const { fields, fullText } = pdfData;
+            const cleanFileName = String(fileName).replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+            const { ownerId, ownerName } = resolveDefaultOwnerInfo();
+
+            const is2024PT = Boolean(
+                fields['Esquerda Centro Single 12'] ||
+                fields['Esquerda Centro Single 12_3'] ||
+                fields['Números Centralizados HV 8 Single_15'] ||
+                fields['Números Centralizados HV 8 Single_5'] ||
+                fields['Esquerda baixo 12']
+            );
+            const is2024EN = !is2024PT && Boolean(fields['Text1'] || fields['Text7'] || fields['Text8'] || fields['Text64'] || fields['Text14']);
+
+            let name = '';
+            let className = '';
+            let subclass = '';
+            let level = 1;
+            let race = '';
+            let background = '';
+            let alignment = 'Neutro';
+            let str = 10, dex = 10, con = 10, int = 10, wis = 10, cha = 10;
+            let ac = 10, hpCurrent = 10, hpMax = 10, hpTemp = 0;
+            let speed = '9m (30 ft)', hitDieType = 8, hitDieCurrent = 1, hitDieMax = 1;
+            let passivePerceptionVal = 0;
+            let initVal = null;
+            let attacksList = [];
+            let spellsList = [];
+            let inventoryList = [];
+            let featuresList = [];
+            let notesList = [];
+
+            if (is2024EN) {
+                name = pickPdfFieldExact(fields, ['Text1'], cleanFileName || 'Herói D&D 2024');
+                background = pickPdfFieldExact(fields, ['Text6'], '');
+                className = pickPdfFieldExact(fields, ['Text7'], 'Aventureiro');
+                race = pickPdfFieldExact(fields, ['Text8'], 'Humano');
+                subclass = pickPdfFieldExact(fields, ['Text9'], '');
+                level = Math.max(1, parseInt(pickPdfFieldExact(fields, ['Text11'], '1')) || 1);
+                ac = Math.max(1, parseInt(pickPdfFieldExact(fields, ['Text13'], '14')) || 14);
+
+                str = parseInt(pickPdfFieldExact(fields, ['Text64'], '10')) || 10;
+                dex = parseInt(pickPdfFieldExact(fields, ['Text66'], '10')) || 10;
+                con = parseInt(pickPdfFieldExact(fields, ['Text67'], '10')) || 10;
+                int = parseInt(pickPdfFieldExact(fields, ['Text63'], '10')) || 10;
+                wis = parseInt(pickPdfFieldExact(fields, ['Text65'], '10')) || 10;
+                cha = parseInt(pickPdfFieldExact(fields, ['Text68'], '10')) || 10;
+
+                const t14 = pickPdfFieldExact(fields, ['Text14'], '');
+                const t16 = pickPdfFieldExact(fields, ['Text16'], '');
+                const t17 = pickPdfFieldExact(fields, ['Text17'], '');
+                hpCurrent = parseInt(t14) || parseInt(t16) || 12;
+                hpMax = (!/d/i.test(t16) && parseInt(t16)) ? parseInt(t16) : hpCurrent;
+                hpTemp = parseInt(pickPdfFieldExact(fields, ['Text15'], '0')) || 0;
+
+                const hdStr = /d/i.test(t16) ? t16 : t17;
+                const hdMatch = hdStr.match(/(\d+)?\s*d\s*(\d+)/i);
+                if (hdMatch) {
+                    hitDieCurrent = parseInt(hdMatch[1]) || level;
+                    hitDieType = parseInt(hdMatch[2]) || 8;
+                } else {
+                    hitDieCurrent = parseInt(t17) || level;
+                    hitDieType = /barbarian|b[áa]rbaro/i.test(className) ? 12 : (/fighter|guerreiro|paladin|ranger/i.test(className) ? 10 : (/wizard|mago|sorcerer|feiticeiro/i.test(className) ? 6 : 8));
+                }
+                hitDieMax = Math.max(level, hitDieCurrent);
+
+                speed = pickPdfFieldExact(fields, ['Text27'], '9m (30 ft)');
+                passivePerceptionVal = parseInt(pickPdfFieldExact(fields, ['Text29'], '0')) || 0;
+                const initRaw = pickPdfFieldExact(fields, ['Text26'], '');
+                if (initRaw !== '' && !isNaN(parseInt(initRaw))) initVal = parseInt(initRaw);
+                alignment = pickPdfFieldExact(fields, ['Text100'], 'Neutro');
+
+                for (let base = 30; base <= 50; base += 4) {
+                    const wn = pickPdfFieldExact(fields, [`Text${base}`], '');
+                    const wa = pickPdfFieldExact(fields, [`Text${base + 1}`], '');
+                    const wd = pickPdfFieldExact(fields, [`Text${base + 2}`], '');
+                    const wn2 = pickPdfFieldExact(fields, [`Text${base + 3}`], '');
+                    if (wn) attacksList.push(`• ${wn}${wa ? ` (${wa})` : ''}${wd ? `: ${wd}` : ''}${wn2 ? ` [${wn2}]` : ''}`);
+                }
+
+                featuresList = ['Text54', 'Text55', 'Text57', 'Text58', 'Text59', 'Text60']
+                    .map(k => pickPdfFieldExact(fields, [k], ''))
+                    .filter(Boolean);
+
+                inventoryList = ['Text99', 'Text101', 'Text102', 'Text103', 'Text104']
+                    .map(k => pickPdfFieldExact(fields, [k], ''))
+                    .filter(Boolean);
+
+                notesList = ['Text96', 'Text97', 'Text98', 'Text109']
+                    .map(k => pickPdfFieldExact(fields, [k], ''))
+                    .filter(Boolean);
+
+                for (let si = 0; si <= 29; si++) {
+                    const sp = pickPdfFieldExact(fields, [String(si)], '');
+                    if (sp && sp.length > 2 && isNaN(Number(sp))) spellsList.push(sp);
+                }
+                for (let ti = 208; ti <= 244; ti++) {
+                    const sp = pickPdfFieldExact(fields, [`Text${ti}`], '');
+                    if (sp && sp.length > 2 && isNaN(Number(sp))) spellsList.push(sp);
+                }
+            } else if (is2024PT) {
+                name = pickPdfFieldExact(fields, ['Esquerda Centro Single 12'], cleanFileName || 'Herói D&D 2024 (PT-BR)');
+                background = pickPdfFieldExact(fields, ['Esquerda Centro Single 12_2'], '');
+                className = pickPdfFieldExact(fields, ['Esquerda Centro Single 12_3'], 'Aventureiro');
+                subclass = pickPdfFieldExact(fields, ['Esquerda Centro Single 12_4'], '');
+                race = pickPdfFieldExact(fields, ['Esquerda Centro Single 12_5'], 'Humano');
+                level = Math.max(1, parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_2'], '1')) || 1);
+                ac = Math.max(1, parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 12 Single_4'], '12')) || 12);
+
+                str = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_15'], '10')) || 10;
+                dex = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_13'], '10')) || 10;
+                con = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_11'], '10')) || 10;
+                int = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_5'], '10')) || 10;
+                wis = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_7'], '10')) || 10;
+                cha = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 8 Single_9'], '10')) || 10;
+
+                const hpStr = pickPdfFieldExact(fields, ['Esquerda baixo 12', 'Esquerda baixo 12_5'], '8');
+                const hpParts = hpStr.split('/');
+                hpCurrent = Math.max(0, parseInt(hpParts[0]) || 8);
+                hpMax = Math.max(1, parseInt(hpParts[1] ?? pickPdfFieldExact(fields, ['Esquerda baixo 12_2', 'Esquerda baixo 12_5'], String(hpCurrent))) || hpCurrent);
+                speed = pickPdfFieldExact(fields, ['Números Centralizados HV 12 Single_3'], '9m');
+                passivePerceptionVal = parseInt(pickPdfFieldExact(fields, ['Números Centralizados HV 12 Single_2'], '0')) || 0;
+                const initRaw = pickPdfFieldExact(fields, ['Números Centralizados HV 12 Single'], '');
+                if (initRaw !== '' && !isNaN(parseInt(initRaw))) initVal = parseInt(initRaw);
+
+                const hdMaxStr = pickPdfFieldExact(fields, ['Esquerda baixo 12_5'], '1d8');
+                const hdMatch = hdMaxStr.match(/(\d+)?\s*d\s*(\d+)/i);
+                hitDieType = hdMatch ? (parseInt(hdMatch[2]) || 8) : 8;
+                hitDieCurrent = parseInt(pickPdfFieldExact(fields, ['Esquerda baixo 12_4'], String(level))) || level;
+                hitDieMax = Math.max(level, hitDieCurrent);
+                alignment = pickPdfFieldExact(fields, ['Caixa de texto 8'], 'Neutro');
+
+                const atk1 = [
+                    pickPdfFieldExact(fields, ['Caixa de texto 1'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_2'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_3'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_4'], '')
+                ].filter(Boolean).join(' · ');
+                const atk2 = [
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_5'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_6'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_7'], ''),
+                    pickPdfFieldExact(fields, ['Caixa de texto 1_8'], '')
+                ].filter(Boolean).join(' · ');
+                if (atk1) attacksList.push(`• ${atk1}`);
+                if (atk2) attacksList.push(`• ${atk2}`);
+
+                featuresList = [
+                    'Multi esquerda 10', 'Multi esquerda 10_2', 'Multi esquerda 10_3',
+                    'Multi esquerda 10_4', 'Multi esquerda 10_5', 'Multi esquerda 10_6'
+                ].map(k => pickPdfFieldExact(fields, [k], '')).filter(Boolean);
+
+                inventoryList = ['Caixa de texto 6_4'].map(k => pickPdfFieldExact(fields, [k], '')).filter(Boolean);
+                notesList = ['Caixa de texto 6', 'Caixa de texto 6_2', 'Caixa de texto 6_3']
+                    .map(k => pickPdfFieldExact(fields, [k], '')).filter(Boolean);
+
+                for (const [fk, fv] of Object.entries(fields)) {
+                    if (/^Magias Esq/i.test(fk) && fv && fv.length > 2) {
+                        spellsList.push(fv);
+                    }
+                }
+            } else {
+                // D&D 5e Clássico / Fluxo de texto genérico
+                name = pickPdfFieldExact(fields, ['CharacterName', 'CharacterName 2', 'CharName', 'Nome do Personagem', 'Nome', 'Name'], '') ||
+                    (fullText.match(/(?:Character Name|Nome do Personagem|Nome)\s*[:=-]\s*([^\n\r]+)/i)?.[1]?.trim()) ||
+                    cleanFileName || 'Herói Importado';
+                const classLevelRaw = pickPdfFieldExact(fields, ['ClassLevel', 'Class & Level', 'Classe e Nível', 'Classe', 'Class'], '') || 'Guerreiro 1';
+                const lvlMatch = classLevelRaw.match(/(\d{1,2})/);
+                level = lvlMatch ? Math.max(1, parseInt(lvlMatch[1]) || 1) : 1;
+                className = classLevelRaw.replace(/\d+/g, '').replace(/[\/,()-]+/g, ' ').trim() || 'Guerreiro';
+                race = pickPdfFieldExact(fields, ['Race ', 'Race', 'Raça', 'Raca', 'Species'], 'Humano');
+                alignment = pickPdfFieldExact(fields, ['Alignment', 'Tendência', 'Alinhamento'], 'Neutro');
+
+                str = parseInt(pickPdfFieldExact(fields, ['STR', 'Strength', 'Força'], '10')) || 10;
+                dex = parseInt(pickPdfFieldExact(fields, ['DEX', 'Dexterity', 'Destreza'], '10')) || 10;
+                con = parseInt(pickPdfFieldExact(fields, ['CON', 'Constitution', 'Constituição'], '10')) || 10;
+                int = parseInt(pickPdfFieldExact(fields, ['INT', 'Intelligence', 'Inteligência'], '10')) || 10;
+                wis = parseInt(pickPdfFieldExact(fields, ['WIS', 'Wisdom', 'Sabedoria'], '10')) || 10;
+                cha = parseInt(pickPdfFieldExact(fields, ['CHA', 'Charisma', 'Carisma'], '10')) || 10;
+
+                hpMax = Math.max(1, parseInt(pickPdfFieldExact(fields, ['HPMax', 'MaxHP', 'PVMax'], '12')) || 12);
+                hpCurrent = Math.max(0, parseInt(pickPdfFieldExact(fields, ['HPCurrent', 'CurrentHP', 'PVAtuais'], String(hpMax))) || hpMax);
+                ac = Math.max(1, parseInt(pickPdfFieldExact(fields, ['AC', 'CA', 'ArmorClass'], '14')) || 14);
+                speed = pickPdfFieldExact(fields, ['Speed', 'Deslocamento'], '9m (30 ft)');
+                hitDieType = 10;
+                hitDieCurrent = level;
+                hitDieMax = level;
+            }
+
+            const dexMod = calcAbilityMod(dex);
+            const wisMod = calcAbilityMod(wis);
+            const initiativeBonus = initVal !== null ? (initVal - dexMod) : 0;
+            const passivePerceptionBonus = passivePerceptionVal > 0 ? (passivePerceptionVal - (10 + wisMod)) : 0;
+
+            const fullRace = [race, background ? `(${background})` : ''].filter(Boolean).join(' ') || 'Humano';
+            const fullClassLevel = `${className}${subclass ? ` (${subclass})` : ''} ${level}`.trim();
+
+            const uniqueSpells = [...new Set(spellsList)];
+            const combinedInventory = [
+                attacksList.length ? `⚔️ ARMAS & ATAQUES:\n${attacksList.join('\n')}` : '',
+                inventoryList.length ? `🎒 EQUIPAMENTOS:\n${inventoryList.join('\n')}` : '',
+                uniqueSpells.length ? `✨ MAGIAS (${uniqueSpells.length}):\n• ${uniqueSpells.join('\n• ')}` : ''
+            ].filter(Boolean).join('\n\n') || 'Equipamento importado via PDF';
+
+            const combinedNotes = [
+                alignment ? `Alinhamento: ${alignment}` : '',
+                featuresList.length ? `🔥 CARACTERÍSTICAS & TALENTOS:\n${featuresList.join('\n\n')}` : '',
+                notesList.length ? `📜 HISTÓRIA & NOTAS:\n${notesList.join('\n\n')}` : ''
+            ].filter(Boolean).join('\n\n') || `Ficha importada de ${fileName}`;
+
+            return {
+                id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                name,
+                ownerId,
+                ownerName,
+                race: fullRace,
+                classLevel: fullClassLevel,
+                alignment,
+                ac,
+                hpCurrent,
+                hpMax,
+                hpTemp,
+                speed,
+                initiativeBonus,
+                passivePerceptionBonus,
+                hitDieType,
+                hitDieCurrent,
+                hitDieMax,
+                stats: { str, dex, con, int, wis, cha },
+                str, dex, con, int, wis, cha,
+                level,
+                attacks: attacksList.join('\n'),
+                features: featuresList.join('\n'),
+                inventory: combinedInventory,
+                notes: combinedNotes,
+                tokenImg: ''
+            };
+        }
+
+        function parseCharacterFromHtmlString(htmlStr, fileName = 'Ficha.html') {
+            const { ownerId, ownerName } = resolveDefaultOwnerInfo();
+            const stripTags = (s) => String(s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+            const nameMatch = htmlStr.match(/class="char-name"[^>]*>([\s\S]*?)<\//i) ||
+                htmlStr.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) ||
+                htmlStr.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+            const cleanName = (nameMatch ? stripTags(nameMatch[1]) : fileName.replace(/\.[^.]+$/, ''))
+                .replace(/\s*-\s*N[íi]vel.*$/i, '').trim() || 'Herói HTML';
+
+            const subMatch = htmlStr.match(/class="(?:char-sub|subtitle)"[^>]*>([\s\S]*?)<\//i);
+            const subText = subMatch ? stripTags(subMatch[1]) : '';
+            let race = 'Humano';
+            let classLevel = 'Aventureiro 1';
+
+            const levelLineMatch = htmlStr.match(/<span class="label">\s*(Level[^<]+)<\/span>/i);
+            if (subText.includes('|')) {
+                const parts = subText.split('|').map(s => s.trim());
+                race = parts[0] || race;
+                classLevel = parts.slice(1).join(' · ') || classLevel;
+            } else if (subText) {
+                race = subText;
+                if (levelLineMatch) classLevel = stripTags(levelLineMatch[1]);
+            }
+
+            const statMap = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+            // Formato 1: <table class="abilities"> (ex: astel.html)
+            const tdMatches = [...htmlStr.matchAll(/<td[^>]*>\s*(\d{1,2})\s*(?:\([+-]?\d+\))?\s*<\/td>/gi)];
+            if (tdMatches.length >= 6) {
+                statMap.str = parseInt(tdMatches[0][1]) || 10;
+                statMap.dex = parseInt(tdMatches[1][1]) || 10;
+                statMap.con = parseInt(tdMatches[2][1]) || 10;
+                statMap.int = parseInt(tdMatches[3][1]) || 10;
+                statMap.wis = parseInt(tdMatches[4][1]) || 10;
+                statMap.cha = parseInt(tdMatches[5][1]) || 10;
+            } else {
+                // Formato 2: .ability-box
+                const boxMatches = [...htmlStr.matchAll(/class="ability-name"[^>]*>([\s\S]*?)<\/[\s\S]*?class="ability-score"[^>]*>\s*(\d{1,2})/gi)];
+                for (const bm of boxMatches) {
+                    const lbl = stripTags(bm[1]).toUpperCase();
+                    const val = parseInt(bm[2]) || 10;
+                    if (lbl.startsWith('FOR') || lbl.startsWith('STR')) statMap.str = val;
+                    else if (lbl.startsWith('DES') || lbl.startsWith('DEX')) statMap.dex = val;
+                    else if (lbl.startsWith('CON')) statMap.con = val;
+                    else if (lbl.startsWith('INT')) statMap.int = val;
+                    else if (lbl.startsWith('SAB') || lbl.startsWith('WIS')) statMap.wis = val;
+                    else if (lbl.startsWith('CAR') || lbl.startsWith('CHA')) statMap.cha = val;
+                }
+            }
+
+            let ac = 16, hpMax = 40, speed = '9m', hitDieType = 10, hitDieCurrent = 1;
+            const acLine = htmlStr.match(/(?:Armor Class|Classe de Armadura|CA)\s*<\/span>\s*(\d{1,2})/i) ||
+                htmlStr.match(/class="val"[^>]*>\s*(\d{1,2})\s*<\/div>\s*<div class="label"[^>]*>\s*(?:CA|AC|Classe de Armadura)/i);
+            if (acLine) ac = parseInt(acLine[1]) || ac;
+
+            const hpLine = htmlStr.match(/(?:Hit Points|Pontos de Vida|PV)\s*<\/span>\s*(\d{1,4})(?:\s*\((\d+)d(\d+))?/i);
+            if (hpLine) {
+                hpMax = parseInt(hpLine[1]) || hpMax;
+                if (hpLine[2]) hitDieCurrent = parseInt(hpLine[2]) || 1;
+                if (hpLine[3]) hitDieType = parseInt(hpLine[3]) || 10;
+            }
+
+            const spdLine = htmlStr.match(/(?:Speed|Deslocamento)\s*<\/span>\s*([^<]+)/i);
+            if (spdLine) speed = spdLine[1].trim() || speed;
+
+            const crMatch = htmlStr.match(/Challenge\s*<\/span>\s*(\d{1,2})/i);
+            const lvlMatch = classLevel.match(/(\d{1,2})/) || htmlStr.match(/N[íi]vel\s*(\d{1,2})/i);
+            const level = lvlMatch ? parseInt(lvlMatch[1]) : (crMatch ? parseInt(crMatch[1]) : hitDieCurrent);
+            hitDieCurrent = Math.max(hitDieCurrent, level || 1);
+
+            if (classLevel === 'Level ? Cleric (Hadar)' && crMatch) {
+                classLevel = `Cleric (Hadar) · ND ${crMatch[1]}`;
+            }
+
+            const imgMatch = htmlStr.match(/<img[^>]+src="([^"]+)"/i);
+            const tokenImg = imgMatch ? imgMatch[1].replace('./npc/data/', './npc/') : '';
+
+            const statsLines = [...htmlStr.matchAll(/<div class="stats-line">([\s\S]*?)<\/div>/gi)]
+                .map(m => stripTags(m[1]))
+                .filter(Boolean);
+            const traitsLines = [...htmlStr.matchAll(/<p>([\s\S]*?)<\/p>/gi)]
+                .map(m => stripTags(m[1]))
+                .filter(Boolean);
+
+            return {
+                id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                name: cleanName,
+                ownerId,
+                ownerName,
+                race,
+                classLevel,
+                ac,
+                hpCurrent: hpMax,
+                hpMax,
+                hpTemp: 0,
+                speed,
+                initiativeBonus: 0,
+                passivePerceptionBonus: 0,
+                hitDieType,
+                hitDieCurrent,
+                hitDieMax: hitDieCurrent,
+                stats: statMap,
+                str: statMap.str, dex: statMap.dex, con: statMap.con, int: statMap.int, wis: statMap.wis, cha: statMap.cha,
+                level: level || 1,
+                inventory: statsLines.map(s => `• ${s}`).join('\n') || 'Equipamento importado via HTML',
+                notes: traitsLines.join('\n\n') || `Importado de ${fileName}`,
+                tokenImg
+            };
+        }
+
+        function parseCharacterFromJsonObject(rawObj, fileName = 'Ficha.json') {
+            let j = rawObj;
+            if (Array.isArray(j) && j.length > 0) j = j[0];
+            if (j && j.character && typeof j.character === 'object') j = j.character;
+            if (j && j.data && typeof j.data === 'object' && (j.data.stats || j.data.classes)) j = j.data;
+
+            const { ownerId, ownerName } = resolveDefaultOwnerInfo();
+
+            // Suporte a Foundry VTT Actor JSON (system.abilities, system.attributes.hp)
+            if (j && j.system && j.system.abilities) {
+                const sys = j.system;
+                const ab = sys.abilities || {};
+                const details = sys.details || {};
+                const hpObj = sys.attributes?.hp || {};
+                const acObj = sys.attributes?.ac || {};
+                const itemsArr = Array.isArray(j.items) ? j.items : [];
+                const weapons = itemsArr.filter(i => i.type === 'weapon').map(i => `• ${i.name}`).join('\n');
+                const spells = itemsArr.filter(i => i.type === 'spell').map(i => `• ${i.name}`).join('\n');
+                const feats = itemsArr.filter(i => i.type === 'feat' || i.type === 'class').map(i => `• ${i.name}`).join('\n');
+                const equip = itemsArr.filter(i => ['equipment', 'consumable', 'loot', 'backpack'].includes(i.type)).map(i => `• ${i.name}`).join('\n');
+                const lvl = Number(details.level?.value ?? details.level ?? 1) || 1;
+                const clsName = itemsArr.find(i => i.type === 'class')?.name || details.class || 'Aventureiro';
+                const stats = {
+                    str: Number(ab.str?.value ?? 10),
+                    dex: Number(ab.dex?.value ?? 10),
+                    con: Number(ab.con?.value ?? 10),
+                    int: Number(ab.int?.value ?? 10),
+                    wis: Number(ab.wis?.value ?? 10),
+                    cha: Number(ab.cha?.value ?? 10)
+                };
+
+                return {
+                    id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                    ownerId,
+                    ownerName,
+                    name: j.name || 'Herói Foundry',
+                    race: details.race?.name || details.race || 'Humano',
+                    classLevel: `${clsName} ${lvl}`,
+                    ac: Number(acObj.value ?? acObj.flat ?? 15),
+                    hpCurrent: Number(hpObj.value ?? 30),
+                    hpMax: Number(hpObj.max ?? 30),
+                    hpTemp: Number(hpObj.temp ?? 0),
+                    speed: '9m (30 ft)',
+                    initiativeBonus: 0,
+                    passivePerceptionBonus: 0,
+                    hitDieType: 10,
+                    hitDieCurrent: lvl,
+                    hitDieMax: lvl,
+                    stats,
+                    ...stats,
+                    level: lvl,
+                    tokenImg: j.prototypeToken?.texture?.src || j.img || '',
+                    inventory: [weapons, equip, spells].filter(Boolean).join('\n\n'),
+                    notes: [feats, details.biography?.value ? String(details.biography.value).replace(/<[^>]+>/g, ' ').trim() : ''].filter(Boolean).join('\n\n') || `Importado de ${fileName}`
+                };
+            }
+
+            // Suporte a D&D Beyond JSON (stats array [1..6], classes array, baseHitPoints)
+            if (j && Array.isArray(j.stats) && j.stats.length >= 6) {
+                const getStat = (id) => Number(j.stats.find(s => s.id === id)?.value ?? 10);
+                const clsStr = Array.isArray(j.classes) ? j.classes.map(c => `${c.definition?.name || 'Classe'} ${c.level || 1}`).join(' / ') : 'Aventureiro 1';
+                const totalLvl = Array.isArray(j.classes) ? j.classes.reduce((acc, c) => acc + (Number(c.level) || 1), 0) : 1;
+                const stats = { str: getStat(1), dex: getStat(2), con: getStat(3), int: getStat(4), wis: getStat(5), cha: getStat(6) };
+                const conMod = Math.floor((stats.con - 10) / 2);
+                const maxHp = (Number(j.baseHitPoints) || 10) + (conMod * totalLvl);
+                return {
+                    id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                    ownerId,
+                    ownerName,
+                    name: j.name || 'Herói D&D Beyond',
+                    race: j.race?.fullName || j.race?.baseName || 'Humano',
+                    classLevel: clsStr,
+                    ac: 15,
+                    hpCurrent: maxHp - (Number(j.removedHitPoints) || 0),
+                    hpMax: maxHp,
+                    hpTemp: Number(j.temporaryHitPoints) || 0,
+                    speed: '9m (30 ft)',
+                    initiativeBonus: 0,
+                    passivePerceptionBonus: 0,
+                    hitDieType: 10,
+                    hitDieCurrent: totalLvl || 1,
+                    hitDieMax: totalLvl || 1,
+                    stats,
+                    ...stats,
+                    level: totalLvl || 1,
+                    tokenImg: j.avatarUrl || '',
+                    inventory: Array.isArray(j.inventory) ? j.inventory.map(i => `• ${i.definition?.name || 'Item'} (x${i.quantity || 1})`).join('\n') : '',
+                    notes: `Importado do D&D Beyond (${fileName})`
+                };
+            }
+
+            // Formato Nativo do Compêndio ou 5etools JSON (ex: animated-armor.json)
+            const hpMaxVal = Number(j.hpMax ?? j.hp?.average ?? j.hp ?? 30) || 30;
+            const hpCurVal = Number(j.hpCurrent ?? hpMaxVal);
+            const acVal = Array.isArray(j.ac) ? (typeof j.ac[0] === 'object' ? j.ac[0].ac : j.ac[0]) : (Number(j.ac) || 15);
+            const lvlVal = Number(j.level ?? j.cr ?? 1) || 1;
+            const stats = {
+                str: Number(j.stats?.str ?? j.str ?? 10),
+                dex: Number(j.stats?.dex ?? j.dex ?? 10),
+                con: Number(j.stats?.con ?? j.con ?? 10),
+                int: Number(j.stats?.int ?? j.int ?? 10),
+                wis: Number(j.stats?.wis ?? j.wis ?? 10),
+                cha: Number(j.stats?.cha ?? j.cha ?? 10)
+            };
+            const typeStr = typeof j.type === 'string' ? j.type : (j.type?.type || 'humanoid');
+            const actionText = Array.isArray(j.action) ? j.action.map(a => `• ${a.name}: ${(a.entries || []).map(e => typeof e === 'string' ? cleanTags(e) : '').join(' ')}`).join('\n') : (j.attacks || '');
+            const traitText = Array.isArray(j.trait) ? j.trait.map(t => `• ${t.name}: ${(t.entries || []).map(e => typeof e === 'string' ? cleanTags(e) : '').join(' ')}`).join('\n') : (j.features || '');
+
+            return {
+                id: 'char-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                ownerId: j.ownerId || ownerId,
+                ownerName: j.ownerName || ownerName,
+                name: j.name || fileName.replace(/\.[^.]+$/, ''),
+                race: j.race || capitalize(typeStr),
+                classLevel: j.classLevel || `${j.className || j.class || capitalize(typeStr)} (ND/Nível ${j.cr ?? lvlVal})`,
+                ac: Number(acVal) || 15,
+                hpCurrent: hpCurVal,
+                hpMax: hpMaxVal,
+                hpTemp: Number(j.hpTemp ?? j.tempHp) || 0,
+                speed: typeof j.speed === 'object' ? Object.entries(j.speed).map(([k, v]) => `${k}: ${v} ft.`).join(', ') : (j.speed || '9m (30 ft)'),
+                initiativeBonus: Number(j.initiativeBonus) || 0,
+                passivePerceptionBonus: j.passive ? (Number(j.passive) - (10 + calcAbilityMod(stats.wis))) : (Number(j.passivePerceptionBonus) || 0),
+                hitDieType: Number(j.hitDieType ?? j.hitDie) || 10,
+                hitDieCurrent: Number(j.hitDieCurrent ?? j.hitDiceCurrent ?? lvlVal) || 1,
+                hitDieMax: Number(j.hitDieMax ?? lvlVal) || 1,
+                stats,
+                ...stats,
+                level: lvlVal,
+                tokenImg: j.tokenImg || j.customToken || '',
+                inventory: [j.inventory, actionText].filter(Boolean).join('\n\n') || 'Sem equipamentos listados',
+                notes: [j.notes, traitText, Array.isArray(j.fluffEntries) ? j.fluffEntries.join('\n\n') : ''].filter(Boolean).join('\n\n') || `Importado de ${fileName}`
+            };
+        }
+
+        async function processUniversalFileIntoCharacters(fileOrBlob, fileName) {
+            const ext = (fileName.split('.').pop() || '').toLowerCase();
+            let newChar = null;
+            if (ext === 'pdf') {
+                showToast(`📄 Lendo campos AcroForm e texto de "${fileName}"...`);
+                const arrayBuffer = await fileOrBlob.arrayBuffer();
+                const pdfData = await extractTextAndFieldsFromPdf(arrayBuffer);
+                newChar = parseCharacterFromPdfData(pdfData, fileName);
+            } else if (ext === 'html' || ext === 'htm') {
+                const rawHtml = await fileOrBlob.text();
+                newChar = parseCharacterFromHtmlString(rawHtml, fileName);
+            } else {
+                const rawText = await fileOrBlob.text();
+                const parsed = JSON.parse(rawText);
+                newChar = parseCharacterFromJsonObject(parsed, fileName);
+            }
+
+            if (!newChar) throw new Error('Não foi possível extrair os dados da ficha.');
+            charactersData.push(newChar);
+            activeCharacterId = newChar.id;
+            saveLocalPersistence();
+            CompendioNetAdapter.broadcastCharacters();
+            switchMainModule('character');
+            showToast(`✅ Ficha "${newChar.name}" (${newChar.classLevel}) importada via .${ext.toUpperCase()}!`);
+        }
+
+        async function handleUniversalCharacterImport(event) {
             const file = event.target.files && event.target.files[0];
             if (!file) return;
+            try {
+                await processUniversalFileIntoCharacters(file, file.name);
+            } catch (err) {
+                showToast('⚠️ Erro ao importar ficha: ' + err.message);
+            } finally {
+                event.target.value = '';
+            }
+        }
+
+        async function importTestFileFromPublic(fileName) {
+            try {
+                const url = `./import-tests/${encodeURIComponent(fileName).replace(/%2F/g, '/')}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status} ao buscar ${url}`);
+                const blob = await res.blob();
+                await processUniversalFileIntoCharacters(blob, fileName);
+            } catch (err) {
+                showToast('⚠️ Erro no teste de importação: ' + err.message);
+            }
+        }
+
+        function mapPdfDataToCompendiumJson(pdfData, category, fileName = 'Ficha.pdf') {
+            const baseChar = parseCharacterFromPdfData(pdfData, fileName);
+            const { fullText } = pdfData;
+
+            if (category === 'items') {
+                const rarityMatch = fullText.match(/\b(common|uncommon|rare|very rare|legendary|artifact|comum|incomum|raro|muito raro|lend[áa]rio)\b/i);
+                const rarityMap = { comum: 'common', incomum: 'uncommon', raro: 'rare', 'muito raro': 'very rare', lendario: 'legendary', lendário: 'legendary' };
+                const rawRar = rarityMatch ? rarityMatch[1].toLowerCase() : 'rare';
+                const descLines = fullText.split(/\n+/).map(s => s.trim()).filter(Boolean).slice(0, 25);
+                return {
+                    name: baseChar.name,
+                    wondrous: true,
+                    type: 'Wondrous item',
+                    rarity: rarityMap[rawRar] || rawRar,
+                    reqAttune: /attunement|sintoniza[çc][ãa]o/i.test(fullText),
+                    entries: descLines.length ? descLines : [`Item importado do arquivo PDF "${fileName}".`]
+                };
+            }
+
+            const crMatch = fullText.match(/(?:Challenge|CR|ND|N[íi]vel de Desafio)\s*[:=-]?\s*([0-9/]+)/i);
+            const cr = crMatch ? crMatch[1] : String(baseChar.level || 1);
+            const traitLines = (baseChar.features || baseChar.notes || '').split(/\n+/).filter(Boolean).slice(0, 8).map((line, i) => ({
+                name: `Característica ${i + 1}`,
+                entries: [line.replace(/^[•*-]\s*/, '')]
+            }));
+            const actionLines = (baseChar.attacks || baseChar.inventory || '').split(/\n+/).filter(Boolean).slice(0, 6).map((line, i) => ({
+                name: `Ação / Equipamento ${i + 1}`,
+                entries: [line.replace(/^[•*-]\s*/, '')]
+            }));
+
+            return {
+                name: baseChar.name,
+                size: ['M'],
+                type: category === 'npcs' ? 'humanoid' : (baseChar.race.toLowerCase() || 'humanoid'),
+                alignment: [baseChar.alignment || 'Neutral'],
+                ac: [baseChar.ac || 15],
+                hp: {
+                    average: baseChar.hpMax || 45,
+                    formula: `${Math.max(1, baseChar.level)}d${baseChar.hitDieType || 8} + ${Math.max(0, Math.floor(((baseChar.stats?.con || 10) - 10) / 2) * (baseChar.level || 1))}`
+                },
+                speed: baseChar.speed || '30 ft.',
+                str: baseChar.stats?.str || 10,
+                dex: baseChar.stats?.dex || 10,
+                con: baseChar.stats?.con || 10,
+                int: baseChar.stats?.int || 10,
+                wis: baseChar.stats?.wis || 10,
+                cha: baseChar.stats?.cha || 10,
+                passive: 10 + Math.floor(((baseChar.stats?.wis || 10) - 10) / 2) + (baseChar.passivePerceptionBonus || 0),
+                languages: ['Common'],
+                cr,
+                trait: traitLines.length ? traitLines : [{ name: 'Ficha Importada (PDF)', entries: [`Extraído automaticamente de ${fileName}.`] }],
+                action: actionLines.length ? actionLines : [{ name: 'Ataque', entries: ['{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}8 ({@dice 1d8 + 4}) damage.'] }]
+            };
+        }
+
+        async function handleJsonFileUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+            if (ext === 'pdf') {
+                try {
+                    showToast('📄 Extraindo estatísticas do PDF para o Compêndio...');
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdfData = await extractTextAndFieldsFromPdf(arrayBuffer);
+                    const cat = document.getElementById('st-category')?.value || currentCategory || 'monsters';
+                    const compJson = mapPdfDataToCompendiumJson(pdfData, cat, file.name);
+                    document.getElementById('json-raw-input').value = JSON.stringify(compJson, null, 2);
+                    const titleInput = document.getElementById('json-entry-title');
+                    if (titleInput && !titleInput.value) titleInput.value = compJson.name;
+                    onRawJsonInput();
+                    showToast(`✅ PDF "${file.name}" convertido em ficha estruturada!`);
+                } catch (err) {
+                    showToast('⚠️ Falha ao ler PDF: ' + err.message);
+                }
+                return;
+            }
+
+            if (ext === 'html' || ext === 'htm') {
+                const rawHtml = await file.text();
+                const parsedChar = parseCharacterFromHtmlString(rawHtml, file.name);
+                const compJson = {
+                    name: parsedChar.name,
+                    size: ['M'],
+                    type: 'humanoid',
+                    alignment: ['Neutral'],
+                    ac: [parsedChar.ac],
+                    hp: { average: parsedChar.hpMax, formula: `${parsedChar.level}d10` },
+                    speed: parsedChar.speed,
+                    str: parsedChar.stats.str,
+                    dex: parsedChar.stats.dex,
+                    con: parsedChar.stats.con,
+                    int: parsedChar.stats.int,
+                    wis: parsedChar.stats.wis,
+                    cha: parsedChar.stats.cha,
+                    passive: 10 + calcAbilityMod(parsedChar.stats.wis),
+                    cr: String(parsedChar.level || 1),
+                    trait: [{ name: 'Origem & Classe', entries: [`${parsedChar.race} — ${parsedChar.classLevel}`] }],
+                    action: [{ name: 'Habilidades & Equipamentos', entries: [parsedChar.inventory || parsedChar.notes] }]
+                };
+                document.getElementById('json-raw-input').value = JSON.stringify(compJson, null, 2);
+                const titleInput = document.getElementById('json-entry-title');
+                if (titleInput && !titleInput.value) titleInput.value = compJson.name;
+                onRawJsonInput();
+                showToast(`✅ HTML "${file.name}" convertido em ficha estruturada!`);
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = () => {
                 document.getElementById('json-raw-input').value = reader.result;
@@ -4556,7 +7384,11 @@
                 virtualFiles,
                 quests: questsData,
                 hitDice: hitDiceData,
-                combatCards
+                combatCards,
+                players: playersData,
+                characters: charactersData,
+                tabletop: tabletopState,
+                knowledge: entityKnowledge
             };
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -4578,7 +7410,12 @@
                     if (Array.isArray(parsed.quests)) questsData = parsed.quests;
                     if (Array.isArray(parsed.hitDice)) hitDiceData = parsed.hitDice;
                     if (Array.isArray(parsed.combatCards)) combatCards = parsed.combatCards;
+                    if (Array.isArray(parsed.players)) playersData = parsed.players;
+                    if (Array.isArray(parsed.characters)) charactersData = parsed.characters;
+                    if (parsed.tabletop && typeof parsed.tabletop === 'object') Object.assign(tabletopState, parsed.tabletop);
+                    if (parsed.knowledge && typeof parsed.knowledge === 'object') Object.assign(entityKnowledge, parsed.knowledge);
 
+                    renderPlayerIdentitySelector();
                     await persistToDiskIfAvailable([]);
                     renderCombatHand();
                     navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
