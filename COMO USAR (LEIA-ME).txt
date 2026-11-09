@@ -7,11 +7,12 @@ Você NÃO precisa saber programar nem mexer em código para usar este app!
 --------------------------------------------------------------------
 1. COMO ABRIR O COMPÊNDIO
 --------------------------------------------------------------------
-1. Dê dois cliques no arquivo "Iniciar Compendio.bat".
-2. Uma janela preta vai abrir e o seu navegador abrirá automaticamente
-   no endereço: http://localhost:8080
-3. Mantenha a janela preta aberta enquanto estiver usando o Compêndio
-   (é ela que salva tudo automaticamente no seu computador!).
+1. Dê dois cliques no arquivo "Iniciar Compendio.vbs".
+2. O Compêndio abrirá automaticamente em uma janela dedicada de aplicativo
+   (conectada ao endereço local http://localhost:8080).
+3. Tudo o que você criar ou editar é salvo automaticamente no seu computador.
+   Ao fechar a janela do Compêndio, o servidor em segundo plano é encerrado
+   sozinho!
 
 --------------------------------------------------------------------
 2. COMO ADICIONAR NOVOS MONSTROS, ITENS, NPCS, MAPAS E SESSÕES
