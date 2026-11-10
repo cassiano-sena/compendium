@@ -733,9 +733,44 @@ const compendioData = {
         }
     },
     "curio": {
-        "curio-regras-mecanicas": {
-            "title": "📜 Regras & Mecânicas (Modo Fatal 5.5e)",
+        "curio-tabelas-referencia": {
+            "title": "📊 Tabelas & Referência Rápida (D&D 2024 / 5e)",
             "children": {
+                "tabela-xp": {
+                    "title": "📊 Tabela de XP, Níveis & Orçamento de Encontros",
+                    "tipo": "html",
+                    "path": "./curio/tabela-xp.html"
+                },
+                "condicoes-e-exaustao": {
+                    "title": "💀 Condições de Combate & Exaustão (2024)",
+                    "tipo": "html",
+                    "path": "./curio/condicoes-e-exaustao.html"
+                },
+                "acoes-e-maestrias": {
+                    "title": "⚔️ Ações em Combate & Maestrias de Armas",
+                    "tipo": "html",
+                    "path": "./curio/acoes-e-maestrias.html"
+                },
+                "testes-cds-e-ambiente": {
+                    "title": "🎲 CDs, Cobertura, Visão, Queda & Descansos",
+                    "tipo": "html",
+                    "path": "./curio/testes-cds-e-ambiente.html"
+                },
+                "precos-pocoes-e-servicos": {
+                    "title": "💰 Poções de Cura, Raridades & Serviços",
+                    "tipo": "html",
+                    "path": "./curio/precos-pocoes-e-servicos.html"
+                }
+            }
+        },
+        "curio-regras-mecanicas": {
+            "title": "📜 Regras & Lore da Campanha (Modo Fatal 5.5e)",
+            "children": {
+                "lore-barovia-e-varhen": {
+                    "title": "🌫️ Cosmologia: Casa Varhen, Osybus & Baróvia",
+                    "tipo": "html",
+                    "path": "./curio/lore-barovia-e-varhen.html"
+                },
                 "template-elite": {
                     "title": "Template Elite · Modo Fatal",
                     "tipo": "html",

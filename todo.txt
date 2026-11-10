@@ -1,6 +1,8 @@
-percepcao passiva
-descanso
-iniciativa
-
-ttrpg system 2d/3d
-visualizador de personagem
+[x] percepcao passiva (calculada automaticamente e clicável na ficha + penalidade de exaustão configurável)
+[x] descanso (curto e longo unificados entre Ficha de Personagem, Dados de Vida, Runa de Combate e Tabletop)
+[x] iniciativa (fila automática na Runa de Combate + destaque do token ativo no Tabletop + desempate configurável)
+[x] ttrpg system 2d (Tabletop VTT com tamanhos 1x1 a 4x4, Régua Tática, Templates AoE, Fog of War do Mestre e Ping)
+[x] visualizador de personagem (Ficha interativa com rolagens 1-clique, Death Saves, Exaustão, Spell Slots, Recursos de Classe/Mods e PV Temporário)
+[x] motor universal de dados (Torre Flutuante + Vantagem/Desvantagem/Crítico/GM Oculto + Statblocks 5etools clicáveis)
+[x] sistema de regras & mods (Presets D&D 2024, D&D 2014, Modo Fatal 5.5e, Old-School 3.5e + API de Mods .json/.js)
+[x] multiplayer tempo real (SSE /api/events + deltas cirúrgicos até 8 jogadores)

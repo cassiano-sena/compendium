@@ -39,6 +39,21 @@ $MimeTypes = @{
     ".opus" = "audio/ogg"
 }
 
+$SessionState = @{
+    sessionId   = "local-session"
+    players     = @()
+    characters  = @()
+    tabletop    = $null
+    knowledge   = @{}
+    combatCards = @()
+    combatTurn  = @{ activeCardId = $null; round = 1 }
+    diceLog     = @()
+    rules       = $null
+    activeMods  = @()
+    lastPing    = $null
+    updatedAt   = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+}
+
 function Get-SafePublicPath([string]$RelPath) {
     $Clean = ($RelPath -replace '^\.?[\\/]+', '')
     $Resolved = [System.IO.Path]::GetFullPath((Join-Path $PublicDir $Clean))
@@ -57,7 +72,84 @@ try {
 
         try {
             if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/status") {
-                $Bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"mode":"powershell","writable":true}')
+                $Bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"mode":"powershell","writable":true,"multiplayerReady":true,"sseReady":false}')
+                $Response.ContentType = "application/json; charset=utf-8"
+                $Response.StatusCode = 200
+                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
+                $Response.Close()
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/mods") {
+                $ModsDir = Get-SafePublicPath "mods"
+                if (-not (Test-Path $ModsDir)) {
+                    New-Item -ItemType Directory -Path $ModsDir -Force | Out-Null
+                }
+                $ModList = @()
+                Get-ChildItem -Path $ModsDir -File | ForEach-Object {
+                    $Ext = $_.Extension.ToLower()
+                    if ($Ext -eq ".json" -or $Ext -eq ".js") {
+                        $Content = [System.IO.File]::ReadAllText($_.FullName, [System.Text.Encoding]::UTF8)
+                        $Manifest = $null
+                        if ($Ext -eq ".json") {
+                            try { $Manifest = $Content | ConvertFrom-Json } catch {}
+                        }
+                        $ModList += @{
+                            fileName = $_.Name
+                            path     = "./mods/$($_.Name)"
+                            type     = $Ext.TrimStart('.')
+                            manifest = $Manifest
+                        }
+                    }
+                }
+                $RespJson = @{ ok = $true; mods = $ModList } | ConvertTo-Json -Depth 15
+                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
+                $Response.ContentType = "application/json; charset=utf-8"
+                $Response.StatusCode = 200
+                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
+                $Response.Close()
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/session") {
+                $RespJson = @{ ok = $true; session = $SessionState; onlinePlayers = @() } | ConvertTo-Json -Depth 20
+                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
+                $Response.ContentType = "application/json; charset=utf-8"
+                $Response.StatusCode = 200
+                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
+                $Response.Close()
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "POST" -and $PathName -eq "/api/session") {
+                $Reader = New-Object System.IO.StreamReader($Request.InputStream, [System.Text.Encoding]::UTF8)
+                $Body = $Reader.ReadToEnd()
+                $Reader.Close()
+
+                $Incoming = $Body | ConvertFrom-Json
+                if ($Incoming.delta) {
+                    $d = $Incoming.delta
+                    if ($d.type -eq "DICE_ROLL" -and $d.roll) {
+                        $SessionState.diceLog += $d.roll
+                    } elseif ($d.type -eq "DICE_CLEAR") {
+                        $SessionState.diceLog = @()
+                    } elseif ($d.type -eq "MAP_PING" -and $d.ping) {
+                        $SessionState.lastPing = $d.ping
+                    }
+                } else {
+                    if ($null -ne $Incoming.players) { $SessionState.players = $Incoming.players }
+                    if ($null -ne $Incoming.characters) { $SessionState.characters = $Incoming.characters }
+                    if ($null -ne $Incoming.tabletop) { $SessionState.tabletop = $Incoming.tabletop }
+                    if ($null -ne $Incoming.knowledge) { $SessionState.knowledge = $Incoming.knowledge }
+                    if ($null -ne $Incoming.combatCards) { $SessionState.combatCards = $Incoming.combatCards }
+                    if ($null -ne $Incoming.combatTurn) { $SessionState.combatTurn = $Incoming.combatTurn }
+                    if ($null -ne $Incoming.diceLog) { $SessionState.diceLog = $Incoming.diceLog }
+                    if ($null -ne $Incoming.rules) { $SessionState.rules = $Incoming.rules }
+                    if ($null -ne $Incoming.activeMods) { $SessionState.activeMods = $Incoming.activeMods }
+                }
+                $SessionState.updatedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                $RespJson = @{ ok = $true; updatedAt = $SessionState.updatedAt } | ConvertTo-Json
+                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
                 $Response.ContentType = "application/json; charset=utf-8"
                 $Response.StatusCode = 200
                 $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
@@ -71,6 +163,18 @@ try {
                 $Reader.Close()
 
                 $Payload = $Body | ConvertFrom-Json
+
+                if ($Payload.deletePaths) {
+                    foreach ($DelRel in $Payload.deletePaths) {
+                        if (-not $DelRel) { continue }
+                        try {
+                            $DelTarget = Get-SafePublicPath $DelRel
+                            if (Test-Path $DelTarget -PathType Leaf) {
+                                Remove-Item -Path $DelTarget -Force
+                            }
+                        } catch {}
+                    }
+                }
 
                 if ($Payload.files) {
                     foreach ($File in $Payload.files) {
@@ -135,4 +239,3 @@ try {
 } finally {
     $Listener.Stop()
 }
-
