@@ -1,7 +1,9 @@
 {
   "name": "rpg-compendium",
-  "version": "1.0.0",
-  "description": "Compêndio Épico de RPG (D&D 5e) - Aplicação web local para fichas, itens, mapas e sessões.",
+  "version": "2.0.0",
+  "description": "Compêndio de RPG & Tabletop VTT (Local-First, Zero Telemetria, Mod-Friendly) - Aplicação web local para fichas, dados, combate, mapas e sessões multiplayer.",
+  "license": "MIT",
+  "author": "RPG Compendium Contributors",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

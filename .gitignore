@@ -1,5 +1,11 @@
-# Perfil isolado do navegador (Edge)
+# Perfil isolado do navegador (Edge / Chromium) - NUNCA versionar dados locais do usuário
 perfil-app/
+perfil-app*/
+
+# Estado de sessão multiplayer ativa e backups pessoais de campanha (Proteção de Privacidade)
+public/session-state.json
+*backup*.json
+compendio-rpg-backup-*.json
 
 # Logs do servidor e de depuração
 *.log
@@ -10,10 +16,11 @@ node_modules/
 .env
 .env.*
 
-# Arquivos temporários do sistema operacional e editores
+# Arquivos temporários do sistema operacional, certificados e editores
 .DS_Store
 Thumbs.db
 Desktop.ini
 *.swp
 *~
-
+*.pem
+*.key

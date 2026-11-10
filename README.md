@@ -49,3 +49,17 @@
   ```powershell
   powershell -ExecutionPolicy Bypass -File .\server.ps1
   ```
+
+---
+
+## 🛡️ Privacidade, Licenças, Autoria e Segurança / Privacy, Licenses & Legal
+
+Este projeto adota os princípios de **Privacidade por Padrão (*Privacy-by-Design*)**, **Execução 100% Local (*Local-First*)**, **Zero Telemetria** e **Autoria Coletiva Pseudônima** para proteger tanto os dados dos jogadores quanto a identidade dos criadores e colaboradores:
+
+- 📄 **[`LICENSE`](LICENSE)** — Código-fonte e motor da aplicação licenciados sob a **Licença MIT** (`Copyright (c) 2026 RPG Compendium Contributors`), fornecidos *"COMO ESTÃO" ("AS IS")* sem garantias.
+- 🛡️ **[`PRIVACY.md`](PRIVACY.md)** — **Política de Privacidade e Soberania de Dados (LGPD / GDPR)**: Zero coleta externa, zero rastreadores, armazenamento 100% local no dispositivo do usuário e exclusão instantânea (`💀 Expurgar`).
+- ⚖️ **[`NOTICE.md`](NOTICE.md)** — **Avisos de Direitos Autorais e Propriedade Intelectual de RPG**: Atribuição oficial do **SRD 5.1 sob Creative Commons (`CC-BY-4.0`)**, Política de Conteúdo de Fãs (*Fan Content Policy*) e separação entre o motor de software e conteúdos importados localmente pelo usuário.
+- 👥 **[`AUTHORS.md`](AUTHORS.md)** — **Declaração de Autoria Coletiva & Preservação de Identidade**: Proteção da privacidade dos criadores e colaboradores sem exposição de dados civis (PII).
+- 🤝 **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — **Guia de Contribuição Segura**: Como contribuir usando pseudônimo e e-mail `noreply` no Git, evitando vazamento de caminhos locais, metadados EXIF ou sessões privadas.
+- 🔒 **[`SECURITY.md`](SECURITY.md)** — **Política de Segurança**: Boas práticas para hospedagem multiplayer em rede local (LAN) ou VPN privada (Tailscale, ZeroTier, Radmin VPN).
+

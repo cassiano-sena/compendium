@@ -443,9 +443,10 @@ function renderRulesAndModsModalBody() {
                 <button class="btn-close-modal" type="button" onclick="closeRulesAndModsModal()">✕</button>
             </div>
             <div class="studio-form-pane" style="border-right:none; max-height:78vh; overflow-y:auto;">
-            <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
                 <button type="button" class="btn-save-primary" onclick="switchRulesModalTab('rules')">⚙️ Sistema & Regras Base</button>
                 <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('mods')">🧩 Mods & Pacotes (${window.installedMods.filter(m => m.enabled).length}/${window.installedMods.length})</button>
+                <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('legal')">🛡️ Privacidade & Licenças</button>
             </div>
 
             <div class="form-section">
@@ -545,6 +546,55 @@ function renderRulesAndModsModalBody() {
         return;
     }
 
+    if (activeRulesModalTab === 'legal') {
+        container.innerHTML = `
+            <div class="studio-header">
+                <h2>🛡️ Privacidade, Soberania de Dados & Licenças Open Source</h2>
+                <button class="btn-close-modal" type="button" onclick="closeRulesAndModsModal()">✕</button>
+            </div>
+            <div class="studio-form-pane" style="border-right:none; max-height:78vh; overflow-y:auto;">
+                <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                    <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('rules')">⚙️ Sistema & Regras Base</button>
+                    <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('mods')">🧩 Mods & Pacotes (${window.installedMods.filter(m => m.enabled).length}/${window.installedMods.length})</button>
+                    <button type="button" class="btn-save-primary" onclick="switchRulesModalTab('legal')">🛡️ Privacidade & Licenças</button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">1. Política de Privacidade (100% Local-First & Zero Telemetria)</h3>
+                    <p style="font-size:12.5px; color:#c2c6d6; margin:6px 0;">
+                        • <strong>Zero Coleta de Dados:</strong> Este aplicativo não possui servidores na nuvem, banco de dados externo, Google Analytics, cookies de rastreamento, anúncios ou telemetria.<br>
+                        • <strong>Soberania Total do Usuário (LGPD / GDPR):</strong> Todas as fichas, mapas, PINs locais, rolagens e notas da sua campanha ficam armazenados exclusivamente no seu dispositivo (<code>localStorage</code>, pasta <code>public/</code> e <code>perfil-app/</code>).<br>
+                        • <strong>Multiplayer Direto (LAN / VPN):</strong> Em sessões com até 8 jogadores, os dados trafegam apenas entre os navegadores dos jogadores e o computador do Mestre (GM) que hospeda a partida.<br>
+                        • <strong>Controle e Exclusão Imediata:</strong> Você pode exportar seus dados em formato aberto (<code>⬇ Backup</code>) ou apagar permanentemente todos os registros locais a qualquer momento clicando em <code>💀 Expurgar</code>.
+                    </p>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">2. Autoria Coletiva, Copyright & Licença Open Source (MIT)</h3>
+                    <p style="font-size:12.5px; color:#c2c6d6; margin:6px 0;">
+                        <code>Copyright (c) 2026 RPG Compendium Contributors (Autores e Colaboradores do Projeto Compêndio RPG)</code><br><br>
+                        • O motor de software, código-fonte, interface, motor de dados e sistema de Tabletop são softwares livres licenciados sob a <strong>Licença MIT</strong> (fornecidos <em>"COMO ESTÃO" / "AS IS"</em>, sem garantias).<br>
+                        • <strong>Proteção de Identidade de Autores e Colaboradores:</strong> Este projeto adota autoria coletiva e pseudônima (<em>Privacy-First Authorship</em>), garantindo que criadores, mantenedores e colaboradores nunca precisem expor dados civis (PII) para criar ou contribuir.
+                    </p>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">3. Propriedade Intelectual de RPG, SRD 5.1 (CC-BY-4.0) & Conteúdo do Usuário</h3>
+                    <p style="font-size:12px; color:#c2c6d6; margin:6px 0;">
+                        • <strong>Atribuição SRD 5.1 (CC-BY-4.0):</strong> As mecânicas base compatíveis com D&D 5e utilizam material do <em>System Reference Document 5.1 ("SRD 5.1")</em>, de autoria da Wizards of the Coast LLC, licenciado sob a <em>Creative Commons Attribution 4.0 International License (CC-BY-4.0)</em>.<br>
+                        • <strong>Política de Conteúdo de Fãs (Fan Content Policy):</strong> Ferramenta independente e não oficial. Não aprovada, patrocinada ou endossada pela Wizards of the Coast.<br>
+                        • <strong>Conteúdo Importado pelo Usuário:</strong> O aplicativo atua como um leitor e editor local neutro de arquivos (<code>.json</code>, <code>.pdf</code>, <code>.html</code>, <code>.svg</code>, <code>.png</code>). Todo conteúdo importado pelo usuário permanece estritamente em sua máquina local para uso privado e doméstico em sua mesa de RPG.
+                    </p>
+                </div>
+
+                <div style="font-size:11.5px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:8px 12px; border-radius:6px;">
+                    📄 Documentação jurídica e técnica completa disponível na raiz do projeto: <code>LICENSE</code>, <code>PRIVACY.md</code>, <code>NOTICE.md</code>, <code>AUTHORS.md</code>, <code>CONTRIBUTING.md</code> e <code>SECURITY.md</code>.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
     // ABA DE MODS
     const modsListHtml = window.installedMods.map(m => {
         const safeId = escapeHtmlText(m.id);
@@ -577,9 +627,10 @@ function renderRulesAndModsModalBody() {
         </div>
         <div class="studio-form-pane" style="border-right:none; max-height:78vh; overflow-y:auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-            <div style="display:flex; gap:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('rules')">⚙️ Sistema & Regras Base</button>
                 <button type="button" class="btn-save-primary" onclick="switchRulesModalTab('mods')">🧩 Mods & Pacotes (${window.installedMods.filter(m => m.enabled).length}/${window.installedMods.length})</button>
+                <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('legal')">🛡️ Privacidade & Licenças</button>
             </div>
             <div style="display:flex; gap:6px;">
                 <button type="button" class="btn-mini" onclick="document.getElementById('mod-file-upload-input').click()">📂 Importar Mod (.JSON / .JS)</button>
