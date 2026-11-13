@@ -11,8 +11,21 @@
 <link rel="stylesheet" href="css/compendio.css">
 </head>
 <body onload="initCompendium()">
+    <script>
+        (function () {
+            var h = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname : '';
+            var isLocal = !h || h === 'localhost' || h === '127.0.0.1' || h === '::1' || h === '[::1]';
+            if (!isLocal) {
+                document.body.classList.add('remote-locked-preauth');
+                window.isHostClient = false;
+            }
+        })();
+    </script>
 
-    <button type="button" id="btn-expand-main-sidebar" class="sidebar-expand-fab" onclick="toggleMainSidebar(false)" title="Expandir barra lateral principal">▶ Menu</button>
+    <div class="collapsed-sidebars-rail" id="collapsed-sidebars-rail">
+        <button type="button" id="btn-expand-main-sidebar" class="collapsed-rail-btn" onclick="toggleMainSidebar(false)" title="Expandir barra lateral principal">▶ Menu Principal</button>
+        <button type="button" id="btn-expand-sub-sidebar" class="collapsed-rail-btn" onclick="toggleSubSidebar(false)" title="Expandir lista lateral secundária">▶ Lista / Índice</button>
+    </div>
 
     <!-- BARRA LATERAL (Módulos / Diretórios Principais) -->
     <aside class="sidebar">
@@ -77,7 +90,6 @@
                         <li class="nav-item" data-cat="npcs" onclick="navigateCategory('npcs', this)"><span>🧙‍♂️ NPCs</span></li>
                         <li class="nav-item" data-cat="maps" onclick="navigateCategory('maps', this)"><span>🗺️ Mapas</span></li>
                         <li class="nav-item" data-cat="items" onclick="navigateCategory('items', this)"><span>⚔️ Itens</span></li>
-                        <li class="nav-item" data-cat="curio" onclick="navigateCategory('curio', this)"><span>📜 Curiosidades & Regras</span></li>
                         <li class="nav-item" data-cat="session" onclick="navigateCategory('session', this)"><span>📖 Planos de Sessão</span></li>
                         <li class="nav-item" data-cat="quests" onclick="navigateCategory('quests', this)"><span>🎯 Quests & Objetivos</span></li>
                         <li class="nav-item" data-cat="hitdice" onclick="navigateCategory('hitdice', this)"><span>🎲 Dados de Vida</span></li>
@@ -85,7 +97,15 @@
                 </div>
             </div>
 
-            <!-- DIRETÓRIO / MÓDULO 2: PERSONAGEM (Individual por Jogador) -->
+            <!-- DIRETÓRIO / MÓDULO 2: CURIOSIDADES & REGRAS (Seção Própria) -->
+            <div class="module-dir-group">
+                <button type="button" class="module-dir-btn" id="btn-dir-curio-rules" onclick="switchMainModule('curio_rules')">
+                    <span>📜 Curiosidades &amp; Regras</span>
+                    <span class="module-dir-chevron">▸</span>
+                </button>
+            </div>
+
+            <!-- DIRETÓRIO / MÓDULO 3: PERSONAGEM (Individual por Jogador) -->
             <div class="module-dir-group">
                 <button type="button" class="module-dir-btn" id="btn-dir-character" onclick="switchMainModule('character')">
                     <span>🛡️ Personagem</span>
@@ -124,9 +144,10 @@
                 </button>
             </div>
             <button class="btn-mini" style="width:100%; font-size:10.5px; color:#a0a4b8;" type="button" onclick="openRulesAndModsModal('legal')" title="Consultar Política de Privacidade (100% Local / Zero Telemetria), Licença MIT e Créditos SRD">
-                🛡️ Privacidade, Licenças & Autoria
+                🛡️ Privacidade, Licenças &amp; Autoria
             </button>
         </div>
+        <div class="sidebar-resizer" id="resizer-main-sidebar" data-resize-target="main" title="Arraste para redimensionar o Menu Principal (duplo clique restaura)"></div>
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
@@ -148,10 +169,9 @@
             <div class="item-list-scroll">
                 <ul class="item-list" id="dynamic-item-list"></ul>
             </div>
+            <div class="sidebar-resizer" id="resizer-sub-sidebar" data-resize-target="sub" title="Arraste para redimensionar a Lista (duplo clique restaura)"></div>
         </div>
 
-        <button type="button" id="btn-expand-sub-sidebar" class="subsidebar-expand-tab" onclick="toggleSubSidebar(false)" title="Expandir lista lateral secundária">▶ Lista</button>
-        
         <!-- Onde a Ficha (HTML Externo, JSON, Quests ou Dados de Vida) vai aparecer -->
         <div class="item-display-area" id="dynamic-display-area"></div>
     </main>
@@ -574,13 +594,18 @@
     </div>
 
     <!-- MODAL VISUAL DE PERFIS, LOGIN, EDIÇÃO DE NOME E PERSONAGENS -->
-    <div class="modal-backdrop" id="profiles-lobby-backdrop" onclick="if(event.target===this) closeProfileManagerModal()">
+    <div class="modal-backdrop" id="profiles-lobby-backdrop" onclick="if(event.target===this && (typeof canDismissProfileModal!=='function' || canDismissProfileModal())) closeProfileManagerModal()">
         <div class="studio-modal" id="profiles-lobby-modal-content" style="max-width:880px; height:auto; max-height:88vh;"></div>
     </div>
 
     <!-- MODAL DE SALA ONLINE, IP OCULTO, KICK/BAN E TUTORIAL -->
     <div class="modal-backdrop" id="multiplayer-room-backdrop" onclick="if(event.target===this) closeMultiplayerRoomModal()">
         <div class="studio-modal" id="multiplayer-room-modal-content" style="max-width:900px; height:auto; max-height:90vh;"></div>
+    </div>
+
+    <!-- TELA ISOLADA: SALA DE ESPERA (SEPARADA DA SALA DE JOGO ATÉ APROVAÇÃO DO HOST) -->
+    <div class="modal-backdrop" id="waiting-room-backdrop" style="z-index:10080;">
+        <div class="studio-modal" id="waiting-room-modal-content" style="max-width:560px; height:auto; max-height:90vh;"></div>
     </div>
 
     <!-- MODAL DE PORTÃO DA SALA (SENHA / KICK / BAN / FECHADA / LOTADA) -->
@@ -601,6 +626,11 @@
     <!-- MODAL DE TOKEN DE OURO NO TABLETOP -->
     <div class="modal-backdrop" id="tt-gold-backdrop" onclick="if(event.target===this && typeof closeGoldTokenModal==='function') closeGoldTokenModal()">
         <div class="studio-modal" id="tt-gold-modal-content" style="max-width:520px; height:auto; max-height:80vh;"></div>
+    </div>
+
+    <!-- MODAL DE ESCOLHA: CRIAR FICHA EM BRANCO OU IMPORTAR -->
+    <div class="modal-backdrop" id="char-create-choice-backdrop" onclick="if(event.target===this && typeof closeNewCharacterChoiceModal==='function') closeNewCharacterChoiceModal()">
+        <div class="studio-modal" id="char-create-choice-modal-content" style="max-width:540px; height:auto; max-height:85vh;"></div>
     </div>
 
     <!-- MODAL DE MACROS DE ROLAGEM DE DADOS -->
@@ -643,292 +673,20 @@
         let dockCollapsed = true;
         let questStatusFilter = 'ALL';
 
-        let playersData = [
-            { id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', authKey: 'local-gm-key', color: '#d8b467', avatarEmoji: '👑' },
-            { id: 'player-1', name: 'Jogador 1 (Kael)', role: 'player', pin: '', authKey: 'local-p1-key', color: '#4fc3f7', avatarEmoji: '⚔️' },
-            { id: 'player-2', name: 'Jogador 2 (Kiriton)', role: 'player', pin: '', authKey: 'local-p2-key', color: '#81c784', avatarEmoji: '🛡️' },
-            { id: 'player-3', name: 'Jogador 3 (Auxiz)', role: 'player', pin: '', authKey: 'local-p3-key', color: '#e57373', avatarEmoji: '🧙' },
-            { id: 'player-4', name: 'Jogador 4 (La Loba)', role: 'player', pin: '', authKey: 'local-p4-key', color: '#ba68c8', avatarEmoji: '🐺' }
-        ];
-        let activePlayerId = 'gm-master';
+        const IS_LOCAL_HOST_ORIGIN = !window.location?.hostname || ['localhost', '127.0.0.1', '::1', '[::1]'].includes(window.location.hostname);
+        window.isHostClient = IS_LOCAL_HOST_ORIGIN;
+        window.hasReceivedHostSessionSnapshot = false;
+        let playersData = IS_LOCAL_HOST_ORIGIN
+            ? [{ id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', authKey: 'local-gm-key', color: '#d8b467', avatarEmoji: '👑' }]
+            : [];
+        let activePlayerId = IS_LOCAL_HOST_ORIGIN ? 'gm-master' : '';
 
-        let questsData = [
-            {
-                id: 'quest-death-house',
-                title: 'A Casa da Morte (Família Durst)',
-                giver: 'Rose & Thorn Durst',
-                location: 'Mansão Durst (D1–D38)',
-                status: 'ACTIVE',
-                summary: 'Investigar os lamentos na mansão de quatro andares, descobrir o destino de Walter Durst no sótão e sobreviver ao altar subterrâneo.',
-                objectives: 'Encontrar a chave do sótão na biblioteca secreta (D9)\nAcalmar os espíritos de Rose e Thorn (D20)\nEnfrentar ou escapar do Lorghoth, o Decaidro, na Câmara do Altar (D35)\nFugir pelas Haunted Zones até a floresta de Baróvia',
-                reward: 'Avanço para o Nível 3 + Relíquias da Família Durst'
-            },
-            {
-                id: 'quest-casa-varhen',
-                title: 'O Sangue da Casa Varhen',
-                giver: 'Astel Vhalzar Varhen',
-                location: 'Vila e Mansão Varhen',
-                status: 'ACTIVE',
-                summary: 'Proteger a linhagem Varhen contra a maldição licantrópica de Verenkar e a invasão dos Sacerdotes de Osybus.',
-                objectives: 'Defender os portões da Vila Varhen\nImpedir o ritual do Arauto de Sangue\nConfrontar Verenkar na Mansão Varhen',
-                reward: 'Bênção Ancestral da Casa Varhen'
-            }
-        ];
+        let questsData = [];
 
-        let hitDiceData = [
-            { id: 'hd-kael', name: 'Kael Varhen', charClass: 'Eldritch Knight 13', dieType: 10, max: 13, current: 13, conMod: 3, notes: 'Second Wind, Action Surge, Indomitable' },
-            { id: 'hd-kiriton', name: 'Kiriton', charClass: 'Mago 1', dieType: 6, max: 1, current: 1, conMod: 2, notes: 'Recuperação Arcana' },
-            { id: 'hd-auxiz', name: 'Auxiz', charClass: 'Ladino (Rogue) 1', dieType: 8, max: 1, current: 1, conMod: 1, notes: 'Ataque Furtivo 1d6, Cthonic Tiefling' },
-            { id: 'hd-laloba', name: 'La Loba (Tanya)', charClass: 'Precognition Barbarian 22', dieType: 12, max: 22, current: 22, conMod: 9, notes: 'Fúria Implacável, ArchDemon' },
-            { id: 'hd-astel', name: 'Astel Vhalzar Varhen', charClass: 'Hexblade / Paladino 20', dieType: 10, max: 20, current: 20, conMod: 2, notes: 'Soberano de Sangue, Shadar-Kai' },
-            { id: 'hd-connor', name: 'Connor Smith', charClass: 'Caçador de Sangue / Bruxo 20', dieType: 10, max: 20, current: 20, conMod: 3, notes: 'Rito Carmesim, Marca de Maldição' }
-        ];
+        let hitDiceData = [];
 
-        let charactersData = [
-            {
-                id: 'char-kael-varhen',
-                name: 'Kael Varhen',
-                ownerId: 'player-1',
-                ownerName: 'Jogador 1 (Kael)',
-                race: 'Aasimar (Nobre da Casa Varhen)',
-                classLevel: 'Fighter (Eldritch Knight) 13',
-                ac: 20,
-                hpCurrent: 158,
-                hpMax: 165,
-                hpTemp: 0,
-                speed: '30ft (9m)',
-                initiativeBonus: 4,
-                passivePerceptionBonus: 5,
-                hitDieType: 10,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 20, dex: 10, con: 20, int: 18, wis: 10, cha: 8 },
-                inventory: '• Greatsword +2 (Weapon Mastery: Graze, +12 atk, 2d6+7 slashing)\n• Longsword +1 (Sap, +11 atk, 1d8+6)\n• Javelin (+10 atk, 1d6+5)\n• Plate Armor (CA 20)\n• Magias Preparadas: Shield, Absorb Elements, Misty Step, Counterspell, Fireball, Spirit Shroud, Haste',
-                notes: 'Ficha padrão importada de public/import-tests/kael-varhen-ek-13-v2.pdf.\nHabilidades: Second Wind, Action Surge, War Bond, Eldritch Strike, Arcane Charge, Indomitable (2x), Three Extra Attacks.',
-                tokenImg: './npc/kael/bucket-head.png'
-            },
-            {
-                id: 'char-kiriton',
-                name: 'Kiriton',
-                ownerId: 'player-2',
-                ownerName: 'Jogador 2 (Kiriton)',
-                race: 'Elf, High (Farmer)',
-                classLevel: 'Mago 1',
-                ac: 13,
-                hpCurrent: 9,
-                hpMax: 9,
-                hpTemp: 0,
-                speed: '30ft (9m)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 2,
-                hitDieType: 8,
-                hitDieCurrent: 1,
-                hitDieMax: 1,
-                stats: { str: 8, dex: 15, con: 13, int: 17, wis: 12, cha: 10 },
-                inventory: '• Cajado Arcano (Foco)\n• Adaga (+4 atk, 1d4+2 perfurante)\n• Grimório & Componentes\n• Truques & Magias de 1º Círculo (D&D 2024 PT-BR)',
-                notes: 'Ficha padrão importada de public/import-tests/kiriton.pdf (D&D 2024 PT-BR).\nTalento de Origem: Tough / Iniciado em Magia.\nTraços de Alto Elfo: Visão no Escuro 18m, Ancestralidade Feérica, Transe, Passo Nebuloso.',
-                tokenImg: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
-            },
-            {
-                id: 'char-auxiz',
-                name: 'Auxiz',
-                ownerId: 'player-3',
-                ownerName: 'Jogador 3 (Auxiz)',
-                race: 'Tiefling Cthonic (Merchant)',
-                classLevel: 'Rogue 1',
-                ac: 13,
-                hpCurrent: 9,
-                hpMax: 9,
-                hpTemp: 0,
-                speed: '30ft (9m)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 2,
-                hitDieType: 8,
-                hitDieCurrent: 1,
-                hitDieMax: 1,
-                stats: { str: 8, dex: 15, con: 10, int: 10, wis: 14, cha: 16 },
-                inventory: '• Shortsword (+4 atk, 1d6+2 piercing, Vex)\n• Dagger x2 (+4 atk, 1d4+2 piercing, Nick)\n• Shortbow (+4 atk, 1d6+2 piercing, Vex, 20 flechas)\n• Leather Armor (CA 13)\n• Thieves\' Tools, Merchant\'s Scale',
-                notes: 'Ficha padrão importada de public/import-tests/character-sheet.pdf.\nHabilidades: Expertise, Sneak Attack (1d6), Thieves\' Cant, Weapon Mastery, Cthonic Legacy.',
-                tokenImg: './npc/zaltherion/zaltherion-act-2-profile.png'
-            },
-            {
-                id: 'char-la-loba',
-                name: 'La Loba (Tanya)',
-                ownerId: 'player-4',
-                ownerName: 'Jogador 4 (La Loba)',
-                race: 'ArchDemon',
-                classLevel: 'Barbarian (Precognition) 22',
-                ac: 30,
-                hpCurrent: 320,
-                hpMax: 320,
-                hpTemp: 0,
-                speed: '45ft (13,5m)',
-                initiativeBonus: 5,
-                passivePerceptionBonus: 8,
-                hitDieType: 12,
-                hitDieCurrent: 22,
-                hitDieMax: 22,
-                stats: { str: 20, dex: 26, con: 24, int: 18, wis: 16, cha: 20 },
-                inventory: '• Claws of the Abyss\n• Unarmored Defense (CA 30)\n• Relíquias Abissais Sintonizadas',
-                notes: 'Ficha padrão importada de public/import-tests/La Loba.pdf.\nHabilidades: Rage, Unarmored Defense, Reckless Attack, Danger Sense, Extra Attack, Brutal Critical, Relentless Rage, Primal Champion, Precognition Foresight.',
-                tokenImg: './npc/aetheron/aetheron.png'
-            },
-            {
-                id: 'char-astel-varhen',
-                name: 'Astel Vhalzar Varhen',
-                ownerId: 'player-1',
-                ownerName: 'Jogador 1 (Astel)',
-                race: 'Humano (Casa Varhen)',
-                classLevel: 'Cleric (Hadar) · ND 30',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m, voo 9m, natação 9m',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 10,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Saving Throws: Str +19, Con +18, Int +18, Wis +15, Cha +14\n• Skills: Athletics +19, Arcana +18, Perception +15\n• Resistências: Necrotic, Radiant',
-                notes: 'Ficha padrão sincronizada de public/import-tests/astel.html e public/npc/astel/astel.html.\nTraços: Instinto, Multiataque.',
-                tokenImg: './npc/kael/bucket-head.png'
-            },
-            {
-                id: 'char-connor-smith',
-                name: 'Connor Smith',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Humano',
-                classLevel: 'Level 10 Battle Smith (Artificer)',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m (30 ft)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 10,
-                hitDieCurrent: 10,
-                hitDieMax: 10,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Steel Defender & Armas Rúnicas de Artífice (Battle Smith)',
-                notes: 'Ficha padrão sincronizada de public/npc/connor/connor.html.',
-                tokenImg: './npc/connor/connor-smith.png'
-            },
-            {
-                id: 'char-aetheron',
-                name: 'Aetheron',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Construct (Humanoid)',
-                classLevel: 'Battle Smith',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m (30 ft)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 10,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Núcleo Arcano & Armadura de Constructo (CA 20)',
-                notes: 'Ficha padrão sincronizada de public/npc/aetheron/aetheron.html.',
-                tokenImg: './npc/aetheron/aetheron.png'
-            },
-            {
-                id: 'char-lyra-bloodseeker',
-                name: 'Lyra Bloodseeker',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Human Lycanthrope',
-                classLevel: 'Beast Barbarian / Champion',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m (30 ft)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 12,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Garras Bestiais Licantrópicas & Fúria Sanguinária',
-                notes: 'Ficha padrão sincronizada de public/npc/lyra/lyra.html.',
-                tokenImg: './monster/data/werewolf/token.png'
-            },
-            {
-                id: 'char-mustang',
-                name: 'Mustang',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Inverted Centaur',
-                classLevel: 'HORSE (Deer) Totem Barbarian',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '12m (40 ft)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 12,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Totem Espiritual & Investida Implacável',
-                notes: 'Ficha padrão sincronizada de public/npc/mustang/mustang.html.',
-                tokenImg: './npc/mustang/mustang.png'
-            },
-            {
-                id: 'char-willick',
-                name: 'Willick Wolfgang Blackthorn III',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Owlin',
-                classLevel: 'Abjurer (Wizard)',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m, voo 9m',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 6,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Grimório de Abjuração Blackthorn & Proteção Arcana',
-                notes: 'Ficha padrão sincronizada de public/npc/willick/willick.html.',
-                tokenImg: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
-            },
-            {
-                id: 'char-zaltherion',
-                name: 'Zaltherion Vindicator',
-                ownerId: 'gm-master',
-                ownerName: 'Mestre (GM)',
-                race: 'Tiefling',
-                classLevel: 'Devotion Paladin',
-                ac: 20,
-                hpCurrent: 140,
-                hpMax: 140,
-                hpTemp: 0,
-                speed: '9m (30 ft)',
-                initiativeBonus: 0,
-                passivePerceptionBonus: 3,
-                hitDieType: 10,
-                hitDieCurrent: 13,
-                hitDieMax: 13,
-                stats: { str: 21, dex: 10, con: 20, int: 18, wis: 8, cha: 10 },
-                inventory: '• Arma Sagrada (Sacred Weapon) & Armadura de Devoção',
-                notes: 'Ficha padrão sincronizada de public/npc/zaltherion/zaltherion.html.',
-                tokenImg: './npc/zaltherion/zaltherion-act-2-profile.png'
-            }
-        ];
-        let activeCharacterId = 'char-kael-varhen';
+        let charactersData = [];
+        let activeCharacterId = null;
         let entityKnowledge = {}; // { "category:key": { globalLevel: 'hidden'|'sighted'|'studied', playerLevels: { [playerId]: 'sighted'|'studied' } } }
         let tabletopState = {
             sessionId: 'local-session',
@@ -937,72 +695,7 @@
             gridSize: 56,
             zoom: 100,
             snapToGrid: true,
-            tokens: [
-                {
-                    id: 'tok-kael-default',
-                    refId: 'char-kael-varhen',
-                    name: 'Kael Varhen',
-                    type: 'pc',
-                    category: 'character',
-                    itemKey: 'char-kael-varhen',
-                    groupKey: '',
-                    ownerId: 'player-1',
-                    x: 112,
-                    y: 168,
-                    hpCurrent: 158,
-                    hpMax: 165,
-                    ac: 20,
-                    imgSrc: './npc/kael/bucket-head.png'
-                },
-                {
-                    id: 'tok-kiriton-default',
-                    refId: 'char-kiriton',
-                    name: 'Kiriton',
-                    type: 'pc',
-                    category: 'character',
-                    itemKey: 'char-kiriton',
-                    groupKey: '',
-                    ownerId: 'player-2',
-                    x: 168,
-                    y: 168,
-                    hpCurrent: 9,
-                    hpMax: 9,
-                    ac: 13,
-                    imgSrc: './npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png'
-                },
-                {
-                    id: 'tok-auxiz-default',
-                    refId: 'char-auxiz',
-                    name: 'Auxiz',
-                    type: 'pc',
-                    category: 'character',
-                    itemKey: 'char-auxiz',
-                    groupKey: '',
-                    ownerId: 'player-3',
-                    x: 224,
-                    y: 168,
-                    hpCurrent: 9,
-                    hpMax: 9,
-                    ac: 13,
-                    imgSrc: './npc/zaltherion/zaltherion-act-2-profile.png'
-                },
-                {
-                    id: 'tok-armor-default',
-                    refId: 'monsters:animated-armor',
-                    name: 'Armadura Animada',
-                    type: 'monster',
-                    category: 'monsters',
-                    groupKey: 'constructos_feras_abissoes',
-                    itemKey: 'animated-armor',
-                    ownerId: 'gm-master',
-                    x: 336,
-                    y: 168,
-                    hpCurrent: 33,
-                    hpMax: 33,
-                    ac: 18,
-                    imgSrc: './monster/data/animated-armor/token.png'
-                }
-            ]
+            tokens: []
         };
         let selectedTabletopTokenId = null;
 
@@ -1065,7 +758,7 @@
                             if (activeModule === 'compendium' && currentCategory === 'hitdice') renderHitDiceScreen();
                         } else if (msg.type === 'STUDY_REQUEST') {
                             const activeP = getActivePlayer();
-                            if (activeP && activeP.role === 'gm') {
+                            if (isEffectiveGmUser(activeP)) {
                                 showToast(`🔍 ${msg.playerName} usou "Estudar" em "${msg.entityTitle}"!`);
                             }
                         }
@@ -1078,9 +771,9 @@
             },
             canControlEntity(ownerId) {
                 const activePlayer = getActivePlayer();
-                if (!activePlayer) return true;
-                if (activePlayer.role === 'gm') return true;
-                return activePlayer.id === ownerId;
+                if (!activePlayer || activePlayer.isUnauthenticated || !activePlayer.id) return false;
+                if (activePlayer.role === 'gm') return window.isHostClient === true;
+                return Boolean(ownerId && activePlayer.id === ownerId);
             },
             broadcastTabletop() {
                 if (this.channel) {
@@ -1159,10 +852,22 @@
             }
         };
 
+        function syncLayoutCssVars() {
+            const root = document.documentElement;
+            if (!root) return;
+            const mainCollapsed = document.body.classList.contains('sidebar-collapsed');
+            const subCollapsed = document.body.classList.contains('subsidebar-collapsed');
+            const mainW = root.style.getPropertyValue('--sidebar-width') || '245px';
+            const subW = root.style.getPropertyValue('--subsidebar-width') || '270px';
+            root.style.setProperty('--active-sidebar-w', mainCollapsed ? '0px' : mainW);
+            root.style.setProperty('--active-subsidebar-w', subCollapsed ? '0px' : subW);
+        }
+
         function toggleMainSidebar(force = null) {
             const next = (force === null) ? !document.body.classList.contains('sidebar-collapsed') : Boolean(force);
             document.body.classList.toggle('sidebar-collapsed', next);
             try { localStorage.setItem('compendio_ui_sidebar_collapsed', next ? '1' : '0'); } catch (e) {}
+            syncLayoutCssVars();
             return next;
         }
 
@@ -1170,11 +875,67 @@
             const next = (force === null) ? !document.body.classList.contains('subsidebar-collapsed') : Boolean(force);
             document.body.classList.toggle('subsidebar-collapsed', next);
             try { localStorage.setItem('compendio_ui_subsidebar_collapsed', next ? '1' : '0'); } catch (e) {}
+            syncLayoutCssVars();
             return next;
+        }
+
+        function applySidebarWidth(target, px, persist = true) {
+            const isMain = target === 'main';
+            const clamped = isMain
+                ? Math.max(190, Math.min(460, Math.round(px)))
+                : Math.max(200, Math.min(500, Math.round(px)));
+            const cssVar = isMain ? '--sidebar-width' : '--subsidebar-width';
+            const storageKey = isMain ? 'compendio_ui_sidebar_width' : 'compendio_ui_subsidebar_width';
+            document.documentElement.style.setProperty(cssVar, `${clamped}px`);
+            if (persist) {
+                try { localStorage.setItem(storageKey, String(clamped)); } catch (e) {}
+            }
+            syncLayoutCssVars();
+        }
+
+        function initSidebarResizers() {
+            if (window._sidebarResizersBound) return;
+            window._sidebarResizersBound = true;
+            const handles = [
+                { el: document.getElementById('resizer-main-sidebar'), target: 'main', defaultW: 245, paneSelector: '.sidebar' },
+                { el: document.getElementById('resizer-sub-sidebar'), target: 'sub', defaultW: 270, paneSelector: '.item-list-sidebar' }
+            ];
+            handles.forEach(cfg => {
+                if (!cfg.el) return;
+                cfg.el.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    applySidebarWidth(cfg.target, cfg.defaultW, true);
+                    showToast('↔️ Largura do painel restaurada.');
+                });
+                cfg.el.addEventListener('mousedown', (ev) => {
+                    if (ev.button !== 0 || window.innerWidth <= 768) return;
+                    ev.preventDefault();
+                    const paneEl = document.querySelector(cfg.paneSelector);
+                    const startX = ev.clientX;
+                    const startW = paneEl ? paneEl.getBoundingClientRect().width : cfg.defaultW;
+                    document.body.classList.add('is-resizing');
+                    const onMove = (mEv) => {
+                        const dx = mEv.clientX - startX;
+                        applySidebarWidth(cfg.target, startW + dx, false);
+                    };
+                    const onUp = (uEv) => {
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        document.body.classList.remove('is-resizing');
+                        applySidebarWidth(cfg.target, startW + (uEv.clientX - startX), true);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                });
+            });
         }
 
         function restoreSidebarLayoutState() {
             try {
+                const mw = Number(localStorage.getItem('compendio_ui_sidebar_width'));
+                if (mw >= 190 && mw <= 460) applySidebarWidth('main', mw, false);
+                const sw = Number(localStorage.getItem('compendio_ui_subsidebar_width'));
+                if (sw >= 200 && sw <= 500) applySidebarWidth('sub', sw, false);
                 if (localStorage.getItem('compendio_ui_sidebar_collapsed') === '1') {
                     document.body.classList.add('sidebar-collapsed');
                 }
@@ -1182,6 +943,20 @@
                     document.body.classList.add('subsidebar-collapsed');
                 }
             } catch (e) {}
+            syncLayoutCssVars();
+            initSidebarResizers();
+        }
+
+        function ensureHostGmAccountPresent() {
+            if (!IS_LOCAL_HOST_ORIGIN || window.isHostClient === false) return;
+            if (!Array.isArray(playersData)) playersData = [];
+            if (!playersData.some(p => p && p.role === 'gm')) {
+                playersData.unshift({ id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', color: '#d8b467', avatarEmoji: '👑' });
+            }
+            if (!activePlayerId || !playersData.some(p => p && p.id === activePlayerId)) {
+                const gm = playersData.find(p => p && p.role === 'gm') || playersData[0];
+                if (gm) activePlayerId = gm.id;
+            }
         }
 
         async function initCompendium() {
@@ -1189,11 +964,24 @@
             if (typeof compendioData === 'undefined') {
                 window.compendioData = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
             }
-            loadLocalPersistence();
+            if (IS_LOCAL_HOST_ORIGIN) {
+                loadLocalPersistence();
+                ensureHostGmAccountPresent();
+            } else {
+                activePlayerId = '';
+            }
             if (typeof CompendioProfiles !== 'undefined') CompendioProfiles.init();
             if (typeof CompendioRules !== 'undefined') await CompendioRules.init();
             if (typeof CompendioDice !== 'undefined') CompendioDice.init();
             await checkServerStatus();
+
+            if (serverWritable && window.isHostClient === false && window.entryApproved === false) {
+                if (typeof enterWaitingRoomFlow === 'function') {
+                    await enterWaitingRoomFlow();
+                }
+                return;
+            }
+
             CompendioNetAdapter.init();
             renderPlayerIdentitySelector();
             renderCombatHand();
@@ -1263,72 +1051,82 @@
 
         function loadLocalPersistence() {
             try {
-                const savedFiles = localStorage.getItem(STORAGE_KEY_FILES);
-                if (savedFiles) virtualFiles = JSON.parse(savedFiles) || {};
-                sanitizeVirtualFiles();
+                const skipCampaignStorage = !IS_LOCAL_HOST_ORIGIN || window.isHostClient === false;
+                if (!skipCampaignStorage) {
+                    const savedFiles = localStorage.getItem(STORAGE_KEY_FILES);
+                    if (savedFiles) virtualFiles = JSON.parse(savedFiles) || {};
+                    sanitizeVirtualFiles();
 
-                const savedCards = localStorage.getItem(STORAGE_KEY_CARDS);
-                if (savedCards) combatCards = JSON.parse(savedCards) || [];
+                    const savedCards = localStorage.getItem(STORAGE_KEY_CARDS);
+                    if (savedCards) combatCards = JSON.parse(savedCards) || [];
 
-                const savedQuests = localStorage.getItem(STORAGE_KEY_QUESTS);
-                if (savedQuests) {
-                    const parsedQuests = JSON.parse(savedQuests);
-                    if (Array.isArray(parsedQuests) && parsedQuests.length > 0) questsData = parsedQuests;
-                }
-
-                const savedHD = localStorage.getItem(STORAGE_KEY_HITDICE);
-                if (savedHD) {
-                    const parsedHD = JSON.parse(savedHD);
-                    if (Array.isArray(parsedHD) && parsedHD.length > 0) hitDiceData = parsedHD;
-                }
-
-                const savedPlayers = localStorage.getItem(STORAGE_KEY_PLAYERS);
-                if (savedPlayers) {
-                    const parsedPlayers = JSON.parse(savedPlayers);
-                    if (Array.isArray(parsedPlayers) && parsedPlayers.length > 0) playersData = parsedPlayers;
-                }
-                const savedActivePlayer = localStorage.getItem(STORAGE_KEY_ACTIVE_PLAYER);
-                if (savedActivePlayer && playersData.some(p => p.id === savedActivePlayer)) {
-                    activePlayerId = savedActivePlayer;
-                }
-
-                const savedChars = localStorage.getItem(STORAGE_KEY_CHARACTERS);
-                if (savedChars) {
-                    const parsedChars = JSON.parse(savedChars);
-                    if (Array.isArray(parsedChars) && parsedChars.length > 0) charactersData = parsedChars;
-                }
-
-                const savedTT = localStorage.getItem(STORAGE_KEY_TABLETOP);
-                if (savedTT) {
-                    const parsedTT = JSON.parse(savedTT);
-                    if (parsedTT && typeof parsedTT === 'object') Object.assign(tabletopState, parsedTT);
-                }
-
-                const savedKnow = localStorage.getItem(STORAGE_KEY_KNOWLEDGE);
-                if (savedKnow) {
-                    const parsedKnow = JSON.parse(savedKnow);
-                    if (parsedKnow && typeof parsedKnow === 'object') entityKnowledge = parsedKnow;
-                }
-
-                const savedData = localStorage.getItem(STORAGE_KEY_DATA);
-                if (savedData) {
-                    const parsed = JSON.parse(savedData);
-                    if (parsed.__replacedAll) {
-                        window._compendioReplacedAll = true;
-                        for (const k of Object.keys(compendioData)) delete compendioData[k];
+                    const savedQuests = localStorage.getItem(STORAGE_KEY_QUESTS);
+                    if (savedQuests) {
+                        const parsedQuests = JSON.parse(savedQuests);
+                        if (Array.isArray(parsedQuests)) questsData = parsedQuests;
                     }
-                    for (const [cat, entries] of Object.entries(parsed)) {
-                        if (cat === '__replacedAll' || !entries || typeof entries !== 'object') continue;
-                        if (!compendioData[cat]) compendioData[cat] = {};
-                        for (const [k, rawV] of Object.entries(entries)) {
-                            const v = normalizeCatalogEntry(k, rawV);
-                            if (v && v.children && compendioData[cat][k] && compendioData[cat][k].children) {
-                                Object.assign(compendioData[cat][k].children, v.children);
-                            } else {
-                                compendioData[cat][k] = v;
+
+                    const savedHD = localStorage.getItem(STORAGE_KEY_HITDICE);
+                    if (savedHD) {
+                        const parsedHD = JSON.parse(savedHD);
+                        if (Array.isArray(parsedHD)) hitDiceData = parsedHD;
+                    }
+
+                    const savedPlayers = localStorage.getItem(STORAGE_KEY_PLAYERS);
+                    if (savedPlayers && IS_LOCAL_HOST_ORIGIN) {
+                        const parsedPlayers = JSON.parse(savedPlayers);
+                        if (Array.isArray(parsedPlayers) && parsedPlayers.length > 0) playersData = parsedPlayers;
+                    }
+                    const savedActivePlayer = localStorage.getItem(STORAGE_KEY_ACTIVE_PLAYER);
+                    if (IS_LOCAL_HOST_ORIGIN && savedActivePlayer && playersData.some(p => p.id === savedActivePlayer)) {
+                        activePlayerId = savedActivePlayer;
+                    }
+
+                    const savedChars = localStorage.getItem(STORAGE_KEY_CHARACTERS);
+                    if (savedChars) {
+                        const parsedChars = JSON.parse(savedChars);
+                        if (Array.isArray(parsedChars)) charactersData = parsedChars;
+                    }
+
+                    const savedTT = localStorage.getItem(STORAGE_KEY_TABLETOP);
+                    if (savedTT) {
+                        const parsedTT = JSON.parse(savedTT);
+                        if (parsedTT && typeof parsedTT === 'object') Object.assign(tabletopState, parsedTT);
+                    }
+
+                    const savedKnow = localStorage.getItem(STORAGE_KEY_KNOWLEDGE);
+                    if (savedKnow) {
+                        const parsedKnow = JSON.parse(savedKnow);
+                        if (parsedKnow && typeof parsedKnow === 'object') entityKnowledge = parsedKnow;
+                    }
+
+                    const savedData = localStorage.getItem(STORAGE_KEY_DATA);
+                    if (savedData) {
+                        const parsed = JSON.parse(savedData);
+                        if (parsed.__replacedAll) {
+                            window._compendioReplacedAll = true;
+                            for (const k of Object.keys(compendioData)) delete compendioData[k];
+                        }
+                        for (const [cat, entries] of Object.entries(parsed)) {
+                            if (cat === '__replacedAll' || !entries || typeof entries !== 'object') continue;
+                            if (!compendioData[cat]) compendioData[cat] = {};
+                            for (const [k, rawV] of Object.entries(entries)) {
+                                const v = normalizeCatalogEntry(k, rawV);
+                                if (v && v.children && compendioData[cat][k] && compendioData[cat][k].children) {
+                                    Object.assign(compendioData[cat][k].children, v.children);
+                                } else {
+                                    compendioData[cat][k] = v;
+                                }
                             }
                         }
                     }
+                } else {
+                    activePlayerId = '';
+                    playersData = [];
+                    charactersData = [];
+                    questsData = [];
+                    hitDiceData = [];
+                    tabletopState.tokens = [];
                 }
                 for (const [cat, entries] of Object.entries(compendioData)) {
                     if (!entries || typeof entries !== 'object') continue;
@@ -1344,14 +1142,13 @@
         function saveLocalPersistence(replacedAll = false) {
             try {
                 if (replacedAll) window._compendioReplacedAll = true;
-                const isRemoteConnected = (window.isHostClient === false && typeof serverWritable !== 'undefined' && serverWritable);
-                if (!isRemoteConnected) {
-                    const payload = Object.assign({}, compendioData);
-                    if (replacedAll || window._compendioReplacedAll) payload.__replacedAll = true;
-                    localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(payload));
-                    localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(virtualFiles));
-                    localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
-                }
+                const isRemoteConnected = !IS_LOCAL_HOST_ORIGIN || (window.isHostClient === false);
+                if (isRemoteConnected) return;
+                const payload = Object.assign({}, compendioData);
+                if (replacedAll || window._compendioReplacedAll) payload.__replacedAll = true;
+                localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(payload));
+                localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(virtualFiles));
+                localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
                 localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(combatCards));
                 localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(questsData));
                 localStorage.setItem(STORAGE_KEY_HITDICE, JSON.stringify(hitDiceData));
@@ -1368,17 +1165,36 @@
             const dot = document.getElementById('status-dot');
             const text = document.getElementById('status-text');
             try {
-                const res = await fetch('/api/status', { cache: 'no-store' });
+                const devId = (typeof getOrCreateDeviceId === 'function') ? getOrCreateDeviceId() : '';
+                const statusUrl = devId ? `/api/status?deviceId=${encodeURIComponent(devId)}` : '/api/status';
+                const res = await fetch(statusUrl, { cache: 'no-store' });
                 if (res.ok) {
                     const data = await res.json();
                     if (data && data.writable) {
                         serverWritable = true;
-                        window.isHostClient = data.isHostClient !== false;
+                        window.isHostClient = data.isHostClient === true;
+                        window.entryApproved = data.isHostClient === true || data.entryApproved !== false;
                         if (data.room) window.onlineRoomConfig = data.room;
                         if (Array.isArray(data.onlinePlayers)) window.onlinePlayersList = data.onlinePlayers;
+                        if (Array.isArray(data.waitingRoom)) window.waitingRoomList = data.waitingRoom;
+                        if (Array.isArray(data.pendingApprovals)) window.pendingApprovalsList = data.pendingApprovals;
                         dot.className = 'status-dot online';
-                        text.textContent = window.isHostClient ? 'Host: Salvo no PC' : 'Conectado à Sala';
-                        if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
+                        text.textContent = window.isHostClient ? 'Host: Salvo no PC' : (window.entryApproved ? 'Conectado à Sala' : 'Sala de Espera');
+                        if (window.isHostClient) {
+                            document.body.classList.remove('remote-locked-preauth');
+                        } else if (!window.hasReceivedHostSessionSnapshot) {
+                            // Garante que proxies ou acessos não-Host nunca retenham perfis ou placeholders locais
+                            activePlayerId = '';
+                            playersData = [];
+                            charactersData = [];
+                            questsData = [];
+                            hitDiceData = [];
+                            tabletopState.tokens = [];
+                            if (!window.entryApproved) document.body.classList.add('remote-locked-preauth');
+                        }
+                        if ((window.isHostClient || (window.entryApproved && window.hasReceivedHostSessionSnapshot)) && typeof ensureSafeInitialProfileForClient === 'function') {
+                            ensureSafeInitialProfileForClient();
+                        }
                         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
                         return;
                     }
@@ -1387,6 +1203,7 @@
             serverWritable = false;
             dot.className = 'status-dot local';
             text.textContent = 'Modo Navegador (Cache)';
+            if (IS_LOCAL_HOST_ORIGIN) document.body.classList.remove('remote-locked-preauth');
             if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
         }
 
@@ -1477,9 +1294,9 @@
             if (activeModule === 'character') {
                 if (!confirm('Deseja limpar os personagens visíveis?')) return;
                 const activePlayer = getActivePlayer();
-                if (activePlayer && activePlayer.role === 'gm') {
+                if (isEffectiveGmUser(activePlayer)) {
                     charactersData = [];
-                } else {
+                } else if (activePlayerId) {
                     charactersData = charactersData.filter(c => c.ownerId !== activePlayerId);
                 }
                 activeCharacterId = null;
@@ -1567,9 +1384,17 @@
             return entityKnowledge[k];
         }
 
+        function isEffectiveGmUser(playerObj = null) {
+            const p = playerObj || (typeof getActivePlayer === 'function' ? getActivePlayer() : null);
+            if (!p || p.isUnauthenticated || !p.id) return false;
+            if (window.isHostClient === false) return false;
+            if (typeof serverWritable !== 'undefined' && serverWritable && window.isHostClient !== true) return false;
+            return p.role === 'gm';
+        }
+
         function getEffectiveKnowledgeLevel(category, itemKey, playerId = activePlayerId) {
             const p = playersData.find(x => x.id === playerId) || getActivePlayer();
-            if (p && p.role === 'gm') return 'gm';
+            if (isEffectiveGmUser(p)) return 'gm';
             const rec = getEntityKnowledgeRecord(category, itemKey, false);
             const rank = { hidden: 0, sighted: 1, studied: 2 };
             const gLvl = rec.globalLevel || 'sighted';
@@ -1579,7 +1404,7 @@
 
         function setEntityGlobalKnowledge(category, itemKey, level) {
             const p = getActivePlayer();
-            if (!p || p.role !== 'gm') return;
+            if (!isEffectiveGmUser(p)) return;
             const rec = getEntityKnowledgeRecord(category, itemKey);
             rec.globalLevel = level;
             saveLocalPersistence();
@@ -1598,7 +1423,7 @@
 
         function togglePlayerStudiedKnowledge(category, itemKey, targetPlayerId) {
             const p = getActivePlayer();
-            if (!p || p.role !== 'gm') return;
+            if (!isEffectiveGmUser(p)) return;
             const rec = getEntityKnowledgeRecord(category, itemKey);
             if (!rec.playerLevels) rec.playerLevels = {};
             const current = rec.playerLevels[targetPlayerId];
@@ -1647,7 +1472,7 @@
             const searchInput = document.getElementById('list-search-input');
             if (searchInput) searchInput.value = '';
 
-            const isGm = getActivePlayer()?.role === 'gm';
+            const isGm = isEffectiveGmUser();
             const listView = { items, listTitle, collection, parentView, groupKey };
             currentListView = listView;
             listContainer.innerHTML = '';
@@ -1781,6 +1606,10 @@
         }
 
         function navigateCategory(categoryName, element) {
+            if (categoryName === 'curio') {
+                switchMainModule('curio_rules');
+                return;
+            }
             activeModule = 'compendium';
             updateMainModuleButtonsUI();
             document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
@@ -1833,13 +1662,15 @@
            ========================================================= */
         function updateMainModuleButtonsUI() {
             const btnComp = document.getElementById('btn-dir-compendium');
+            const btnCurioRules = document.getElementById('btn-dir-curio-rules');
             const btnChar = document.getElementById('btn-dir-character');
             const btnTT = document.getElementById('btn-dir-tabletop');
             if (btnComp) btnComp.classList.toggle('active', activeModule === 'compendium');
+            if (btnCurioRules) btnCurioRules.classList.toggle('active', activeModule === 'curio_rules');
             if (btnChar) btnChar.classList.toggle('active', activeModule === 'character');
             if (btnTT) btnTT.classList.toggle('active', activeModule === 'tabletop');
 
-            const isGm = getActivePlayer()?.role === 'gm';
+            const isGm = isEffectiveGmUser();
             const ctaEl = document.querySelector('.sidebar-cta');
             if (ctaEl) ctaEl.style.display = isGm ? 'flex' : 'none';
             const sessNav = document.querySelector('.nav-item[data-cat="session"]');
@@ -1855,6 +1686,7 @@
                     dirEl.classList.add('open');
                     if (chevEl) chevEl.textContent = '▼';
                 }
+                if (currentCategory === 'curio') currentCategory = 'monsters';
                 updateMainModuleButtonsUI();
                 const activeNav = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
                 navigateCategory(currentCategory, activeNav);
@@ -1866,6 +1698,233 @@
             }
         }
 
+        function openCurioArticleFromRulesSection(groupKey, itemKey) {
+            activeModule = 'curio_rules';
+            window._curioRulesTab = 'article';
+            window._activeCurioRuleKey = `${groupKey || ''}|${itemKey || ''}`;
+            currentCategory = 'curio';
+            const rootItems = compendioData.curio || {};
+            if (groupKey && rootItems[groupKey]?.children?.[itemKey]) {
+                loadItem(itemKey, null, rootItems[groupKey].children, groupKey);
+            } else if (rootItems[itemKey]) {
+                loadItem(itemKey, null, rootItems, '');
+            }
+            renderCurioRulesSidebarList(window._activeCurioRuleKey);
+        }
+
+        function renderCurioRulesSidebarList(activeItemToken = '') {
+            const listTitleEl = document.getElementById('dynamic-list-title');
+            if (listTitleEl) listTitleEl.textContent = 'Curiosidades & Regras';
+            document.getElementById('session-back').style.display = 'none';
+
+            const isGm = isEffectiveGmUser();
+            const curTab = window._curioRulesTab || 'overview';
+            const effRules = (typeof CompendioRules !== 'undefined' && CompendioRules.getEffectiveRules)
+                ? CompendioRules.getEffectiveRules()
+                : { presetName: 'D&D 2024' };
+            const activeModsCount = Array.isArray(window.installedMods) ? window.installedMods.filter(m => m && m.enabled).length : 0;
+            const totalModsCount = Array.isArray(window.installedMods) ? window.installedMods.length : 0;
+
+            const pinnedItems = [
+                {
+                    id: 'overview',
+                    title: '⚖️ Visão Geral (Regras & Lore)',
+                    searchTitle: 'visao geral regras lore painel',
+                    badge: escapeHtmlText(effRules.presetName || 'Sistema'),
+                    onClick: "renderCurioRulesModule('overview')"
+                },
+                {
+                    id: 'rules',
+                    title: '⚙️ Regras do Sistema',
+                    searchTitle: 'regras sistema combate descanso critico',
+                    badge: escapeHtmlText(effRules.presetName || '2024'),
+                    onClick: "renderCurioRulesModule('rules')"
+                },
+                {
+                    id: 'mods',
+                    title: '🧩 Mods & Pacotes',
+                    searchTitle: 'mods pacotes extensoes scripts',
+                    badge: `${activeModsCount}/${totalModsCount}`,
+                    onClick: "renderCurioRulesModule('mods')"
+                }
+            ];
+
+            let html = pinnedItems.map(pi => {
+                const isAct = curTab === pi.id ? 'active' : '';
+                return `
+                    <li class="list-item ${isAct}" data-title="${pi.searchTitle}" onclick="${pi.onClick}">
+                        <span>${pi.title}</span>
+                        <div class="list-item-right"><span class="list-item-folder-badge">${pi.badge}</span></div>
+                    </li>
+                `;
+            }).join('');
+
+            const curioEnts = getAllCatalogEntities(['curio']);
+            const visibleCurio = isGm ? curioEnts : curioEnts.filter(e => {
+                const lvl = typeof getEffectiveKnowledgeLevel === 'function' ? getEffectiveKnowledgeLevel('curio', e.itemKey) : 'studied';
+                return lvl !== 'hidden';
+            });
+
+            if (visibleCurio.length > 0) {
+                html += visibleCurio.map(e => {
+                    const tok = `${e.groupKey || ''}|${e.itemKey}`;
+                    const isAct = (curTab === 'article' && activeItemToken === tok) ? 'active' : '';
+                    const gArg = `'${String(e.groupKey || '').replace(/'/g, "\\'")}'`;
+                    const iArg = `'${String(e.itemKey || '').replace(/'/g, "\\'")}'`;
+                    return `
+                        <li class="list-item ${isAct}" data-key="${escapeHtmlText(e.itemKey)}" data-title="${escapeHtmlText((e.title || '').toLowerCase())}" onclick="openCurioArticleFromRulesSection(${gArg}, ${iArg})">
+                            <span>📜 ${escapeHtmlText(e.title)}</span>
+                            <div class="list-item-right">
+                                ${e.groupKey ? `<span class="list-item-folder-badge">📁 ${escapeHtmlText(e.groupKey)}</span>` : `<span class="list-item-folder-badge">Lore</span>`}
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+            } else {
+                html += `<li class="list-item" style="color:#828699; cursor:default; font-size:11.5px;">Nenhuma curiosidade/artigo cadastrado ainda</li>`;
+            }
+
+            const listEl = document.getElementById('dynamic-item-list');
+            if (listEl) listEl.innerHTML = html;
+        }
+
+        function renderCurioRulesModule(tab = null) {
+            activeModule = 'curio_rules';
+            currentCategory = 'curio';
+            if (tab) window._curioRulesTab = tab;
+            if (!window._curioRulesTab) window._curioRulesTab = 'overview';
+            updateMainModuleButtonsUI();
+            renderCurioRulesSidebarList(window._activeCurioRuleKey || '');
+
+            const curTab = window._curioRulesTab;
+            if (curTab === 'article' && window._activeCurioRuleKey) {
+                const [gKey, iKey] = window._activeCurioRuleKey.split('|');
+                const root = compendioData.curio || {};
+                const exists = gKey ? root[gKey]?.children?.[iKey] : root[iKey];
+                if (exists) {
+                    openCurioArticleFromRulesSection(gKey, iKey);
+                    return;
+                }
+                window._curioRulesTab = 'overview';
+            }
+
+            const isGm = isEffectiveGmUser();
+            const displayArea = document.getElementById('dynamic-display-area');
+            if (!displayArea) return;
+            const r = window.activeRulesConfig || (typeof RULESET_PRESETS !== 'undefined' ? RULESET_PRESETS.dnd2024 : {});
+            const eff = (typeof CompendioRules !== 'undefined' && CompendioRules.getEffectiveRules) ? CompendioRules.getEffectiveRules() : r;
+            const mods = Array.isArray(window.installedMods) ? window.installedMods : [];
+            const curioEnts = getAllCatalogEntities(['curio']);
+            const visibleCurio = isGm ? curioEnts : curioEnts.filter(e => {
+                const lvl = typeof getEffectiveKnowledgeLevel === 'function' ? getEffectiveKnowledgeLevel('curio', e.itemKey) : 'studied';
+                return lvl !== 'hidden';
+            });
+
+            const headerNavHtml = `
+                <div class="entry-toolbar" style="margin-bottom:16px;">
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                        <button type="button" class="${window._curioRulesTab === 'overview' ? 'btn-save-primary' : 'btn-action-bar'}" onclick="renderCurioRulesModule('overview')">⚖️ Visão Geral</button>
+                        <button type="button" class="${window._curioRulesTab === 'rules' ? 'btn-save-primary' : 'btn-action-bar'}" onclick="renderCurioRulesModule('rules')">⚙️ Sistema &amp; Regras</button>
+                        <button type="button" class="${window._curioRulesTab === 'mods' ? 'btn-save-primary' : 'btn-action-bar'}" onclick="renderCurioRulesModule('mods')">🧩 Mods (${mods.filter(m => m.enabled).length}/${mods.length})</button>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                        ${isGm ? `<button type="button" class="btn-summon-card" onclick="currentCategory='curio'; openStudioModal();">＋ Nova Curiosidade / Lore</button>` : ''}
+                        <button type="button" class="btn-action-bar" onclick="openRulesAndModsModal('${window._curioRulesTab === 'mods' ? 'mods' : 'rules'}')">🛠️ Editor Completo de Regras &amp; Mods</button>
+                    </div>
+                </div>
+            `;
+
+            if (window._curioRulesTab === 'rules') {
+                const presetBtns = (typeof RULESET_PRESETS !== 'undefined' ? Object.values(RULESET_PRESETS) : []).map(p => `
+                    <button type="button" class="${r.presetId === p.presetId ? 'btn-save-primary' : 'btn-action-bar'}" ${isGm ? `onclick="CompendioRules.applyPreset('${p.presetId}'); renderCurioRulesModule('rules');"` : 'disabled'}>
+                        ${escapeHtmlText(p.presetName)}
+                    </button>
+                `).join('');
+                const conds = (typeof CompendioRules !== 'undefined' && CompendioRules.getAllConditions) ? CompendioRules.getAllConditions() : [];
+                displayArea.innerHTML = `
+                    <div class="info-container" style="max-width:960px;">
+                        ${headerNavHtml}
+                        <h2 class="info-title">⚙️ Sistema &amp; Regras da Campanha: ${escapeHtmlText(eff.presetName || r.presetName || 'Customizado')}</h2>
+                        ${presetBtns ? `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">${presetBtns}</div>` : ''}
+                        <div class="form-section">
+                            <h3 class="form-section-title">Regras Efetivas em Vigor</h3>
+                            <div class="form-grid-3">
+                                <div class="form-group"><label>Acerto Crítico</label><div><code>${escapeHtmlText(eff.critRule || 'double-dice')}</code></div></div>
+                                <div class="form-group"><label>Exaustão</label><div><code>${escapeHtmlText(eff.exhaustionMode || '2024-penalty')}</code> (${Number(eff.exhaustionPenaltyPerLevel ?? -2)}/nível)</div></div>
+                                <div class="form-group"><label>Escala de Grade</label><div><code>${Number(eff.gridMetersPerSquare || 1.5)}m</code> / <code>${Number(eff.gridFeetPerSquare || 5)}ft</code> (${escapeHtmlText(eff.diagonalRule || 'equidistant')})</div></div>
+                                <div class="form-group"><label>Descanso Longo (PV / DV)</label><div><code>${Number(eff.longRestHpPercent ?? 100)}% PV</code> · <code>${Number(eff.longRestHitDicePercent ?? 100)}% DV</code></div></div>
+                                <div class="form-group"><label>Desempate de Iniciativa</label><div><code>${escapeHtmlText(eff.initiativeTieBreaker || 'dex')}</code></div></div>
+                                <div class="form-group"><label>Fórmula Base</label><div><code>${escapeHtmlText(eff.defaultDiceFormula || '1d20')}</code></div></div>
+                            </div>
+                            <div style="margin-top:10px; font-size:12px; color:#c2c6d6;">
+                                <strong>Condições disponíveis (${conds.length}):</strong> ${conds.map(c => `<span class="list-item-folder-badge" style="display:inline-block; margin:2px;">${escapeHtmlText(c)}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (window._curioRulesTab === 'mods') {
+                const modCards = mods.map(m => `
+                    <div class="form-section" style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-color:${m.enabled ? '#d8b467' : '#3c3e4a'};">
+                        <div>
+                            <strong style="font-size:14px; color:${m.enabled ? '#f2cf83' : '#e2e4ec'};">🧩 ${escapeHtmlText(m.name)}</strong>
+                            <span class="list-item-folder-badge">v${escapeHtmlText(m.version || '1.0')}</span>
+                            <div style="font-size:12px; color:#c2c6d6; margin-top:4px;">${escapeHtmlText(m.description || 'Sem descrição.')}</div>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            ${isGm ? `<label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:bold; color:${m.enabled ? '#8df596' : '#a0a4b8'};"><input type="checkbox" ${m.enabled ? 'checked' : ''} onchange="CompendioModAPI.toggleMod('${escapeHtmlText(m.id)}', this.checked); renderCurioRulesModule('mods');">${m.enabled ? 'ATIVO' : 'Inativo'}</label>` : `<span class="list-item-folder-badge">${m.enabled ? 'ATIVO' : 'Inativo'}</span>`}
+                        </div>
+                    </div>
+                `).join('') || `<p class="info-text">Nenhum Mod instalado ainda. Use "🛠️ Editor Completo de Regras &amp; Mods" para instalar pacotes <code>.json</code> ou scripts <code>.js</code>.</p>`;
+
+                displayArea.innerHTML = `
+                    <div class="info-container" style="max-width:960px;">
+                        ${headerNavHtml}
+                        <h2 class="info-title">🧩 Mods &amp; Pacotes da Campanha (${mods.filter(m => m.enabled).length} ativos)</h2>
+                        ${modCards}
+                    </div>
+                `;
+                return;
+            }
+
+            const curioCardsHtml = visibleCurio.map(e => {
+                const gArg = `'${String(e.groupKey || '').replace(/'/g, "\\'")}'`;
+                const iArg = `'${String(e.itemKey || '').replace(/'/g, "\\'")}'`;
+                return `
+                    <div class="form-section" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;" onclick="openCurioArticleFromRulesSection(${gArg}, ${iArg})">
+                        <div>
+                            <strong style="color:#f2cf83; font-size:14px;">📜 ${escapeHtmlText(e.title)}</strong>
+                            ${e.groupKey ? `<div style="font-size:11.5px; color:#9da3b8; margin-top:2px;">Pasta: ${escapeHtmlText(e.groupKey)}</div>` : ''}
+                        </div>
+                        <button type="button" class="btn-mini">Ler Artigo →</button>
+                    </div>
+                `;
+            }).join('') || `<div style="font-size:12.5px; color:#9da3b8; padding:10px 0;">Nenhum artigo de curiosidade ou lore cadastrado ainda.${isGm ? ' Clique em <strong>"＋ Nova Curiosidade / Lore"</strong> para criar!' : ''}</div>`;
+
+            displayArea.innerHTML = `
+                <div class="info-container" style="max-width:960px;">
+                    ${headerNavHtml}
+                    <h2 class="info-title">📜 Curiosidades &amp; Regras da Campanha</h2>
+                    <div class="form-grid" style="margin-bottom:14px;">
+                        <div class="form-section" style="margin:0; cursor:pointer;" onclick="renderCurioRulesModule('rules')">
+                            <h3 class="form-section-title">⚙️ Sistema em Vigor</h3>
+                            <p style="margin:0; font-size:12.5px; color:#c2c6d6;"><strong>${escapeHtmlText(eff.presetName || r.presetName || 'D&D 2024')}</strong> · Crítico: <code>${escapeHtmlText(eff.critRule || 'double-dice')}</code> · Grade: <code>${Number(eff.gridMetersPerSquare || 1.5)}m</code></p>
+                        </div>
+                        <div class="form-section" style="margin:0; cursor:pointer;" onclick="renderCurioRulesModule('mods')">
+                            <h3 class="form-section-title">🧩 Mods &amp; Licenças</h3>
+                            <p style="margin:0; font-size:12.5px; color:#c2c6d6;"><strong>${mods.filter(m => m.enabled).length}</strong> mod(s) ativo(s) de ${mods.length} instalado(s).</p>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3 class="form-section-title">📚 Artigos de Lore, História &amp; Regras da Mesa (${visibleCurio.length})</h3>
+                        ${curioCardsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
         function switchMainModule(moduleName) {
             activeModule = moduleName;
             updateMainModuleButtonsUI();
@@ -1874,6 +1933,8 @@
                 renderCharacterModule();
             } else if (moduleName === 'tabletop') {
                 renderTabletopModule();
+            } else if (moduleName === 'curio_rules') {
+                renderCurioRulesModule();
             } else {
                 const activeNav = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
                 navigateCategory(currentCategory, activeNav);
@@ -1882,11 +1943,18 @@
 
         function onHeaderAddClick() {
             if (activeModule === 'character') {
-                createNewCharacterForActivePlayer();
+                openNewCharacterChoiceModal();
             } else if (activeModule === 'tabletop') {
                 addActiveCharacterToTabletop();
+            } else if (activeModule === 'curio_rules') {
+                if (!isEffectiveGmUser()) {
+                    showToast('🔒 Apenas o Mestre pode criar curiosidades e lore.');
+                    return;
+                }
+                currentCategory = 'curio';
+                openStudioModal();
             } else {
-                if (getActivePlayer()?.role !== 'gm') {
+                if (!isEffectiveGmUser()) {
                     showToast('🔒 Apenas o Mestre pode criar páginas no Compêndio.');
                     return;
                 }
@@ -1895,13 +1963,33 @@
         }
 
         function getActivePlayer() {
-            return playersData.find(p => p.id === activePlayerId) || playersData[0];
+            const found = (playersData || []).find(p => p.id === activePlayerId) || null;
+            if (window.isHostClient !== true) {
+                if (!found || found.role === 'gm' || found.id === 'gm-master') {
+                    return {
+                        id: '',
+                        name: 'Não autenticado',
+                        role: 'guest',
+                        color: '#78909c',
+                        avatarEmoji: '⏳',
+                        isUnauthenticated: true
+                    };
+                }
+                return found;
+            }
+            return found || (playersData || [])[0] || { id: 'gm-master', name: 'Mestre (GM)', role: 'gm', color: '#d8b467', avatarEmoji: '👑' };
         }
 
         function renderPlayerIdentitySelector() {
             const sel = document.getElementById('active-player-select');
             if (!sel) return;
-            sel.innerHTML = playersData.map(p => {
+            const visiblePlayers = (window.isHostClient !== true)
+                ? (playersData || []).filter(p => p.role !== 'gm' && p.id !== 'gm-master')
+                : (playersData || []);
+            const placeholder = (window.isHostClient !== true && (!activePlayerId || !visiblePlayers.some(p => p.id === activePlayerId)))
+                ? `<option value="" selected>⏳ Selecionar Conta...</option>`
+                : '';
+            sel.innerHTML = placeholder + visiblePlayers.map(p => {
                 const badge = p.role === 'gm' ? '👑' : '🎮';
                 const lock = p.pin ? ' 🔒' : '';
                 return `<option value="${escapeHtmlText(p.id)}" ${p.id === activePlayerId ? 'selected' : ''}>${badge} ${escapeHtmlText(p.name)}${lock}</option>`;
@@ -1913,6 +2001,11 @@
             const check = CompendioNetAdapter.verifyIdentity(newPlayerId);
             if (!check.verified) return;
             const targetPlayer = check.player;
+            if (window.isHostClient !== true && (targetPlayer.role === 'gm' || targetPlayer.id === 'gm-master')) {
+                showToast('🔒 Apenas o Host/PC principal pode usar a conta de Mestre (GM).');
+                renderPlayerIdentitySelector();
+                return;
+            }
             if (targetPlayer.pin && targetPlayer.id !== activePlayerId) {
                 const entered = prompt(`🔐 Digite o PIN de acesso para entrar como "${targetPlayer.name}":`);
                 if (entered !== targetPlayer.pin) {
@@ -1954,10 +2047,16 @@
         }
 
         function promptAddPlayerIdentity() {
+            if (window.isHostClient !== true && serverWritable) {
+                if (typeof openProfileManagerModal === 'function') openProfileManagerModal('new');
+                showToast('⏳ Use o formulário "Solicitar Nova Conta" para aguardar aprovação do Host.');
+                return;
+            }
             const name = prompt('Nome do novo jogador (ex: Bruno, Sofia):');
             if (!name || !name.trim()) return;
             const cleanName = name.trim();
             const pin = prompt(`Opcional: Defina um PIN de acesso para "${cleanName}" (ou deixe em branco):`, '') || '';
+            const prevActive = getActivePlayer();
             const id = 'player-' + Date.now().toString(36);
             playersData.push({
                 id,
@@ -1966,13 +2065,19 @@
                 pin: pin.trim(),
                 authKey: 'local-' + id
             });
-            activePlayerId = id;
+            if (!(window.isHostClient === true && prevActive && prevActive.role === 'gm')) {
+                activePlayerId = id;
+            }
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.syncServerSession) {
+                CompendioNetAdapter.syncServerSession();
+            }
             renderPlayerIdentitySelector();
             if (activeModule === 'character') renderCharacterModule();
             else if (activeModule === 'tabletop') renderTabletopModule();
+            else if (activeModule === 'curio_rules') renderCurioRulesModule();
             else navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
-            showToast(`✅ Jogador "${cleanName}" adicionado e selecionado!`);
+            showToast(`✅ Jogador "${cleanName}" adicionado${(window.isHostClient === true && prevActive?.role === 'gm') ? ' (você permanece como Mestre)' : ' e selecionado'}!`);
         }
 
         /* =========================================================
@@ -1990,7 +2095,8 @@
         function canAccessFullCharacterSheet(charObj) {
             if (!charObj) return false;
             const player = getActivePlayer();
-            if (!player || player.role === 'gm') return true;
+            if (!player || player.isUnauthenticated || !player.id) return false;
+            if (isEffectiveGmUser(player)) return true;
             return charObj.ownerId === player.id;
         }
 
@@ -1998,8 +2104,69 @@
             return charactersData;
         }
 
-        function createNewCharacterForActivePlayer() {
+        function closeNewCharacterChoiceModal() {
+            document.getElementById('char-create-choice-backdrop')?.classList.remove('open');
+        }
+
+        function openNewCharacterChoiceModal() {
             const player = getActivePlayer();
+            if (!player || player.isUnauthenticated || !player.id) {
+                if (typeof openProfileManagerModal === 'function') openProfileManagerModal('login');
+                showToast('🔒 Selecione ou solicite sua conta de jogador antes de criar uma ficha.');
+                return;
+            }
+            const backdrop = document.getElementById('char-create-choice-backdrop');
+            const box = document.getElementById('char-create-choice-modal-content');
+            if (!backdrop || !box) {
+                createNewCharacterForActivePlayer();
+                return;
+            }
+            box.innerHTML = `
+                <div class="studio-header">
+                    <h2>🛡️ Novo Personagem</h2>
+                    <button class="btn-close-modal" type="button" onclick="closeNewCharacterChoiceModal()">✕</button>
+                </div>
+                <div class="studio-form-pane" style="border-right:none;">
+                    <p style="margin-top:0; font-size:13px; color:#c2c6d6;">
+                        Deseja <strong>importar uma ficha já existente</strong> (<code>.json</code>, <code>.pdf</code> ou <code>.html</code>) ou criar uma <strong>ficha em branco</strong> do zero?
+                    </p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin:14px 0;">
+                        <button type="button" class="btn-save-primary" style="padding:14px 12px; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:13px;" onclick="closeNewCharacterChoiceModal(); document.getElementById('universal-sheet-import-input').click();">
+                            <span style="font-size:22px;">📥</span>
+                            <span>Importar Ficha</span>
+                            <span style="font-size:11px; opacity:0.85; font-weight:normal;">.JSON, .PDF ou .HTML</span>
+                        </button>
+                        <button type="button" class="btn-action-bar" style="padding:14px 12px; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:13px; justify-content:center;" onclick="closeNewCharacterChoiceModal(); createNewCharacterForActivePlayer();">
+                            <span style="font-size:22px;">📝</span>
+                            <span>Criar em Branco</span>
+                            <span style="font-size:11px; opacity:0.85; font-weight:normal;">Preencher manualmente</span>
+                        </button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid #3c3e4a;">
+                        <select class="form-control" style="flex:1; min-width:210px; font-size:11.5px; border-color:#d8b467;" onchange="if(this.value){closeNewCharacterChoiceModal(); importTestFileFromPublic(this.value); this.value='';}" title="Ou importe direto de import-tests/">
+                            <option value="">🧪 Ou escolher arquivo em public/import-tests/...</option>
+                            <option value="kael-varhen-ek-13-v2.pdf">📄 kael-varhen-ek-13-v2.pdf (EN)</option>
+                            <option value="kiriton.pdf">📄 kiriton.pdf (PT-BR)</option>
+                            <option value="character-sheet.pdf">📄 character-sheet.pdf (Auxiz)</option>
+                            <option value="La Loba.pdf">📄 La Loba.pdf (Lvl 22)</option>
+                            <option value="DnD_2024_Character-Sheet (PT-BR).pdf">📄 DnD_2024_Character-Sheet (PT-BR).pdf</option>
+                            <option value="astel.html">🌐 astel.html (Ficha HTML)</option>
+                            <option value="animated-armor.json">📋 animated-armor.json (5etools)</option>
+                        </select>
+                        <button type="button" class="btn-mini" onclick="closeNewCharacterChoiceModal()">Cancelar</button>
+                    </div>
+                </div>
+            `;
+            backdrop.classList.add('open');
+        }
+
+        async function createNewCharacterForActivePlayer() {
+            const player = getActivePlayer();
+            if (!player || player.isUnauthenticated || !player.id) {
+                if (typeof openProfileManagerModal === 'function') openProfileManagerModal('login');
+                showToast('🔒 Selecione ou solicite sua conta de jogador antes de criar uma ficha.');
+                return;
+            }
             const ownerId = (player && player.role !== 'gm') ? player.id : (playersData.find(p => p.role === 'player')?.id || player.id);
             const ownerObj = playersData.find(p => p.id === ownerId) || player;
             const newChar = {
@@ -2024,6 +2191,10 @@
                 notes: '',
                 tokenImg: ''
             };
+            if (window.isHostClient !== true && serverWritable && typeof submitApprovalRequest === 'function') {
+                await submitApprovalRequest('character_create', { character: newChar }, '⏳ Solicitação de criação de personagem enviada ao Host/Mestre!');
+                return;
+            }
             charactersData.push(newChar);
             activeCharacterId = newChar.id;
             saveLocalPersistence();
@@ -2050,7 +2221,7 @@
 
         function renderCharacterModule() {
             const player = getActivePlayer();
-            const isGm = player && player.role === 'gm';
+            const isGm = isEffectiveGmUser(player);
             const allChars = charactersData;
             const listTitleEl = document.getElementById('dynamic-list-title');
             if (listTitleEl) {
@@ -2106,7 +2277,7 @@
                         <h2 class="info-title">🛡️ Personagens (${escapeHtmlText(player ? player.name : '')})</h2>
                         <p class="info-text">Nenhum personagem cadastrado ainda. Crie uma ficha do zero ou importe um arquivo <strong>.JSON</strong>, <strong>.PDF</strong> ou <strong>.HTML</strong>.</p>
                         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                            <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="createNewCharacterForActivePlayer()">＋ Criar Ficha de Personagem</button>
+                            <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="openNewCharacterChoiceModal()">＋ Criar Ficha de Personagem</button>
                             <button type="button" class="btn-action-bar" style="padding:10px 18px;" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
                             ${testFilesDropdown}
                         </div>
@@ -2126,7 +2297,7 @@
                                 </div>
                             </div>
                             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                                <button type="button" class="btn-summon-card" onclick="createNewCharacterForActivePlayer()">＋ Criar Meu Personagem</button>
+                                <button type="button" class="btn-summon-card" onclick="openNewCharacterChoiceModal()">＋ Criar Meu Personagem</button>
                                 <button type="button" class="btn-action-bar" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
                                 ${testFilesDropdown}
                             </div>
@@ -2314,10 +2485,25 @@
             renderCharacterModule();
         }
 
-        function updateCharacterOwner(charId, newOwnerId) {
+        async function updateCharacterOwner(charId, newOwnerId) {
             const c = charactersData.find(x => x.id === charId);
             const p = playersData.find(x => x.id === newOwnerId);
             if (!c || !p) return;
+            const activeP = getActivePlayer();
+            const isHostGm = window.isHostClient === true && activeP && activeP.role === 'gm';
+            if (!isHostGm && window.isHostClient !== true) {
+                if (typeof submitApprovalRequest === 'function' && serverWritable) {
+                    await submitApprovalRequest('character_transfer', {
+                        mode: 'transfer',
+                        charId: c.id,
+                        targetPlayerId: p.id
+                    }, '⏳ Pedido de troca/transferência de personagem enviado ao Host/Mestre!');
+                } else {
+                    showToast('🔒 Apenas o Host/Mestre pode trocar o dono de um personagem.');
+                }
+                renderCharacterModule();
+                return;
+            }
             c.ownerId = p.id;
             c.ownerName = p.name;
             tabletopState.tokens.forEach(t => {
@@ -2412,9 +2598,10 @@
         function addActiveCharacterToTabletop() {
             const ownChar = charactersData.find(c => c.ownerId === activePlayerId) || charactersData.find(c => c.id === activeCharacterId);
             if (!ownChar) {
-                createNewCharacterForActivePlayer();
+                openNewCharacterChoiceModal();
+                return;
             }
-            const target = charactersData.find(c => c.id === activeCharacterId) || charactersData[0];
+            const target = ownChar || charactersData[0];
             if (target) sendCharacterToTabletop(target.id);
         }
 
@@ -2505,7 +2692,8 @@
 
         function canSeeTokenExactStats(tok) {
             const p = getActivePlayer();
-            if (!p || p.role === 'gm') return true;
+            if (!p || p.isUnauthenticated || !p.id) return false;
+            if (isEffectiveGmUser(p)) return true;
             if (tok.ownerId === p.id) return true;
             if (tok.category && tok.itemKey) {
                 return getEffectiveKnowledgeLevel(tok.category, tok.itemKey, p.id) === 'studied';
@@ -2530,7 +2718,7 @@
 
         function renderTabletopModule() {
             const player = getActivePlayer();
-            const isGm = player && player.role === 'gm';
+            const isGm = isEffectiveGmUser(player);
             const listTitleEl = document.getElementById('dynamic-list-title');
             if (listTitleEl) {
                 listTitleEl.textContent = `Tokens na Mesa (${tabletopState.tokens.length})`;
@@ -2687,7 +2875,12 @@
         }
 
         function toggleTabletopSnap(checked) {
+            if (typeof isEffectiveGmUser === 'function' && !isEffectiveGmUser()) {
+                if (typeof showToast === 'function') showToast('🔒 Apenas o Mestre/Host pode alterar o Snap da grade.');
+                return false;
+            }
             tabletopState.snapToGrid = Boolean(checked);
+            if (typeof tabletopState === 'object') tabletopState.gridSnap = tabletopState.snapToGrid;
             saveLocalPersistence();
             CompendioNetAdapter.broadcastTabletop();
         }
@@ -2814,6 +3007,10 @@
         }
 
         function jumpToCatalogEntity(category, groupKey, itemKey) {
+            if (category === 'curio' && typeof openCurioArticleFromRulesSection === 'function') {
+                openCurioArticleFromRulesSection(groupKey, itemKey);
+                return;
+            }
             activeModule = 'compendium';
             if (typeof updateMainModuleButtonsUI === 'function') updateMainModuleButtonsUI();
             const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${category}"]`);
@@ -3513,7 +3710,7 @@
 
         function renderKnowledgeControlBarHtml(category, itemKey, itemTitle) {
             const activePl = getActivePlayer();
-            const isGm = activePl && activePl.role === 'gm';
+            const isGm = isEffectiveGmUser(activePl);
             const rec = getEntityKnowledgeRecord(category, itemKey, false);
 
             if (!isGm) return '';
@@ -3588,7 +3785,7 @@
 
         function renderEntryToolbar(includeHtmlMonsterSpawner = false) {
             if (!activeItemContext) return '';
-            const isGm = getActivePlayer()?.role === 'gm';
+            const isGm = isEffectiveGmUser();
             const cat = activeItemContext.category || currentCategory;
             const gKey = activeItemContext.groupKey || '';
             const iKey = activeItemContext.key || '';
@@ -3607,9 +3804,9 @@
                 <div class="entry-toolbar">
                     ${extraSummon}
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button type="button" class="btn-summon-card" onclick="spawnCompendiumEntityToken('${safeCat}', '${safeGrp}', '${safeKey}')" title="Transformar esta Ficha em um Token posicionado no mapa Tabletop">🎲 Enviar ao Tabletop (Token)</button>
                         ${effLvl === 'studied' ? `<button type="button" class="btn-action-bar" onclick="exportActiveCompendiumEntryJson()" title="Exportar esta ficha em formato .JSON">📤 Exportar .JSON</button>` : ''}
                         ${isGm ? `
+                            <button type="button" class="btn-summon-card" onclick="spawnCompendiumEntityToken('${safeCat}', '${safeGrp}', '${safeKey}')" title="Transformar esta Ficha em um Token posicionado no mapa Tabletop">🎲 Enviar ao Tabletop (Token)</button>
                             <button type="button" class="btn-action-bar" onclick="openStudioModal()">＋ Nova Página</button>
                             <button type="button" class="btn-action-bar" onclick="editActiveEntry()">✏️ Editar esta Página</button>
                             <button type="button" class="btn-action-bar danger" onclick="deleteActiveEntry()">🗑️ Excluir</button>
@@ -4387,6 +4584,7 @@
 
             dockCollapsed = false;
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
             showToast(`🔮 ${qty}x "${mobName}" invocado(s) na Runa de Combate!`);
         }
@@ -4413,12 +4611,14 @@
             if (!card) return;
             card.collapsed = !card.collapsed;
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
         function setAllCardsCollapsed(collapsedState) {
             combatCards.forEach(c => c.collapsed = collapsedState);
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4426,6 +4626,7 @@
             if (event) event.stopPropagation();
             combatCards = combatCards.filter(c => c.id !== cardId);
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4435,6 +4636,7 @@
             combatCards = [];
             dockCollapsed = true;
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4487,6 +4689,7 @@
                     }
                     mob.calc = "";
                     saveLocalPersistence();
+                    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
                     renderCombatHand();
                 } catch (e) {
                     const disp = document.getElementById(`calc-disp-${id}`);
@@ -4511,6 +4714,7 @@
             if (!mob.effects) mob.effects = [];
             mob.effects.push({ name, turns });
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4519,6 +4723,7 @@
             if (!mob) return;
             mob.effects.splice(effIndex, 1);
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4534,6 +4739,7 @@
                 mob.hp = Math.min(n, mob.maxHp);
             }
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
         }
 
@@ -4545,6 +4751,7 @@
                 }
             });
             saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
             renderCombatHand();
             const btn = document.getElementById('btn-advance-turn');
             if (btn) {
@@ -4828,7 +5035,9 @@
             const validCats = ['monsters', 'npcs', 'items', 'maps', 'curio', 'session'];
             const targetCat = (isEdit && activeItemContext?.category && validCats.includes(activeItemContext.category))
                 ? activeItemContext.category
-                : (validCats.includes(currentCategory) ? currentCategory : 'monsters');
+                : ((!isEdit && activeModule === 'curio_rules')
+                    ? 'curio'
+                    : (validCats.includes(currentCategory) ? currentCategory : 'monsters'));
             catSelect.value = targetCat;
             const modosPermitidos = { monsters: ['5etools','monster'], npcs: ['5etools','monster'], items: ['5etools','item'], maps: ['article'], curio: ['article'], session: ['article'] }[targetCat];
             document.querySelectorAll('.mode-card').forEach(el => { el.style.display = (!modosPermitidos || modosPermitidos.includes(el.dataset.mode)) ? '' : 'none'; });
@@ -5168,11 +5377,15 @@
 
         function resolveDefaultOwnerInfo() {
             const player = getActivePlayer();
-            const ownerId = (player && player.role !== 'gm')
+            if (!player || player.isUnauthenticated || !player.id) {
+                return { ownerId: '', ownerName: 'Sem Dono' };
+            }
+            const nonGm = playersData.find(p => p.role !== 'gm');
+            const ownerId = (player.role !== 'gm')
                 ? player.id
-                : (playersData.find(p => p.role === 'player')?.id || (player ? player.id : 'player-1'));
-            const ownerObj = playersData.find(p => p.id === ownerId) || player || { id: 'player-1', name: 'Jogador 1' };
-            return { ownerId: ownerObj.id, ownerName: ownerObj.name };
+                : (nonGm ? nonGm.id : player.id);
+            const ownerObj = playersData.find(p => p.id === ownerId) || player;
+            return { ownerId: ownerObj.id || '', ownerName: ownerObj.name || 'Jogador' };
         }
 
         function parseCharacterFromPdfData(pdfData, fileName = 'Ficha.pdf') {
@@ -5676,6 +5889,17 @@
             }
 
             if (!newChar) throw new Error('Não foi possível extrair os dados da ficha.');
+            if (window.isHostClient !== true && serverWritable && typeof submitApprovalRequest === 'function') {
+                const activeP = getActivePlayer();
+                if (!activeP || activeP.isUnauthenticated || !activeP.id) {
+                    showToast('🔒 Faça login em uma conta de jogador antes de importar uma ficha.');
+                    return;
+                }
+                newChar.ownerId = activeP.id;
+                newChar.ownerName = activeP.name;
+                await submitApprovalRequest('character_create', { character: newChar }, `⏳ Ficha "${newChar.name}" enviada para aprovação do Host/Mestre!`);
+                return;
+            }
             charactersData.push(newChar);
             activeCharacterId = newChar.id;
             saveLocalPersistence();

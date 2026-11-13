@@ -267,12 +267,16 @@ const CompendioDice = {
         let expr = String(rawExpr || baseDie).trim();
         if (/^[+-]\d+$/.test(expr)) expr = `${baseDie}${expr}`;
 
-        const player = (typeof getActivePlayer === 'function') ? getActivePlayer() : { id: 'gm-master', name: 'Mestre (GM)', role: 'gm' };
+        const rawPlayer = (typeof getActivePlayer === 'function') ? getActivePlayer() : null;
+        const player = rawPlayer || { id: '', name: 'Convidado', role: 'player', isUnauthenticated: true };
+        const isGmSender = (typeof isEffectiveGmUser === 'function')
+            ? isEffectiveGmUser(player)
+            : Boolean(player && !player.isUnauthenticated && player.role === 'gm' && window.isHostClient !== false);
         const rules = (typeof CompendioRules !== 'undefined') ? CompendioRules.getEffectiveRules() : { critRule: 'double-dice', exhaustionMode: '2024-penalty', exhaustionPenaltyPerLevel: -2 };
 
         const mode = options.mode || window.diceRollMode || 'normal';
         const isCrit = Boolean(options.isCrit ?? false);
-        const isSecret = Boolean(options.isSecret ?? (player.role === 'gm' && window.diceSecretGm));
+        const isSecret = Boolean(options.isSecret ?? (isGmSender && window.diceSecretGm));
         const isDamage = Boolean(options.isDamage);
 
         // Verifica se há personagem ativo para aplicar penalidade de Exaustão em testes de d20
@@ -283,7 +287,7 @@ const CompendioDice = {
         if (!options.skipExhaustion && typeof charactersData !== 'undefined') {
             const charObj = options.charId
                 ? charactersData.find(c => c.id === options.charId)
-                : (player.role !== 'gm' ? charactersData.find(c => c.ownerId === player.id) : null);
+                : (!isGmSender && player.id ? charactersData.find(c => c.ownerId === player.id) : null);
             if (charObj) {
                 rolledCharName = charObj.name || '';
                 if (!options.actorName) actorName = `${charObj.name} (${playerDisplay})`;
@@ -486,8 +490,10 @@ const CompendioDice = {
         const container = document.getElementById('dice-tower-floating-root');
         if (!container) return;
 
-        const activePl = (typeof getActivePlayer === 'function') ? getActivePlayer() : { role: 'gm' };
-        const isGm = activePl && activePl.role === 'gm';
+        const activePl = (typeof getActivePlayer === 'function') ? getActivePlayer() : null;
+        const isGm = (typeof isEffectiveGmUser === 'function')
+            ? isEffectiveGmUser(activePl)
+            : Boolean(activePl && !activePl.isUnauthenticated && activePl.role === 'gm' && window.isHostClient !== false);
 
         const prevCustomFormula = document.getElementById('custom-dice-formula-input')?.value || '';
         const visibleLogs = window.diceLogData.slice().reverse().slice(0, 30);

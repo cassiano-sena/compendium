@@ -49,20 +49,44 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             ? getOrCreateDeviceId()
             : (window.localDeviceId || window.localClientId);
         const passcode = typeof getActiveRoomPasscode === 'function' ? getActiveRoomPasscode() : '';
+        const isHost = window.isHostClient === true;
+        const resolvedId = isHost
+            ? ((typeof activePlayerId !== 'undefined' && activePlayerId) ? activePlayerId : (p?.id || 'gm-master'))
+            : ((typeof activePlayerId !== 'undefined' && activePlayerId && activePlayerId !== 'gm-master' && p && !p.isUnauthenticated && p.role !== 'gm') ? activePlayerId : '');
+        const resolvedRole = (isHost && p && p.role === 'gm') ? 'gm' : 'player';
         return {
             clientId: window.localClientId,
             deviceId,
-            senderId: (typeof activePlayerId !== 'undefined' && activePlayerId) ? activePlayerId : (p?.id || 'gm-master'),
-            senderName: p ? p.name : 'Jogador',
-            senderRole: p ? p.role : 'player',
+            senderId: resolvedId,
+            senderName: p && !p.isUnauthenticated ? p.name : 'Não autenticado',
+            senderRole: resolvedRole,
             senderColor: p?.color || '#d8b467',
-            senderAvatar: p?.avatarEmoji || (p?.role === 'gm' ? '👑' : '🛡️'),
+            senderAvatar: p?.avatarEmoji || (resolvedRole === 'gm' ? '👑' : '🛡️'),
             passcode
         };
     };
 
     CompendioNetAdapter._handleServerRejection = function(status, data) {
-        if (!data || typeof showRoomGateModal !== 'function') return;
+        if (!data) return;
+        if (data.approvalRequired || data.waiting) {
+            window.entryApproved = false;
+            if (this.sse) {
+                try { this.sse.close(); } catch (e) {}
+                this.sse = null;
+            }
+            if (typeof enterWaitingRoomFlow === 'function') enterWaitingRoomFlow(data);
+            return;
+        }
+        if (data.gmBlocked || data.accountRequired) {
+            if (typeof activePlayerId !== 'undefined') activePlayerId = '';
+            if (typeof document !== 'undefined' && document.body && window.isHostClient !== true) {
+                document.body.classList.add('remote-locked-preauth');
+            }
+            if (typeof openProfileManagerModal === 'function') openProfileManagerModal('login');
+            if (typeof showToast === 'function' && data.error) showToast('🔒 ' + data.error);
+            return;
+        }
+        if (typeof showRoomGateModal !== 'function') return;
         if (data.banned) showRoomGateModal('banned', data.error || 'Acesso bloqueado pelo Mestre.');
         else if (data.kicked) showRoomGateModal('kicked', data.error || 'Você foi desconectado da sala.');
         else if (data.closed) showRoomGateModal('room_closed', data.error || 'A sala foi encerrada pelo Mestre.');
@@ -121,7 +145,9 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                     CompendioDice.renderWidget();
                 }
                 const activePl = getActivePlayer();
-                const isGm = activePl && activePl.role === 'gm';
+                const isGm = (typeof isEffectiveGmUser === 'function')
+                    ? isEffectiveGmUser(activePl)
+                    : Boolean(activePl && !activePl.isUnauthenticated && activePl.role === 'gm' && window.isHostClient !== false);
                 if (!msg.roll.isSecret || isGm) {
                     const actorShown = typeof getPlayerDisplayName === 'function'
                         ? getPlayerDisplayName(msg.roll.actorId || msg.senderId, msg.roll.actorName)
@@ -150,7 +176,10 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             }
             if (typeof CompendioRules !== 'undefined') CompendioRules.refreshAllScreens();
         } else if (msg.type === 'STUDY_REQUEST') {
-            if (getActivePlayer()?.role === 'gm' && typeof showToast === 'function') {
+            const isGmNow = typeof isEffectiveGmUser === 'function'
+                ? isEffectiveGmUser()
+                : Boolean(getActivePlayer()?.role === 'gm' && window.isHostClient !== false);
+            if (isGmNow && typeof showToast === 'function') {
                 showToast(`🖐️ ${msg.playerName || 'Jogador'} pediu para ESTUDAR: "${msg.entityTitle || msg.entityKey}"`);
             }
         }
@@ -158,6 +187,14 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
     CompendioNetAdapter.applyServerSessionSnapshot = function(sess) {
         if (!sess || typeof sess !== 'object') return;
+        if (window.isHostClient === true && sess.hostInitialized === false && typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData()) {
+            window.hasReceivedHostSessionSnapshot = true;
+            if (sess.roomConfig && typeof sess.roomConfig === 'object') {
+                window.onlineRoomConfig = sess.roomConfig;
+            }
+            this.syncServerSession();
+            return;
+        }
         const isTyping = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
         const studioOpen = document.getElementById('studio-modal-backdrop')?.classList.contains('open');
         const roleBefore = typeof getActivePlayer === 'function' ? getActivePlayer()?.role : null;
@@ -170,7 +207,8 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         if (sess.roomConfig && typeof sess.roomConfig === 'object') {
             window.onlineRoomConfig = sess.roomConfig;
         }
-        if (Array.isArray(sess.players) && sess.players.length > 0) {
+        window.hasReceivedHostSessionSnapshot = true;
+        if (Array.isArray(sess.players) && (!window.isHostClient || sess.players.length > 0)) {
             const localPinMap = new Map((playersData || []).map(p => [p.id, p.pin || '']));
             playersData = sess.players.map(p => {
                 const merged = (p.pin === undefined && window.isHostClient && localPinMap.has(p.id))
@@ -178,9 +216,19 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                     : Object.assign({}, p);
                 return typeof ensurePlayerExtendedFields === 'function' ? ensurePlayerExtendedFields(merged) : merged;
             });
-            if (!isTyping) renderPlayerIdentitySelector();
+            if (window.isHostClient === true && !playersData.some(p => p && p.role === 'gm')) {
+                playersData.unshift({ id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', color: '#d8b467', avatarEmoji: '👑' });
+            }
+            if (window._autoSelectApprovedPlayerId && playersData.some(p => p.id === window._autoSelectApprovedPlayerId && p.role !== 'gm')) {
+                const autoId = window._autoSelectApprovedPlayerId;
+                window._autoSelectApprovedPlayerId = null;
+                if (typeof switchProfileImmediately === 'function') switchProfileImmediately(autoId);
+                if (typeof closeProfileManagerModal === 'function') closeProfileManagerModal(true);
+            } else if (!isTyping && typeof renderPlayerIdentitySelector === 'function') {
+                renderPlayerIdentitySelector();
+            }
         }
-        if (Array.isArray(sess.characters) && (sess.characters.length > 0 || !window.isHostClient || (Array.isArray(sess.players) && sess.players.length > 0))) {
+        if (Array.isArray(sess.characters) && (!window.isHostClient || sess.hostInitialized !== false || sess.characters.length > 0)) {
             charactersData = sess.characters;
             if (!isTyping && activeModule === 'character') renderCharacterModule();
         }
@@ -189,6 +237,9 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             const prevLocalTokens = (tabletopState && Array.isArray(tabletopState.tokens)) ? tabletopState.tokens : [];
             const prevLocalShapes = (tabletopState && Array.isArray(tabletopState.aoeTemplates)) ? tabletopState.aoeTemplates : [];
             tabletopState = sess.tabletop;
+            if (tabletopState.gridSnap !== undefined && tabletopState.snapToGrid === undefined) {
+                tabletopState.snapToGrid = Boolean(tabletopState.gridSnap);
+            }
             // Preserva objeto sendo arrastado/editado localmente para nunca cancelar ações simultâneas
             if (inter && inter.type === 'token' && inter.id) {
                 const mine = prevLocalTokens.find(t => t.id === inter.id);
@@ -275,7 +326,10 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
         if (sess.lastStudyRequest && sess.lastStudyRequest.id && sess.lastStudyRequest.id !== this._lastStudyReqId) {
             this._lastStudyReqId = sess.lastStudyRequest.id;
-            if (getActivePlayer()?.role === 'gm' && typeof showToast === 'function') {
+            const isGmNow = typeof isEffectiveGmUser === 'function'
+                ? isEffectiveGmUser()
+                : Boolean(getActivePlayer()?.role === 'gm' && window.isHostClient !== false);
+            if (isGmNow && typeof showToast === 'function') {
                 showToast(`🖐️ ${sess.lastStudyRequest.playerName || 'Jogador'} pediu para ESTUDAR: "${sess.lastStudyRequest.entityTitle || sess.lastStudyRequest.entityKey}"`);
             }
         }
@@ -317,6 +371,12 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
         if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
+        if (document.getElementById('profiles-lobby-backdrop')?.classList.contains('open') && typeof renderProfileManagerModal === 'function') {
+            renderProfileManagerModal(window._activeProfileTab || 'login');
+        }
+        if (typeof renderPlayerIdentitySelector === 'function') {
+            renderPlayerIdentitySelector();
+        }
 
         const roleAfter = typeof getActivePlayer === 'function' ? getActivePlayer()?.role : null;
         const roleChanged = roleBefore !== roleAfter;
@@ -335,24 +395,50 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         }
     };
 
-    CompendioNetAdapter.connectRealtimeServer = async function() {
+    CompendioNetAdapter.connectRealtimeServer = async function(options = {}) {
+        const forceReconnect = Boolean(options && options.forceReconnect);
+        if (this._connectingRealtime && !forceReconnect) return;
+        if (!forceReconnect && this.sse && this.sse.readyState !== 2 && tabletopState.networkMode === 'lan-sse') {
+            return;
+        }
+        this._connectingRealtime = true;
         try {
-            const stRes = await fetch('/api/status', { cache: 'no-store' });
+            const devId = typeof getOrCreateDeviceId === 'function' ? getOrCreateDeviceId() : (window.localDeviceId || window.localClientId);
+            const stRes = await fetch(`/api/status?deviceId=${encodeURIComponent(devId)}`, { cache: 'no-store' });
             if (!stRes.ok) return;
             const stData = await stRes.json();
             if (!stData || !stData.multiplayerReady) return;
 
             if (typeof stData.isHostClient === 'boolean') window.isHostClient = stData.isHostClient;
+            window.entryApproved = stData.isHostClient === true || stData.entryApproved !== false;
             if (stData.room) window.onlineRoomConfig = stData.room;
             if (Array.isArray(stData.onlinePlayers)) window.onlinePlayersList = stData.onlinePlayers;
-            if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
+            if (Array.isArray(stData.waitingRoom)) window.waitingRoomList = stData.waitingRoom;
+            if (Array.isArray(stData.pendingApprovals)) window.pendingApprovalsList = stData.pendingApprovals;
+
+            if (!stData.isHostClient && stData.entryApproved === false) {
+                if (this.sse) {
+                    try { this.sse.close(); } catch (e) {}
+                    this.sse = null;
+                }
+                if (typeof enterWaitingRoomFlow === 'function') enterWaitingRoomFlow(stData);
+                return;
+            }
+
+            if ((window.isHostClient || window.hasReceivedHostSessionSnapshot) && typeof ensureSafeInitialProfileForClient === 'function') {
+                ensureSafeInitialProfileForClient();
+            }
             if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
 
             tabletopState.networkMode = stData.sseReady ? 'lan-sse' : 'lan-poll';
             const meta = this._getClientMeta();
 
             if (stData.sseReady && typeof EventSource !== 'undefined') {
-                if (this.sse) this.sse.close();
+                if (!forceReconnect && this.sse && this.sse.readyState !== 2) return;
+                if (this.sse) {
+                    try { this.sse.close(); } catch (e) {}
+                    this.sse = null;
+                }
                 const params = new URLSearchParams({
                     clientId: meta.clientId,
                     deviceId: meta.deviceId,
@@ -370,25 +456,94 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                     try {
                         const data = JSON.parse(ev.data);
                         if (typeof data.isHostClient === 'boolean') window.isHostClient = data.isHostClient;
+                        window.entryApproved = data.isHostClient === true || data.entryApproved !== false;
                         if (data.room) window.onlineRoomConfig = data.room;
                         if (Array.isArray(data.onlinePlayers)) window.onlinePlayersList = data.onlinePlayers;
+                        if (Array.isArray(data.waitingRoom)) window.waitingRoomList = data.waitingRoom;
+                        if (Array.isArray(data.pendingApprovals)) window.pendingApprovalsList = data.pendingApprovals;
                         window.roomGateBlockState = null;
 
                         if (data.session) {
-                            const serverHasPlayers = Array.isArray(data.session.players) && data.session.players.length > 0;
-                            const serverHasChars = Array.isArray(data.session.characters) && data.session.characters.length > 0;
-                            if (!serverHasPlayers && !serverHasChars && window.isHostClient) {
+                            const hasHostLocalData = typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData();
+                            if (window.isHostClient && data.session.hostInitialized === false) {
+                                window.hasReceivedHostSessionSnapshot = true;
+                                if (!hasHostLocalData) {
+                                    this.applyServerSessionSnapshot(data.session);
+                                }
                                 this.syncServerSession();
                             } else {
                                 this.applyServerSessionSnapshot(data.session);
                             }
+                        } else if (typeof ensureSafeInitialProfileForClient === 'function') {
+                            ensureSafeInitialProfileForClient();
                         }
-                        if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
                         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
+                        if (typeof updateConnectedPlayersPresenceUI === 'function') updateConnectedPlayersPresenceUI();
                         if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
                         else if (activeModule === 'character' && typeof renderCharacterModule === 'function') renderCharacterModule();
                         else if (activeModule === 'compendium' && !window.isHostClient && typeof refreshCompendiumViewAfterSync === 'function') {
                             refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true });
+                        }
+                    } catch (e) {}
+                });
+
+                es.addEventListener('waiting_room_update', (ev) => {
+                    try {
+                        const data = JSON.parse(ev.data);
+                        if (Array.isArray(data.waitingRoom)) {
+                            const prevCount = Array.isArray(window.waitingRoomList) ? window.waitingRoomList.length : 0;
+                            window.waitingRoomList = data.waitingRoom;
+                            if (window.isHostClient && data.waitingRoom.length > prevCount && typeof showToast === 'function') {
+                                const latest = data.waitingRoom[data.waitingRoom.length - 1];
+                                showToast(`⏳ Sala de Espera: "${latest?.requestedName || 'Visitante'}" aguarda aprovação para entrar!`);
+                            }
+                            if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
+                            if (document.getElementById('multiplayer-room-backdrop')?.classList.contains('open') && typeof renderMultiplayerRoomModal === 'function') {
+                                renderMultiplayerRoomModal(window._activeRoomTab || 'room');
+                            }
+                        }
+                    } catch (e) {}
+                });
+
+                es.addEventListener('approval_queue_update', (ev) => {
+                    try {
+                        const data = JSON.parse(ev.data);
+                        if (Array.isArray(data.pendingApprovals)) {
+                            const prevPending = (window.pendingApprovalsList || []).filter(a => a.status === 'pending').length;
+                            window.pendingApprovalsList = data.pendingApprovals;
+                            const nextPending = data.pendingApprovals.filter(a => a.status === 'pending').length;
+                            if (window.isHostClient && nextPending > prevPending && typeof showToast === 'function') {
+                                showToast(`📋 Nova solicitação (${nextPending} pendente) em 🌐 Sala / 👥 Contas!`);
+                            }
+                            if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
+                            if (document.getElementById('multiplayer-room-backdrop')?.classList.contains('open') && typeof renderMultiplayerRoomModal === 'function') {
+                                renderMultiplayerRoomModal(window._activeRoomTab || 'room');
+                            }
+                            if (document.getElementById('profiles-lobby-backdrop')?.classList.contains('open') && typeof renderProfileManagerModal === 'function') {
+                                renderProfileManagerModal(window._activeProfileTab || 'login');
+                            }
+                        }
+                    } catch (e) {}
+                });
+
+                es.addEventListener('approval_resolved', (ev) => {
+                    try {
+                        const data = JSON.parse(ev.data);
+                        const myDev = typeof getOrCreateDeviceId === 'function' ? getOrCreateDeviceId() : '';
+                        if (data.requestedByDeviceId && data.requestedByDeviceId === myDev) {
+                            const req = data.request || {};
+                            if (req.status === 'approved') {
+                                if (req.type === 'player_create' && data.createdPlayerId) {
+                                    window._autoSelectApprovedPlayerId = data.createdPlayerId;
+                                    if (playersData.some(p => p.id === data.createdPlayerId)) {
+                                        if (typeof switchProfileImmediately === 'function') switchProfileImmediately(data.createdPlayerId);
+                                        if (typeof closeProfileManagerModal === 'function') closeProfileManagerModal(true);
+                                    }
+                                }
+                                if (typeof showToast === 'function') showToast('✅ Solicitação aprovada pelo Host/Mestre!');
+                            } else if (req.status === 'rejected') {
+                                if (typeof showToast === 'function') showToast(`❌ Solicitação recusada: ${req.reason || 'Negada pelo Host.'}`);
+                            }
                         }
                     } catch (e) {}
                 });
@@ -399,7 +554,11 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                         if (Array.isArray(data.onlinePlayers)) {
                             window.onlinePlayersList = data.onlinePlayers;
                             if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
-                            if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
+                            if (typeof updateConnectedPlayersPresenceUI === 'function') {
+                                updateConnectedPlayersPresenceUI();
+                            } else if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') {
+                                renderTabletopModule();
+                            }
                             if (document.getElementById('multiplayer-room-backdrop')?.classList.contains('open') && typeof renderMultiplayerRoomModal === 'function') {
                                 renderMultiplayerRoomModal(window._activeRoomTab || 'room');
                             }
@@ -420,7 +579,7 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                     } catch (e) {}
                 });
 
-                ['kicked', 'banned', 'room_closed', 'room_locked', 'room_full', 'auth_required'].forEach(evtName => {
+                ['kicked', 'banned', 'room_closed', 'room_locked', 'room_full', 'auth_required', 'approval_required'].forEach(evtName => {
                     es.addEventListener(evtName, (ev) => {
                         try {
                             const data = JSON.parse(ev.data || '{}');
@@ -428,6 +587,11 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                             if (this.sse === es) this.sse = null;
                             if (evtName === 'room_closed' && window.onlineRoomConfig) {
                                 window.onlineRoomConfig.isOpen = false;
+                            }
+                            if (evtName === 'approval_required') {
+                                window.entryApproved = false;
+                                if (typeof enterWaitingRoomFlow === 'function') enterWaitingRoomFlow(data);
+                                return;
                             }
                             if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
                             if (typeof showRoomGateModal === 'function') {
@@ -482,10 +646,13 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
                         if (d && d.session) {
                             const isFirstPoll = this.lastServerUpdatedAt === 0;
-                            const serverHasPlayers = Array.isArray(d.session.players) && d.session.players.length > 0;
-                            const serverHasChars = Array.isArray(d.session.characters) && d.session.characters.length > 0;
-                            if (isFirstPoll && !serverHasPlayers && !serverHasChars && window.isHostClient) {
+                            const hasHostLocalData = typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData();
+                            if (isFirstPoll && window.isHostClient && d.session.hostInitialized === false) {
+                                window.hasReceivedHostSessionSnapshot = true;
                                 this.lastServerUpdatedAt = d.session.updatedAt || Date.now();
+                                if (!hasHostLocalData) {
+                                    this.applyServerSessionSnapshot(d.session);
+                                }
                                 this.syncServerSession();
                             } else if (d.session.updatedAt > this.lastServerUpdatedAt) {
                                 this.lastServerUpdatedAt = d.session.updatedAt;
@@ -500,10 +667,6 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
     CompendioNetAdapter.sendPresenceUpdate = async function() {
         await this.postSessionPayload({ delta: { type: 'PRESENCE_UPDATE' } });
-        // Atualiza URL da conexão SSE para refletir novo perfil/cor caso reconecte
-        if (this.sse && tabletopState.networkMode === 'lan-sse') {
-            this.connectRealtimeServer();
-        }
     };
 
     CompendioNetAdapter.applyIncomingDelta = function(d, data = {}) {
@@ -572,6 +735,12 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
         if (d.type === 'TOKEN_MOVE' && d.token) {
             if (inter && inter.type === 'token' && inter.id === d.token.id) return;
+            const localIsGm = typeof isEffectiveGmUser === 'function' ? isEffectiveGmUser() : (window.isHostClient === true);
+            if (!localIsGm && d.token.hiddenFromPlayers) {
+                tabletopState.tokens = tabletopState.tokens.filter(t => t.id !== d.token.id);
+                if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+                return;
+            }
             const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
             if (idx >= 0) Object.assign(tabletopState.tokens[idx], d.token);
             else tabletopState.tokens.push(d.token);
@@ -583,6 +752,13 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         }
         if (d.type === 'TOKEN_UPSERT' && d.token) {
             if (inter && inter.type === 'token' && inter.id === d.token.id) return;
+            const localIsGm = typeof isEffectiveGmUser === 'function' ? isEffectiveGmUser() : (window.isHostClient === true);
+            if (!localIsGm && d.token.hiddenFromPlayers) {
+                tabletopState.tokens = tabletopState.tokens.filter(t => t.id !== d.token.id);
+                if (typeof window !== 'undefined' && window.selectedTabletopTokenId === d.token.id) window.selectedTabletopTokenId = null;
+                if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+                return;
+            }
             const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
             if (idx >= 0) tabletopState.tokens[idx] = Object.assign({}, tabletopState.tokens[idx], d.token);
             else tabletopState.tokens.push(d.token);
@@ -679,10 +855,11 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
     CompendioNetAdapter.sendDelta = async function(deltaObj, opts = {}) {
         if (!deltaObj || !deltaObj.type) return null;
         if (this.channel && !opts.skipChannel) {
+            const fallbackId = window.isHostClient ? 'gm-master' : '';
             this.channel.postMessage({
                 type: 'DELTA',
                 clientId: window.localClientId,
-                senderId: typeof activePlayerId !== 'undefined' ? activePlayerId : 'gm-master',
+                senderId: (typeof activePlayerId !== 'undefined' && activePlayerId) ? activePlayerId : fallbackId,
                 delta: deltaObj
             });
         }
@@ -697,14 +874,15 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         const now = Date.now();
         if (visible && now - (this._cursorLastSentAt || 0) < 55) return;
         this._cursorLastSentAt = now;
-        const p = typeof getActivePlayer === 'function' ? getActivePlayer() : { id: 'gm-master', name: 'Mestre', color: '#d8b467' };
-        const pName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(p) : (p?.name || 'Jogador');
+        const p = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+        if (!p || p.isUnauthenticated || !p.id) return;
+        const pName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(p) : (p.name || 'Jogador');
         this.sendDelta({
             type: 'CURSOR_MOVE',
             clientId: window.localClientId,
-            playerId: p?.id || 'gm-master',
+            playerId: p.id,
             playerName: pName,
-            color: p?.color || '#d8b467',
+            color: p.color || '#4fc3f7',
             x: Math.round(x),
             y: Math.round(y),
             visible
@@ -765,7 +943,8 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
     };
 
     CompendioNetAdapter.broadcastCombat = function() {
-        if (this.channel) {
+        const isHostGm = (window.isHostClient === true) && (typeof isEffectiveGmUser === 'function' ? isEffectiveGmUser() : true);
+        if (this.channel && isHostGm) {
             this.channel.postMessage({
                 type: 'COMBAT_SYNC',
                 senderId: activePlayerId,
@@ -773,6 +952,7 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                 combatTurn: window.combatTurnState
             });
         }
+        if (!isHostGm) return;
         this.postSessionPayload({
             combatCards,
             combatTurn: window.combatTurnState
@@ -815,20 +995,34 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         await this.postSessionPayload({ delta: { type: 'MAP_PING', ping: pingObj } });
     };
 
+    CompendioNetAdapter._hasLocalHostCampaignData = function() {
+        try {
+            if (Array.isArray(charactersData) && charactersData.length > 0) return true;
+            if (Array.isArray(playersData) && playersData.some(p => p && p.id !== 'gm-master' && p.role !== 'gm')) return true;
+            if (typeof tabletopState === 'object' && tabletopState) {
+                if ((tabletopState.tokens && tabletopState.tokens.length > 0) || Boolean(tabletopState.mapPath)) return true;
+                if ((tabletopState.aoeTemplates && tabletopState.aoeTemplates.length > 0) || (tabletopState.fogRegions && tabletopState.fogRegions.length > 0)) return true;
+            }
+            if (Array.isArray(questsData) && questsData.length > 0) return true;
+            if (Array.isArray(hitDiceData) && hitDiceData.length > 0) return true;
+            if (Array.isArray(combatCards) && combatCards.length > 0) return true;
+            if (typeof entityKnowledge === 'object' && entityKnowledge && Object.keys(entityKnowledge).length > 0) return true;
+        } catch (e) {}
+        return false;
+    };
+
     CompendioNetAdapter.syncServerSession = async function() {
         const activeP = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
-        const senderIsGm = (window.isHostClient !== false) && activeP && activeP.role === 'gm';
+        if (window.isHostClient !== true) {
+            if (!window.hasReceivedHostSessionSnapshot) return;
+            if (!activeP || activeP.isUnauthenticated || !activeP.id || activeP.role === 'gm') return;
+            const ownChars = Array.isArray(charactersData) ? charactersData.filter(c => c && c.ownerId === activeP.id) : [];
+            await this.postSessionPayload({ characters: ownChars });
+            return;
+        }
+        const senderIsGm = (window.isHostClient === true) && activeP && activeP.role === 'gm';
         const payload = {
-            players: window.isHostClient
-                ? playersData
-                : (playersData || []).map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    role: p.role,
-                    color: p.color,
-                    avatarEmoji: p.avatarEmoji,
-                    hasPin: Boolean(p.pin || p.hasPin)
-                })),
+            players: playersData,
             characters: charactersData,
             tabletop: tabletopState,
             combatCards,

@@ -16,6 +16,15 @@ window.tabletopCursorShareEnabled = (typeof localStorage !== 'undefined' && loca
 window.tabletopCamera = window.tabletopCamera || { x: 40, y: 30, scale: 1, initialized: false, stageWidth: 1600, stageHeight: 1000 };
 window._ttMapDimensionsCache = window._ttMapDimensionsCache || {};
 
+function _isVttEffectiveGm(playerObj = null) {
+    if (typeof isEffectiveGmUser === 'function') return isEffectiveGmUser(playerObj);
+    const p = playerObj || (typeof getActivePlayer === 'function' ? getActivePlayer() : null);
+    if (!p || p.isUnauthenticated || !p.id) return false;
+    if (window.isHostClient === false) return false;
+    if (typeof serverWritable !== 'undefined' && serverWritable && window.isHostClient !== true) return false;
+    return p.role === 'gm';
+}
+
 function ensureCharacterExtendedFields(c) {
     if (!c || typeof c !== 'object') return c;
     if (c.inspiration === undefined) c.inspiration = false;
@@ -371,7 +380,7 @@ function longRestCharacter(charId, silent = false) {
 // Sobrescreve renderCharacterModule com todos os recursos da Fase 3
 function renderCharacterModule() {
     const player = getActivePlayer();
-    const isGm = player && player.role === 'gm';
+    const isGm = _isVttEffectiveGm(player);
     const playerShownName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(player, 'Jogador') : (player ? player.name : 'Jogador');
     const getOwnerShown = (ch) => typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(ch.ownerId, ch.ownerName || 'Jogador') : (ch.ownerName || 'Jogador');
     const allChars = charactersData;
@@ -429,11 +438,11 @@ function renderCharacterModule() {
             <div class="info-container">
                 <h2 class="info-title">🛡️ Personagens (${escapeHtmlText(playerShownName)})</h2>
                 <p class="info-text">Nenhum personagem cadastrado ainda. Crie uma ficha do zero ou importe um arquivo <strong>.JSON</strong>, <strong>.PDF</strong> ou <strong>.HTML</strong>.</p>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                    <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="createNewCharacterForActivePlayer()">＋ Criar Ficha de Personagem</button>
-                    <button type="button" class="btn-action-bar" style="padding:10px 18px;" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
-                    ${testFilesDropdown}
-                </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="if(typeof openNewCharacterChoiceModal==='function'){openNewCharacterChoiceModal();}else{createNewCharacterForActivePlayer();}">＋ Criar Ficha de Personagem</button>
+                        <button type="button" class="btn-action-bar" style="padding:10px 18px;" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
+                        ${testFilesDropdown}
+                    </div>
             </div>
         `;
         return;
@@ -453,7 +462,7 @@ function renderCharacterModule() {
                         </div>
                     </div>
                     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                        <button type="button" class="btn-summon-card" onclick="createNewCharacterForActivePlayer()">＋ Criar Meu Personagem</button>
+                        <button type="button" class="btn-summon-card" onclick="if(typeof openNewCharacterChoiceModal==='function'){openNewCharacterChoiceModal();}else{createNewCharacterForActivePlayer();}">＋ Criar Meu Personagem</button>
                         <button type="button" class="btn-action-bar" onclick="document.getElementById('universal-sheet-import-input').click()">📥 Importar (.JSON / .PDF / .HTML)</button>
                         ${testFilesDropdown}
                     </div>
@@ -622,7 +631,10 @@ function renderCharacterModule() {
                     </div>
                     <div class="form-group">
                         <label>Jogador Dono (Identidade)</label>
-                        <select class="form-control" ${isGm ? '' : 'disabled'} onchange="updateCharacterOwner('${activeChar.id}', this.value)">${ownerOptions}</select>
+                        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                            <select class="form-control" style="flex:1; min-width:140px;" ${isGm ? '' : 'disabled'} onchange="updateCharacterOwner('${activeChar.id}', this.value)">${ownerOptions}</select>
+                            ${(typeof openCharacterTransferModal === 'function') ? `<button type="button" class="btn-mini" style="white-space:nowrap;" onclick="openCharacterTransferModal('${activeChar.id}')" title="Transferir ou trocar este personagem com outro jogador (sujeito à aprovação do Host/Mestre)">🤝 ${isGm ? 'Trocar/Transferir' : 'Solicitar Troca'}</button>` : ''}
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Deslocamento</label>
@@ -1017,7 +1029,7 @@ function syncTabletopStageDimensionsForMap(mapSrc) {
 
 function setTabletopToolMode(mode) {
     const p = getActivePlayer();
-    const isGm = p && p.role === 'gm';
+    const isGm = _isVttEffectiveGm(p);
     if ((mode === 'fog' || mode === 'calibrate') && !isGm) {
         showToast('🔒 Apenas o Mestre pode usar esta ferramenta.');
         return;
@@ -1043,7 +1055,7 @@ function toggleTabletopCursorShare() {
 
 function toggleTabletopGridEnabled(forceVal = null) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') {
+    if (!_isVttEffectiveGm(p)) {
         showToast('🔒 Apenas o Mestre (GM) pode desabilitar ou habilitar a grade.');
         return false;
     }
@@ -1061,25 +1073,24 @@ function toggleTabletopGridEnabled(forceVal = null) {
 
 function toggleTabletopSnap(checked) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') {
-        // Jogadores não desabilitam o modo grade quando apenas o mestre deve desabilitar
-        if (!checked && tabletopState.gridEnabled !== false) {
-            showToast('🔒 Apenas o Mestre pode desabilitar o modo grade.');
-            renderTabletopModule();
-            return;
-        }
+    if (!_isVttEffectiveGm(p)) {
+        showToast('🔒 Apenas o Mestre (GM) pode alterar o Snap na grade.');
+        renderTabletopModule();
+        return false;
     }
     tabletopState.snapToGrid = Boolean(checked);
+    tabletopState.gridSnap = tabletopState.snapToGrid;
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopMeta) {
-        CompendioNetAdapter.broadcastTabletopMeta({ snapToGrid: tabletopState.snapToGrid });
+        CompendioNetAdapter.broadcastTabletopMeta({ snapToGrid: tabletopState.snapToGrid, gridSnap: tabletopState.snapToGrid });
     }
     updateTabletopGridVisualsOnly();
+    return true;
 }
 
 function nudgeTabletopCalibration(patch = {}) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     ensureTabletopExtendedState();
     if (patch.reset) {
         tabletopState.gridSize = 56;
@@ -1143,7 +1154,7 @@ function updateTabletopGridVisualsOnly() {
 
 function onTabletopMapChange(newMapPath) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') {
+    if (!_isVttEffectiveGm(p)) {
         showToast('🔒 Apenas o Mestre pode trocar o mapa do Tabletop.');
         return;
     }
@@ -1162,16 +1173,82 @@ function isTokenMovableByCurrentUser(tok) {
     if (!tok) return false;
     if (tok.locked) return false;
     const p = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
-    if (p && p.role === 'gm') return true;
-    if (!tok.ownerId || (p && tok.ownerId === p.id)) return true;
+    if (!p || p.isUnauthenticated || !p.id) return false;
+    if (_isVttEffectiveGm(p)) return true;
+    if (!tok.ownerId || tok.ownerId === p.id) return true;
     return Boolean(tok.allowPlayersMove);
+}
+
+function isTokenVisibleToCurrentUser(tok, activePl = null) {
+    if (!tok) return false;
+    const p = activePl || (typeof getActivePlayer === 'function' ? getActivePlayer() : null);
+    if (_isVttEffectiveGm(p)) return true;
+    return !tok.hiddenFromPlayers;
+}
+
+function formatChestSummaryText(tok, isGm, variant = 'badge') {
+    const itemsKnown = Boolean(isGm || tok.revealItemCountToPlayers);
+    const itemCount = Array.isArray(tok.chestItems) ? tok.chestItems.length : 0;
+    const goldVal = Number(tok.chestGold) || 0;
+    if (variant === 'list') {
+        return itemsKnown ? `${itemCount} itens` : (tok.locked ? '🔒 Trancado' : 'Baú');
+    }
+    if (variant === 'drawer') {
+        const countPart = itemsKnown ? `${itemCount} itens` : 'Itens ocultos';
+        return `${countPart} · ${goldVal} PO${tok.locked ? ' 🔒' : ''}`;
+    }
+    if (variant === 'bar') {
+        const countPart = itemsKnown ? `${itemCount} itens · ` : '';
+        return `🧰 ${countPart}${goldVal} PO${tok.locked ? ' 🔒' : ''}`;
+    }
+    return itemsKnown ? `🧰 ${itemCount} itens` : (tok.locked ? '🧰 🔒' : '🧰 Baú');
+}
+
+function canCurrentUserLootToken(tok, activePl = null, targetChar = null) {
+    const p = activePl || (typeof getActivePlayer === 'function' ? getActivePlayer() : null);
+    if (!tok) return false;
+    if (_isVttEffectiveGm(p)) return true;
+    if (!p || p.isUnauthenticated || !p.id) return false;
+    if (tok.hiddenFromPlayers) return false;
+    const policy = tok.lootPolicy || 'all';
+    if (policy === 'players') {
+        return Array.isArray(tok.allowedPlayerIds) && tok.allowedPlayerIds.includes(p.id);
+    }
+    if (policy === 'characters') {
+        const allowedChars = Array.isArray(tok.allowedCharIds) ? tok.allowedCharIds : [];
+        if (targetChar) return allowedChars.includes(targetChar.id);
+        return (typeof charactersData !== 'undefined' ? charactersData : []).some(c =>
+            canAccessFullCharacterSheet(c) && allowedChars.includes(c.id)
+        );
+    }
+    return true;
+}
+
+function toggleTabletopTokenVisibility(tokenId) {
+    const p = getActivePlayer();
+    if (!_isVttEffectiveGm(p)) {
+        showToast('🔒 Apenas o Mestre pode ocultar ou mostrar tokens.');
+        return;
+    }
+    const tok = tabletopState.tokens.find(t => t.id === tokenId);
+    if (!tok) return;
+    tok.hiddenFromPlayers = !tok.hiddenFromPlayers;
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTokenDelta) {
+        CompendioNetAdapter.broadcastTokenDelta('upsert', tok);
+    } else if (typeof CompendioNetAdapter !== 'undefined') {
+        CompendioNetAdapter.broadcastTabletop();
+    }
+    renderTabletopModule();
+    updateTabletopSelectionUI();
+    showToast(tok.hiddenFromPlayers ? `🙈 "${tok.name}" ocultado dos jogadores.` : `👁️ "${tok.name}" agora visível aos jogadores.`);
 }
 
 function toggleTabletopTokenLock(tokenId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
     const p = getActivePlayer();
-    const isGm = p && p.role === 'gm';
+    const isGm = _isVttEffectiveGm(p);
     if (!isGm && (!p || tok.ownerId !== p.id)) {
         showToast('⚠️ Apenas o Mestre ou o dono pode travar/destravar este token.');
         return;
@@ -1264,6 +1341,12 @@ function updateTabletopTokenDom(tokenId) {
     const tok = tabletopState?.tokens?.find(t => String(t.id) === String(tokenId));
     const el = document.querySelector(`.tt-token[data-token-id="${CSS?.escape ? CSS.escape(String(tokenId)) : tokenId}"]`);
     if (!tok || !el) return false;
+    const p = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+    const isGm = _isVttEffectiveGm(p);
+    if (!isTokenVisibleToCurrentUser(tok, p)) {
+        el.remove();
+        return false;
+    }
     const { gx } = getTabletopGridMetrics();
     const footprint = Math.max(1, Number(tok.sizeSquares) || 1);
     const sz = Math.max(24, (gx * footprint) - 6);
@@ -1272,11 +1355,12 @@ function updateTabletopTokenDom(tokenId) {
     el.style.width = `${sz}px`;
     el.style.height = `${sz}px`;
     el.classList.toggle('is-locked-token', Boolean(tok.locked));
+    el.classList.toggle('is-hidden-token', Boolean(tok.hiddenFromPlayers));
     el.classList.toggle('selected-token', String(tok.id) === String(selectedTabletopTokenId));
     const hpEl = el.querySelector('.tt-token-hp');
     if (hpEl) {
         if (tok.type === 'gold') hpEl.textContent = `🪙 ${Number(tok.goldAmount) || 0} PO`;
-        else if (tok.type === 'chest') hpEl.textContent = `🧰 ${(tok.chestItems || []).length} itens`;
+        else if (tok.type === 'chest') hpEl.textContent = formatChestSummaryText(tok, isGm, 'badge');
         else if (tok.type === 'item') hpEl.textContent = '⚔️ Item';
         else {
             const showExact = canSeeTokenExactStats(tok);
@@ -1293,10 +1377,13 @@ function updateTabletopSelectionUI() {
     document.querySelectorAll('.tt-aoe-wrapper[data-shape-id]').forEach(el => {
         el.classList.toggle('is-selected', String(el.getAttribute('data-shape-id')) === String(window.selectedShapeId));
     });
+    document.querySelectorAll('.tt-drawer-card[data-drawer-token-id]').forEach(el => {
+        el.classList.toggle('is-selected', String(el.getAttribute('data-drawer-token-id')) === String(selectedTabletopTokenId));
+    });
     const barRoot = document.getElementById('tt-selection-bar-root');
     if (barRoot) {
         const p = getActivePlayer();
-        const isGm = p && p.role === 'gm';
+        const isGm = _isVttEffectiveGm(p);
         barRoot.innerHTML = buildSelectedControlBarHtml(isGm);
     }
 }
@@ -1748,7 +1835,7 @@ function startTransformAoeShape(e, aoeId, handleKind) {
 /* ------------------ NÉVOA DE GUERRA & PING ------------------ */
 function toggleTabletopFogBase() {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     ensureTabletopExtendedState();
     tabletopState.fogEnabled = !tabletopState.fogEnabled;
     saveLocalPersistence();
@@ -1763,7 +1850,7 @@ function toggleTabletopFogBase() {
 
 function addDefaultFogCoverAll() {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     ensureTabletopExtendedState();
     const { w, h } = getTabletopStageDimensions();
     tabletopState.fogEnabled = true;
@@ -1783,7 +1870,7 @@ function addDefaultFogCoverAll() {
 function removeFogRegion(fogId, ev) {
     if (ev) ev.stopPropagation();
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     ensureTabletopExtendedState();
     tabletopState.fogRegions = tabletopState.fogRegions.filter(f => f.id !== fogId);
     saveLocalPersistence();
@@ -1796,6 +1883,10 @@ function removeFogRegion(fogId, ev) {
 }
 
 function clearAllTabletopTacticalOverlays() {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre pode limpar as formas táticas e névoa da mesa.');
+        return;
+    }
     ensureTabletopExtendedState();
     tabletopState.aoeTemplates = [];
     tabletopState.fogRegions = [];
@@ -1827,7 +1918,7 @@ function triggerTabletopPingAt(x, y, senderName = null, broadcast = true, pingCo
             id: 'ping-' + Date.now(),
             x,
             y,
-            senderId: activePl?.id || 'gm-master',
+            senderId: (activePl && !activePl.isUnauthenticated && activePl.id) ? activePl.id : '',
             senderName: activePl?.name || 'Jogador',
             color: resolvedColor
         });
@@ -1846,7 +1937,7 @@ function onTabletopStageMouseDown(e) {
     const startX = worldStart.x;
     const startY = worldStart.y;
     const activePl = getActivePlayer();
-    const isGm = activePl && activePl.role === 'gm';
+    const isGm = _isVttEffectiveGm(activePl);
 
     // 1. Ping (1-shot quando vindo do modo 'ping' -> retorna ao modo 'move' logo após)
     if (e.altKey || (window.tabletopToolMode === 'ping' && e.button === 0)) {
@@ -1869,7 +1960,7 @@ function onTabletopStageMouseDown(e) {
         window.ttActiveInteraction = { type: 'ruler', id: cid };
         const rulerObj = {
             clientId: cid,
-            playerId: activePl?.id || 'gm-master',
+            playerId: (activePl && !activePl.isUnauthenticated && activePl.id) ? activePl.id : '',
             playerName: pName,
             color: pColor,
             startX,
@@ -2069,29 +2160,63 @@ function onTabletopStageMouseDown(e) {
 }
 
 /* ------------------ GAVETA SCROLLÁVEL DE TOKENS, OURO & BAÚ ------------------ */
+function updateTokenDrawerUI() {
+    const isGm = _isVttEffectiveGm();
+    const drawerRoot = document.getElementById('tt-token-drawer-root');
+    const drawerBtn = document.getElementById('tt-btn-drawer-toggle');
+    if (drawerBtn) {
+        drawerBtn.classList.toggle('is-active', Boolean(window.ttDrawerOpen));
+        drawerBtn.textContent = `📦 Gaveta (${tabletopState.tokens.length})`;
+    }
+    if (drawerRoot) {
+        drawerRoot.innerHTML = renderTokenDrawerPanelHtml(isGm);
+        return true;
+    }
+    return false;
+}
+
 function toggleTokenDrawer(force = null) {
     window.ttDrawerOpen = (force === null) ? !window.ttDrawerOpen : Boolean(force);
-    renderTabletopModule();
+    if (window.ttDrawerOpen && !_isVttEffectiveGm() && !['pcs', 'placed'].includes(window.ttDrawerTab)) {
+        window.ttDrawerTab = 'pcs';
+    }
+    if (!updateTokenDrawerUI()) renderTabletopModule();
 }
 
 function setTokenDrawerTab(tab) {
-    window.ttDrawerTab = tab;
-    renderTabletopModule();
+    const isGm = _isVttEffectiveGm();
+    if (!isGm && !['pcs', 'placed'].includes(tab)) {
+        window.ttDrawerTab = 'pcs';
+    } else {
+        window.ttDrawerTab = tab;
+    }
+    if (!updateTokenDrawerUI()) renderTabletopModule();
 }
 
 function filterTokenDrawerCards(query) {
     window.ttDrawerSearch = String(query || '').toLowerCase();
     const list = document.getElementById('tt-drawer-items-grid');
     if (!list) return;
+    let visibleCount = 0;
     list.querySelectorAll('.tt-drawer-card[data-drawer-title]').forEach(card => {
         const title = card.getAttribute('data-drawer-title') || '';
-        card.style.display = (!window.ttDrawerSearch || title.includes(window.ttDrawerSearch)) ? 'flex' : 'none';
+        const match = !window.ttDrawerSearch || title.includes(window.ttDrawerSearch);
+        card.style.display = match ? 'flex' : 'none';
+        if (match) visibleCount++;
     });
+    const emptyEl = document.getElementById('tt-drawer-search-empty');
+    if (emptyEl) {
+        emptyEl.style.display = (visibleCount === 0 && window.ttDrawerSearch) ? 'block' : 'none';
+    }
 }
 
 function sendCharacterToTabletop(charId) {
     const c = charactersData.find(x => x.id === charId);
     if (!c) return;
+    if (!_isVttEffectiveGm() && typeof canAccessFullCharacterSheet === 'function' && !canAccessFullCharacterSheet(c)) {
+        showToast('🔒 Você só pode posicionar seus próprios personagens no Tabletop.');
+        return;
+    }
     let existing = tabletopState.tokens.find(t => t.refId === c.id);
     if (!existing) {
         const center = getTabletopCameraCenterWorld();
@@ -2123,7 +2248,7 @@ function sendCharacterToTabletop(charId) {
             CompendioNetAdapter.broadcastTabletop();
         }
     } else {
-        selectedTabletopTokenId = existing.id;
+        selectTabletopToken(existing.id);
     }
     if (activeModule !== 'tabletop') switchMainModule('tabletop');
     else renderTabletopModule();
@@ -2131,6 +2256,10 @@ function sendCharacterToTabletop(charId) {
 }
 
 async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle = '') {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre pode posicionar criaturas, mapas ou itens do Compêndio no Tabletop.');
+        return;
+    }
     if (cat === 'maps') {
         const root = compendioData.maps || {};
         const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
@@ -2224,9 +2353,9 @@ async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle 
     showToast(`🎲 Token "${title}" posicionado no Tabletop!`);
 }
 
-function spawnGoldTokenOnTabletop(amount = 50, locked = false, label = 'Saco de Ouro') {
+function spawnGoldTokenOnTabletop(amount = 50, locked = false, label = 'Saco de Ouro', opts = {}) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') {
+    if (!_isVttEffectiveGm(p)) {
         showToast('🔒 Apenas o Mestre pode criar tokens de Ouro.');
         return null;
     }
@@ -2241,6 +2370,10 @@ function spawnGoldTokenOnTabletop(amount = 50, locked = false, label = 'Saco de 
         type: 'gold',
         ownerId: 'gm-master',
         locked: Boolean(locked),
+        hiddenFromPlayers: Boolean(opts && opts.hiddenFromPlayers),
+        lootPolicy: (opts && ['all', 'players', 'characters'].includes(opts.lootPolicy)) ? opts.lootPolicy : 'all',
+        allowedPlayerIds: Array.isArray(opts?.allowedPlayerIds) ? opts.allowedPlayerIds.slice() : [],
+        allowedCharIds: Array.isArray(opts?.allowedCharIds) ? opts.allowedCharIds.slice() : [],
         goldAmount: goldVal,
         x: Math.max(12, center.x - Math.round(gx / 2)),
         y: Math.max(12, center.y - Math.round(gx / 2)),
@@ -2262,24 +2395,38 @@ function spawnGoldTokenOnTabletop(amount = 50, locked = false, label = 'Saco de 
     return tok;
 }
 
-function spawnChestTokenOnTabletop(label = 'Baú de Tesouro', gold = 25, items = [], locked = false) {
+function spawnChestTokenOnTabletop(labelOrCfg = 'Baú de Tesouro', gold = 25, items = [], locked = false, opts = {}) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') {
+    if (!_isVttEffectiveGm(p)) {
         showToast('🔒 Apenas o Mestre pode criar Baús.');
         return null;
     }
     ensureTabletopExtendedState();
+    const cfg = (labelOrCfg && typeof labelOrCfg === 'object' && !Array.isArray(labelOrCfg))
+        ? labelOrCfg
+        : Object.assign({
+            name: labelOrCfg,
+            chestGold: gold,
+            chestItems: items,
+            locked: Boolean(locked)
+        }, opts || {});
+
     const center = getTabletopCameraCenterWorld();
     const { gx } = getTabletopGridMetrics();
     const tok = {
         id: 'tok-chest-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
         refId: 'chest',
-        name: (label && String(label).trim()) || 'Baú de Tesouro',
+        name: (cfg.name && String(cfg.name).trim()) || 'Baú de Tesouro',
         type: 'chest',
         ownerId: 'gm-master',
-        locked: Boolean(locked),
-        chestGold: Math.max(0, Math.floor(Number(gold) || 0)),
-        chestItems: Array.isArray(items) ? items : [],
+        locked: Boolean(cfg.locked),
+        hiddenFromPlayers: Boolean(cfg.hiddenFromPlayers),
+        revealItemCountToPlayers: Boolean(cfg.revealItemCountToPlayers),
+        lootPolicy: ['all', 'players', 'characters'].includes(cfg.lootPolicy) ? cfg.lootPolicy : 'all',
+        allowedPlayerIds: Array.isArray(cfg.allowedPlayerIds) ? cfg.allowedPlayerIds.slice() : [],
+        allowedCharIds: Array.isArray(cfg.allowedCharIds) ? cfg.allowedCharIds.slice() : [],
+        chestGold: Math.max(0, Math.floor(Number(cfg.chestGold) || 0)),
+        chestItems: Array.isArray(cfg.chestItems) ? cfg.chestItems.map(it => Object.assign({}, it)) : [],
         x: Math.max(12, center.x - Math.round(gx / 2)),
         y: Math.max(12, center.y - Math.round(gx / 2)),
         hpCurrent: 10,
@@ -2296,14 +2443,15 @@ function spawnChestTokenOnTabletop(label = 'Baú de Tesouro', gold = 25, items =
         CompendioNetAdapter.broadcastTabletop();
     }
     renderTabletopModule();
-    openChestTokenModal(tok.id);
+    if (!cfg.skipOpenAfterSpawn) openChestTokenModal(tok.id);
+    else showToast(`🧰 "${tok.name}" posicionado no Tabletop!`);
     return tok;
 }
 
 function renderTokenDrawerPanelHtml(isGm) {
     if (!window.ttDrawerOpen) return '';
-    const activeTab = window.ttDrawerTab || 'monsters';
-    const searchVal = window.ttDrawerSearch || '';
+    const p = getActivePlayer();
+    const visibleTokens = tabletopState.tokens.filter(t => isTokenVisibleToCurrentUser(t, p));
     const tabs = [
         { id: 'pcs', label: `🛡️ PJs (${charactersData.length})` },
         ...(isGm ? [
@@ -2312,96 +2460,136 @@ function renderTokenDrawerPanelHtml(isGm) {
             { id: 'items', label: '⚔️ Itens' },
             { id: 'loot', label: '🪙 Ouro & 🧰 Baú' }
         ] : []),
-        { id: 'placed', label: `📍 Na Mesa (${tabletopState.tokens.length})` }
+        { id: 'placed', label: `📍 Na Mesa (${visibleTokens.length})` }
     ];
+    const requestedTab = window.ttDrawerTab || (isGm ? 'monsters' : 'pcs');
+    const activeTab = tabs.some(tb => tb.id === requestedTab) ? requestedTab : tabs[0].id;
+    window.ttDrawerTab = activeTab;
+    const searchVal = window.ttDrawerSearch || '';
+    const searchLower = searchVal.toLowerCase();
+    const matchesSearch = (titleStr) => !searchLower || String(titleStr || '').toLowerCase().includes(searchLower);
 
     let bodyHtml = '';
     if (activeTab === 'pcs') {
-        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
-            (charactersData.map(c => {
-                const titleLower = escapeHtmlText(c.name.toLowerCase());
-                return `
-                    <div class="tt-drawer-card" data-drawer-title="${titleLower}" onclick="sendCharacterToTabletop('${c.id}')">
-                        <div class="tt-drawer-card-info">
-                            <strong>🛡️ ${escapeHtmlText(c.name)}</strong>
-                            <span>${c.hpCurrent}/${c.hpMax} PV · CA ${c.ac || 10}</span>
-                        </div>
-                        <span class="btn-mini" style="flex:0 0 auto;">＋ Mesa</span>
+        const visibleChars = isGm
+            ? charactersData
+            : charactersData.filter(c => typeof canAccessFullCharacterSheet === 'function' ? canAccessFullCharacterSheet(c) : true);
+        let matchCount = 0;
+        const cardsHtml = visibleChars.map(c => {
+            const titleLower = escapeHtmlText((c.name || '').toLowerCase());
+            const isVis = matchesSearch(c.name);
+            if (isVis) matchCount++;
+            const ownerShown = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(c.ownerId, c.ownerName || '') : (c.ownerName || '');
+            return `
+                <div class="tt-drawer-card" style="display:${isVis ? 'flex' : 'none'};" data-drawer-title="${titleLower}" onclick="sendCharacterToTabletop('${c.id}')">
+                    <div class="tt-drawer-card-info">
+                        <strong>🛡️ ${escapeHtmlText(c.name)}</strong>
+                        <span>${c.hpCurrent}/${c.hpMax} PV · CA ${c.ac || 10}${ownerShown ? ` · ${escapeHtmlText(ownerShown)}` : ''}</span>
                     </div>
-                `;
-            }).join('') || `<div style="color:#8e92a8; font-size:12px;">Nenhum personagem cadastrado ainda.</div>`) + `</div>`;
+                    <span class="btn-mini" style="flex:0 0 auto;">＋ Mesa</span>
+                </div>
+            `;
+        }).join('');
+        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
+            (cardsHtml || `<div class="tt-drawer-empty">Nenhum personagem disponível ainda.</div>`) +
+            `<div id="tt-drawer-search-empty" class="tt-drawer-empty" style="display:${visibleChars.length > 0 && matchCount === 0 ? 'block' : 'none'};">Nenhum personagem encontrado para "${escapeHtmlText(searchVal)}".</div>` +
+            `</div>`;
     } else if (activeTab === 'loot' && isGm) {
         bodyHtml = `
-            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
-                <div style="background:#171820; border:1px solid #d4ac0d; border-radius:6px; padding:10px; flex:1; min-width:240px;">
-                    <div style="font-size:12px; font-weight:700; color:#ffd54f; margin-bottom:6px;">🪙 Posicionar Token de Ouro</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="tt-drawer-loot-box" style="border-color:#d4ac0d;">
+                    <div style="font-size:12px; font-weight:700; color:#ffd54f;">🪙 Posicionar Token de Ouro</div>
+                    <input type="text" id="drawer-gold-label" class="form-control" style="padding:5px 8px; font-size:12px;" value="Saco de Ouro" placeholder="Nome">
                     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                        <input type="text" id="drawer-gold-label" class="form-control" style="flex:1; min-width:110px; padding:4px 7px; font-size:12px;" value="Saco de Ouro" placeholder="Nome">
-                        <input type="number" id="drawer-gold-amount" class="form-control" style="width:82px; padding:4px 7px; font-size:12px;" value="50" min="1" title="Quantidade de PO">
-                        <button type="button" class="btn-summon-card" style="padding:5px 10px;" onclick="spawnGoldTokenOnTabletop(document.getElementById('drawer-gold-amount').value, false, document.getElementById('drawer-gold-label').value)">＋ Ouro</button>
+                        <input type="number" id="drawer-gold-amount" class="form-control" style="width:92px; padding:5px 8px; font-size:12px;" value="50" min="1" title="Quantidade de PO">
+                        <span style="font-size:11px; color:#9da3b8;">PO</span>
+                        <label style="font-size:11px; color:#ccc; display:flex; align-items:center; gap:3px; cursor:pointer;" title="Posicionar inicialmente oculto para jogadores"><input type="checkbox" id="drawer-gold-hidden"> 🙈 Oculto</label>
+                        <button type="button" class="btn-summon-card" style="flex:1; padding:6px 10px;" onclick="spawnGoldTokenOnTabletop(document.getElementById('drawer-gold-amount').value, false, document.getElementById('drawer-gold-label').value, { hiddenFromPlayers: Boolean(document.getElementById('drawer-gold-hidden')?.checked) })">＋ Posicionar Ouro</button>
                     </div>
                 </div>
-                <div style="background:#171820; border:1px solid #d8b467; border-radius:6px; padding:10px; flex:1; min-width:260px;">
-                    <div style="font-size:12px; font-weight:700; color:#f2cf83; margin-bottom:6px;">🧰 Posicionar Baú com Itens</div>
+                <div class="tt-drawer-loot-box" style="border-color:#d8b467;">
+                    <div style="font-size:12px; font-weight:700; color:#f2cf83;">🧰 Configurar e Posicionar Baú</div>
+                    <input type="text" id="drawer-chest-label" class="form-control" style="padding:5px 8px; font-size:12px;" value="Baú de Tesouro" placeholder="Nome do Baú">
                     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                        <input type="text" id="drawer-chest-label" class="form-control" style="flex:1; min-width:120px; padding:4px 7px; font-size:12px;" value="Baú de Tesouro" placeholder="Nome do Baú">
-                        <input type="number" id="drawer-chest-gold" class="form-control" style="width:74px; padding:4px 7px; font-size:12px;" value="25" min="0" title="Ouro dentro (PO)">
-                        <label style="font-size:11px; color:#ccc; display:flex; align-items:center; gap:3px; cursor:pointer;"><input type="checkbox" id="drawer-chest-locked"> 🔒</label>
-                        <button type="button" class="btn-summon-card" style="padding:5px 10px;" onclick="spawnChestTokenOnTabletop(document.getElementById('drawer-chest-label').value, document.getElementById('drawer-chest-gold').value, [], document.getElementById('drawer-chest-locked').checked)">＋ Baú</button>
+                        <input type="number" id="drawer-chest-gold" class="form-control" style="width:76px; padding:5px 8px; font-size:12px;" value="25" min="0" title="Ouro inicial (PO)">
+                        <span style="font-size:11px; color:#9da3b8;">PO</span>
+                        <label style="font-size:11px; color:#ccc; display:flex; align-items:center; gap:3px; cursor:pointer;"><input type="checkbox" id="drawer-chest-locked"> 🔒 Trancado</label>
+                        <button type="button" class="btn-summon-card" style="flex:1; padding:6px 10px;" onclick="openChestCreateModal({ name: document.getElementById('drawer-chest-label')?.value, chestGold: document.getElementById('drawer-chest-gold')?.value, locked: Boolean(document.getElementById('drawer-chest-locked')?.checked) })">⚙️ Configurar &amp; Criar Baú...</button>
                     </div>
+                    <div style="font-size:10.5px; color:#9da3b8; margin-top:4px;">Abre o assistente para definir itens, visibilidade e quem pode saquear antes de colocar na mesa.</div>
                 </div>
             </div>
         `;
     } else if (activeTab === 'placed') {
-        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
-            (tabletopState.tokens.map(t => {
-                const icon = t.type === 'pc' ? '🛡️' : (t.type === 'gold' ? '🪙' : (t.type === 'chest' ? '🧰' : (t.type === 'item' ? '⚔️' : (t.type === 'npc' ? '🧙‍♂️' : '🐉'))));
-                const sub = t.type === 'gold'
-                    ? `${Number(t.goldAmount) || 0} PO${t.locked ? ' 🔒' : ''}`
-                    : (t.type === 'chest' ? `${(t.chestItems || []).length} itens · ${t.chestGold || 0} PO${t.locked ? ' 🔒' : ''}` : `${t.hpCurrent}/${t.hpMax} PV`);
-                const canDel = CompendioNetAdapter.canControlEntity(t.ownerId);
-                return `
-                    <div class="tt-drawer-card ${t.id === selectedTabletopTokenId ? 'is-selected' : ''}" data-drawer-title="${escapeHtmlText(t.name.toLowerCase())}" onclick="selectTabletopToken('${t.id}')">
-                        <div class="tt-drawer-card-info">
-                            <strong>${icon} ${escapeHtmlText(t.name)}</strong>
-                            <span>${escapeHtmlText(sub)}</span>
-                        </div>
-                        <div style="display:flex; gap:4px;">
-                            ${canDel ? `<button type="button" class="btn-mini danger" style="padding:2px 6px;" onclick="event.stopPropagation(); removeTabletopToken('${t.id}')" title="Remover">✕</button>` : ''}
-                        </div>
+        let matchCount = 0;
+        const cardsHtml = visibleTokens.map(t => {
+            const icon = t.type === 'pc' ? '🛡️' : (t.type === 'gold' ? '🪙' : (t.type === 'chest' ? '🧰' : (t.type === 'item' ? '⚔️' : (t.type === 'npc' ? '🧙‍♂️' : '🐉'))));
+            const showExact = typeof canSeeTokenExactStats === 'function' ? canSeeTokenExactStats(t) : isGm;
+            const sub = t.type === 'gold'
+                ? `${Number(t.goldAmount) || 0} PO${t.locked ? ' 🔒' : ''}`
+                : (t.type === 'chest'
+                    ? formatChestSummaryText(t, isGm, 'drawer')
+                    : (t.type === 'item'
+                        ? '📦 Objeto/Item'
+                        : (showExact ? `${t.hpCurrent}/${t.hpMax} PV · CA ${t.ac || '?'}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type))));
+            const canDel = CompendioNetAdapter.canControlEntity(t.ownerId);
+            const isVis = matchesSearch(t.name);
+            if (isVis) matchCount++;
+            return `
+                <div class="tt-drawer-card ${String(t.id) === String(selectedTabletopTokenId) ? 'is-selected' : ''} ${t.hiddenFromPlayers ? 'is-hidden-card' : ''}" style="display:${isVis ? 'flex' : 'none'};" data-drawer-token-id="${escapeHtmlText(t.id)}" data-drawer-title="${escapeHtmlText((t.name || '').toLowerCase())}" onclick="selectTabletopToken('${t.id}')">
+                    <div class="tt-drawer-card-info">
+                        <strong>${icon} ${t.hiddenFromPlayers && isGm ? '🙈 ' : ''}${escapeHtmlText(t.name)}</strong>
+                        <span>${escapeHtmlText(sub)}</span>
                     </div>
-                `;
-            }).join('') || `<div style="color:#8e92a8; font-size:12px;">Nenhum token posicionado na mesa ainda.</div>`) + `</div>`;
-    } else {
+                    <div style="display:flex; gap:4px; flex-shrink:0;">
+                        ${isGm ? `<button type="button" class="btn-mini ${t.hiddenFromPlayers ? 'is-active' : ''}" style="padding:2px 6px;" onclick="event.stopPropagation(); toggleTabletopTokenVisibility('${t.id}')" title="${t.hiddenFromPlayers ? 'Mostrar token aos jogadores' : 'Ocultar token dos jogadores'}">${t.hiddenFromPlayers ? '🙈' : '👁️'}</button>` : ''}
+                        ${(t.type === 'gold' || t.type === 'chest') ? `<button type="button" class="btn-mini" style="padding:2px 6px;" onclick="event.stopPropagation(); openInteractiveTokenModal('${t.id}')" title="Abrir / Saquear">🎒</button>` : ''}
+                        ${canDel ? `<button type="button" class="btn-mini danger" style="padding:2px 6px;" onclick="event.stopPropagation(); removeTabletopToken('${t.id}')" title="Remover">✕</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
+            (cardsHtml || `<div class="tt-drawer-empty">Nenhum token visível na mesa ainda.</div>`) +
+            `<div id="tt-drawer-search-empty" class="tt-drawer-empty" style="display:${visibleTokens.length > 0 && matchCount === 0 ? 'block' : 'none'};">Nenhum token na mesa para "${escapeHtmlText(searchVal)}".</div>` +
+            `</div>`;
+    } else if (isGm) {
         const cats = activeTab === 'items' ? ['items', 'curio'] : (activeTab === 'npcs' ? ['npcs'] : ['monsters']);
-        const ents = getAllCatalogEntities(cats);
-        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
-            (ents.map(e => {
-                const titleLower = escapeHtmlText(e.title.toLowerCase());
-                const visMatch = (!searchVal || titleLower.includes(searchVal.toLowerCase())) ? 'flex' : 'none';
-                const args = `'${e.category}', '${String(e.groupKey || '').replace(/'/g, "\\'")}', '${String(e.itemKey || '').replace(/'/g, "\\'")}', '${escapeHtmlText(e.title).replace(/'/g, "\\'")}'`;
-                return `
-                    <div class="tt-drawer-card" style="display:${visMatch};" data-drawer-title="${titleLower}" onclick="spawnCompendiumEntityToken(${args})">
-                        <div class="tt-drawer-card-info">
-                            <strong>${escapeHtmlText(e.title)}</strong>
-                            <span>${escapeHtmlText(e.category)}</span>
-                        </div>
-                        <span class="btn-mini" style="flex:0 0 auto;">＋ Posicionar</span>
+        const ents = typeof getAllCatalogEntities === 'function' ? getAllCatalogEntities(cats) : [];
+        let matchCount = 0;
+        const cardsHtml = ents.map(e => {
+            const titleLower = escapeHtmlText((e.title || '').toLowerCase());
+            const isVis = matchesSearch(e.title);
+            if (isVis) matchCount++;
+            const args = `'${e.category}', '${String(e.groupKey || '').replace(/'/g, "\\'")}', '${String(e.itemKey || '').replace(/'/g, "\\'")}', '${escapeHtmlText(e.title).replace(/'/g, "\\'")}'`;
+            return `
+                <div class="tt-drawer-card" style="display:${isVis ? 'flex' : 'none'};" data-drawer-title="${titleLower}" onclick="spawnCompendiumEntityToken(${args})">
+                    <div class="tt-drawer-card-info">
+                        <strong>${escapeHtmlText(e.title)}</strong>
+                        <span>${escapeHtmlText(e.category)}</span>
                     </div>
-                `;
-            }).join('') || `<div style="color:#8e92a8; font-size:12px;">Nenhuma entrada encontrada nesta categoria do Compêndio.</div>`) + `</div>`;
+                    <span class="btn-mini" style="flex:0 0 auto;">＋ Mesa</span>
+                </div>
+            `;
+        }).join('');
+        bodyHtml = `<div class="tt-drawer-grid" id="tt-drawer-items-grid">` +
+            (cardsHtml || `<div class="tt-drawer-empty">Nenhuma entrada encontrada nesta categoria do Compêndio.</div>`) +
+            `<div id="tt-drawer-search-empty" class="tt-drawer-empty" style="display:${ents.length > 0 && matchCount === 0 ? 'block' : 'none'};">Nenhum resultado para "${escapeHtmlText(searchVal)}".</div>` +
+            `</div>`;
     }
 
+    const showSearch = activeTab !== 'loot';
     return `
-        <div id="tt-token-drawer" class="tt-token-drawer">
+        <div id="tt-token-drawer" class="tt-token-drawer open">
             <div class="tt-token-drawer-header">
+                <div class="tt-token-drawer-top">
+                    <span>📦 Gaveta de Tokens</span>
+                    <button type="button" class="btn-mini" style="padding:2px 7px;" onclick="toggleTokenDrawer(false)" title="Fechar gaveta">✕</button>
+                </div>
                 <div class="tt-token-drawer-tabs">
                     ${tabs.map(tb => `<button type="button" class="btn-mini ${activeTab === tb.id ? 'is-active' : ''}" onclick="setTokenDrawerTab('${tb.id}')">${tb.label}</button>`).join('')}
                 </div>
-                <div style="display:flex; gap:6px; align-items:center;">
-                    <input type="text" id="tt-drawer-search" class="form-control" style="width:170px; padding:3px 7px; font-size:11.5px;" value="${escapeHtmlText(searchVal)}" placeholder="🔍 Filtrar..." oninput="filterTokenDrawerCards(this.value)">
-                    <button type="button" class="btn-mini" onclick="toggleTokenDrawer(false)" title="Fechar gaveta">✕</button>
-                </div>
+                ${showSearch ? `<input type="text" id="tt-drawer-search" class="form-control" style="width:100%; padding:4px 8px; font-size:11.5px;" value="${escapeHtmlText(searchVal)}" placeholder="🔍 Filtrar..." oninput="filterTokenDrawerCards(this.value)">` : ''}
             </div>
             <div class="tt-token-drawer-body">${bodyHtml}</div>
         </div>
@@ -2415,13 +2603,17 @@ function _resolveTargetLootCharacterForCurrentUser() {
     const p = getActivePlayer();
     const own = charactersData.find(c => c.id === activeCharacterId && canAccessFullCharacterSheet(c))
         || charactersData.find(c => p && c.ownerId === p.id)
-        || (p && p.role === 'gm' ? charactersData[0] : null);
+        || (_isVttEffectiveGm(p) ? charactersData[0] : null);
     return own || null;
 }
 
 function openInteractiveTokenModal(tokenId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
+    if (!isTokenVisibleToCurrentUser(tok)) {
+        showToast('🙈 Este token está oculto pelo Mestre.');
+        return;
+    }
     if (tok.type === 'gold') openGoldTokenModal(tokenId);
     else if (tok.type === 'chest') openChestTokenModal(tokenId);
 }
@@ -2429,6 +2621,10 @@ function openInteractiveTokenModal(tokenId) {
 function openSheetFromTabletopToken(tokenId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
+    if (!isTokenVisibleToCurrentUser(tok)) {
+        showToast('🙈 Este token está oculto pelo Mestre.');
+        return;
+    }
     if (tok.type === 'gold' || tok.type === 'chest') {
         openInteractiveTokenModal(tokenId);
         return;
@@ -2454,29 +2650,123 @@ function closeGoldTokenModal() {
     document.getElementById('tt-gold-backdrop')?.classList.remove('open');
 }
 
+function _renderLootPermissionsEditorHtml(cfg, kind = 'chest-token', tokenId = '') {
+    const policy = ['all', 'players', 'characters'].includes(cfg.lootPolicy) ? cfg.lootPolicy : 'all';
+    const allowedP = new Set(Array.isArray(cfg.allowedPlayerIds) ? cfg.allowedPlayerIds : []);
+    const allowedC = new Set(Array.isArray(cfg.allowedCharIds) ? cfg.allowedCharIds : []);
+    const nonGmPlayers = (typeof playersData !== 'undefined' ? playersData : []).filter(pl => pl && pl.role !== 'gm');
+    const allChars = (typeof charactersData !== 'undefined' ? charactersData : []);
+
+    const safeTokArg = `'${String(tokenId || '').replace(/'/g, "\\'")}'`;
+    const onPolicyChange = (val) => `onLootPermissionPolicyChange('${kind}', ${safeTokArg}, '${val}')`;
+    const onToggleId = (field, itemId) => `onLootPermissionIdToggle('${kind}', ${safeTokArg}, '${field}', '${String(itemId).replace(/'/g, "\\'")}', this.checked)`;
+
+    let detailHtml = '';
+    if (policy === 'players') {
+        detailHtml = nonGmPlayers.length
+            ? `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">` + nonGmPlayers.map(pl => `
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; background:#15161c; border:1px solid ${allowedP.has(pl.id) ? '#d8b467' : '#3c3e4a'}; padding:4px 8px; border-radius:5px; cursor:pointer;">
+                    <input type="checkbox" ${allowedP.has(pl.id) ? 'checked' : ''} onchange="${onToggleId('allowedPlayerIds', pl.id)}">
+                    <span>${escapeHtmlText(pl.avatarEmoji || '🎮')} ${escapeHtmlText(pl.name)}</span>
+                </label>
+            `).join('') + `</div>`
+            : `<div style="font-size:11px; color:#9da3b8; margin-top:6px;">Nenhum jogador cadastrado ainda — crie contas de jogador ou use "Todos os jogadores".</div>`;
+    } else if (policy === 'characters') {
+        detailHtml = allChars.length
+            ? `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">` + allChars.map(c => `
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; background:#15161c; border:1px solid ${allowedC.has(c.id) ? '#d8b467' : '#3c3e4a'}; padding:4px 8px; border-radius:5px; cursor:pointer;">
+                    <input type="checkbox" ${allowedC.has(c.id) ? 'checked' : ''} onchange="${onToggleId('allowedCharIds', c.id)}">
+                    <span>🛡️ ${escapeHtmlText(c.name)} <em style="color:#8f95ab;">(${escapeHtmlText(c.ownerName || 'Jogador')})</em></span>
+                </label>
+            `).join('') + `</div>`
+            : `<div style="font-size:11px; color:#9da3b8; margin-top:6px;">Nenhum personagem criado ainda.</div>`;
+    }
+
+    return `
+        <div style="margin-top:10px; padding:8px 10px; background:#171820; border:1px solid #3c3e4a; border-radius:6px;">
+            <div style="font-size:11.5px; font-weight:700; color:#f2cf83; margin-bottom:6px;">🔐 Quem pode coletar este tesouro?</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:11.5px; cursor:pointer;">
+                    <input type="radio" name="loot-pol-${kind}-${escapeHtmlText(tokenId || 'draft')}" ${policy === 'all' ? 'checked' : ''} onchange="${onPolicyChange('all')}"> 🌍 Todos os jogadores
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:11.5px; cursor:pointer;">
+                    <input type="radio" name="loot-pol-${kind}-${escapeHtmlText(tokenId || 'draft')}" ${policy === 'players' ? 'checked' : ''} onchange="${onPolicyChange('players')}"> 👥 Selecionar jogadores
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:11.5px; cursor:pointer;">
+                    <input type="radio" name="loot-pol-${kind}-${escapeHtmlText(tokenId || 'draft')}" ${policy === 'characters' ? 'checked' : ''} onchange="${onPolicyChange('characters')}"> 🛡️ Selecionar personagens
+                </label>
+            </div>
+            ${detailHtml}
+        </div>
+    `;
+}
+
+function onLootPermissionPolicyChange(kind, tokenId, nextPolicy) {
+    if (kind === 'chest-draft') {
+        if (!window._pendingChestCreateDraft) return;
+        window._pendingChestCreateDraft.lootPolicy = nextPolicy;
+        renderChestCreateModalBody();
+    } else if (kind === 'gold-token') {
+        updateGoldTokenSettings(tokenId, { lootPolicy: nextPolicy });
+    } else {
+        updateChestSettings(tokenId, { lootPolicy: nextPolicy });
+    }
+}
+
+function onLootPermissionIdToggle(kind, tokenId, field, itemId, checked) {
+    const applyArr = (obj) => {
+        const set = new Set(Array.isArray(obj?.[field]) ? obj[field] : []);
+        if (checked) set.add(itemId);
+        else set.delete(itemId);
+        return Array.from(set);
+    };
+    if (kind === 'chest-draft') {
+        if (!window._pendingChestCreateDraft) return;
+        window._pendingChestCreateDraft[field] = applyArr(window._pendingChestCreateDraft);
+        renderChestCreateModalBody();
+    } else if (kind === 'gold-token') {
+        const tok = tabletopState.tokens.find(t => t.id === tokenId);
+        if (tok) updateGoldTokenSettings(tokenId, { [field]: applyArr(tok) });
+    } else {
+        const tok = tabletopState.tokens.find(t => t.id === tokenId);
+        if (tok) updateChestSettings(tokenId, { [field]: applyArr(tok) });
+    }
+}
+
 function openGoldTokenModal(tokenId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     const backdrop = document.getElementById('tt-gold-backdrop');
     const container = document.getElementById('tt-gold-modal-content');
     if (!tok || !backdrop || !container) return;
+    if (!isTokenVisibleToCurrentUser(tok)) {
+        showToast('🙈 Este token está oculto pelo Mestre.');
+        return;
+    }
     window._activeChestOrGoldTokenId = tok.id;
 
     const p = getActivePlayer();
-    const isGm = p && p.role === 'gm';
-    const targetChar = _resolveTargetLootCharacterForCurrentUser();
-    const charOptions = charactersData
-        .filter(c => canAccessFullCharacterSheet(c))
+    const isGm = _isVttEffectiveGm(p);
+    const canLoot = canCurrentUserLootToken(tok, p);
+    const allowedC = Array.isArray(tok.allowedCharIds) ? tok.allowedCharIds : [];
+    const eligibleChars = charactersData.filter(c => {
+        if (!canAccessFullCharacterSheet(c)) return false;
+        if (!isGm && tok.lootPolicy === 'characters') return allowedC.includes(c.id);
+        return true;
+    });
+    const targetChar = eligibleChars.find(c => c.id === activeCharacterId) || eligibleChars[0] || _resolveTargetLootCharacterForCurrentUser();
+    const charOptions = eligibleChars
         .map(c => `<option value="${c.id}" ${targetChar && c.id === targetChar.id ? 'selected' : ''}>🛡️ ${escapeHtmlText(c.name)} (${Number(c.gold) || 0} PO)</option>`)
         .join('');
     const goldAmt = Math.max(0, Number(tok.goldAmount) || 0);
 
     container.innerHTML = `
         <div class="studio-header">
-            <h2>🪙 ${escapeHtmlText(tok.name)} (${goldAmt} PO)</h2>
+            <h2>🪙 ${escapeHtmlText(tok.name)} (${goldAmt} PO)${tok.hiddenFromPlayers && isGm ? ' 🙈' : ''}</h2>
             <button class="btn-close-modal" type="button" onclick="closeGoldTokenModal()">✕</button>
         </div>
-        <div class="studio-form-pane" style="border-right:none;">
+        <div class="studio-form-pane" style="border-right:none; max-height:76vh; overflow-y:auto;">
             ${tok.locked ? `<div style="background:rgba(198,40,40,0.2); border:1px solid #c62828; color:#ff9e9e; padding:8px 10px; border-radius:6px; margin-bottom:12px; font-size:12px;">🔒 Este token de ouro está bloqueado pelo Mestre.</div>` : ''}
+            ${(!isGm && !canLoot) ? `<div style="background:rgba(198,40,40,0.18); border:1px solid #8b6b35; color:#f2cf83; padding:8px 10px; border-radius:6px; margin-bottom:12px; font-size:12px;">🚫 O Mestre restringiu a coleta deste ouro a jogadores ou personagens específicos.</div>` : ''}
 
             ${isGm ? `
                 <div class="form-section" style="margin-bottom:12px;">
@@ -2491,13 +2781,19 @@ function openGoldTokenModal(tokenId) {
                             <input type="number" id="gm-gold-amt" class="form-control" min="0" value="${goldAmt}" onchange="updateGoldTokenSettings('${tok.id}', { goldAmount: Math.max(0, Number(this.value) || 0) })">
                         </div>
                     </div>
-                    <label style="display:flex; align-items:center; gap:6px; margin-top:8px; cursor:pointer; font-size:12px;">
-                        <input type="checkbox" ${tok.locked ? 'checked' : ''} onchange="updateGoldTokenSettings('${tok.id}', { locked: this.checked })"> 🔒 Bloquear coleta por jogadores
-                    </label>
+                    <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:8px;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                            <input type="checkbox" ${tok.locked ? 'checked' : ''} onchange="updateGoldTokenSettings('${tok.id}', { locked: this.checked })"> 🔒 Bloquear coleta por jogadores
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                            <input type="checkbox" ${tok.hiddenFromPlayers ? 'checked' : ''} onchange="updateGoldTokenSettings('${tok.id}', { hiddenFromPlayers: this.checked })"> 🙈 Ocultar dos jogadores
+                        </label>
+                    </div>
+                    ${_renderLootPermissionsEditorHtml(tok, 'gold-token', tok.id)}
                 </div>
             ` : ''}
 
-            ${(!tok.locked || isGm) && goldAmt > 0 ? `
+            ${((!tok.locked && canLoot) || isGm) && goldAmt > 0 ? `
                 <div class="form-section">
                     <h3 class="form-section-title">🎒 Recolher para Ficha de Personagem</h3>
                     ${charOptions ? `
@@ -2510,7 +2806,7 @@ function openGoldTokenModal(tokenId) {
                             <button type="button" class="btn-action-bar" onclick="collectGoldTokenAmount('${tok.id}', document.getElementById('gold-loot-partial-amt').value)">🪙 Pegar Quantia</button>
                             <button type="button" class="btn-save-primary" onclick="collectGoldTokenAmount('${tok.id}', 'all')">✨ Pegar Tudo (${goldAmt} PO)</button>
                         </div>
-                    ` : `<p style="font-size:12px; color:#b8b2a6;">Crie ou selecione uma ficha de personagem antes de recolher moedas.</p>`}
+                    ` : `<p style="font-size:12px; color:#b8b2a6;">Crie ou selecione uma ficha de personagem elegível antes de recolher moedas.</p>`}
                 </div>
             ` : (goldAmt <= 0 ? `<div class="info-text">Não restam mais moedas neste ponto.</div>` : '')}
         </div>
@@ -2520,22 +2816,24 @@ function openGoldTokenModal(tokenId) {
 
 function updateGoldTokenSettings(tokenId, patch) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
+    const prevHidden = Boolean(tok.hiddenFromPlayers);
     Object.assign(tok, patch);
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTokenDelta) {
         CompendioNetAdapter.broadcastTokenDelta('upsert', tok);
     }
-    updateTabletopTokenDom(tok.id);
+    if (prevHidden !== Boolean(tok.hiddenFromPlayers)) renderTabletopModule();
+    else updateTabletopTokenDom(tok.id);
     openGoldTokenModal(tok.id);
 }
 
 async function collectGoldTokenAmount(tokenId, amountOrAll = 'all') {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
-    const isGm = (typeof getActivePlayer === 'function') ? getActivePlayer()?.role === 'gm' : true;
+    const isGm = _isVttEffectiveGm();
     if (tok.locked && !isGm) {
         showToast('🔒 Este token de ouro está bloqueado pelo Mestre.');
         return;
@@ -2544,6 +2842,10 @@ async function collectGoldTokenAmount(tokenId, amountOrAll = 'all') {
     const targetChar = charactersData.find(c => c.id === targetCharId);
     if (!targetChar) {
         showToast('Selecione um personagem para receber o ouro.');
+        return;
+    }
+    if (!canCurrentUserLootToken(tok, getActivePlayer(), targetChar)) {
+        showToast('🚫 Você ou este personagem não tem permissão para coletar este ouro.');
         return;
     }
 
@@ -2559,6 +2861,7 @@ async function collectGoldTokenAmount(tokenId, amountOrAll = 'all') {
         const res = await CompendioNetAdapter.broadcastGoldCollect({
             tokenId: tok.id,
             amount: wanted,
+            targetCharId: targetChar.id,
             removeIfEmpty: true
         });
         if (!res || res.ok === false) {
@@ -2593,9 +2896,147 @@ async function collectGoldTokenAmount(tokenId, amountOrAll = 'all') {
     showToast(`🪙 +${collected} PO adicionados à ficha de "${targetChar.name}"!`);
 }
 
+window._pendingChestCreateDraft = null;
+
 function closeChestTokenModal() {
     window._activeChestOrGoldTokenId = null;
+    window._pendingChestCreateDraft = null;
     document.getElementById('tt-chest-backdrop')?.classList.remove('open');
+}
+
+function openChestCreateModal(prefill = {}) {
+    const p = getActivePlayer();
+    if (!_isVttEffectiveGm(p)) {
+        showToast('🔒 Apenas o Mestre pode criar Baús.');
+        return;
+    }
+    const backdrop = document.getElementById('tt-chest-backdrop');
+    if (!backdrop) return;
+    window._activeChestOrGoldTokenId = null;
+    window._pendingChestCreateDraft = {
+        name: (prefill?.name && String(prefill.name).trim()) || 'Baú de Tesouro',
+        chestGold: Math.max(0, Math.floor(Number(prefill?.chestGold ?? 25) || 0)),
+        locked: Boolean(prefill?.locked),
+        hiddenFromPlayers: Boolean(prefill?.hiddenFromPlayers),
+        revealItemCountToPlayers: Boolean(prefill?.revealItemCountToPlayers),
+        lootPolicy: 'all',
+        allowedPlayerIds: [],
+        allowedCharIds: [],
+        chestItems: Array.isArray(prefill?.chestItems) ? prefill.chestItems.slice() : []
+    };
+    renderChestCreateModalBody();
+    backdrop.classList.add('open');
+}
+
+function renderChestCreateModalBody() {
+    const draft = window._pendingChestCreateDraft;
+    const container = document.getElementById('tt-chest-modal-content');
+    if (!draft || !container) return;
+
+    const compItems = getAllCatalogEntities(['items', 'curio']);
+    const compItemOpts = `<option value="">🎒 + Adicionar Item do Compêndio...</option>` +
+        compItems.map(i => `<option value="${i.category}|${i.groupKey}|${i.itemKey}|${escapeHtmlText(i.title)}">⚔️ ${escapeHtmlText(i.title)}</option>`).join('');
+
+    const itemsHtml = draft.chestItems.map(it => {
+        const sItemId = `'${String(it.id).replace(/'/g, "\\'")}'`;
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; background:#15161c; border:1px solid #3c3e4a; border-radius:6px; padding:6px 10px; margin-bottom:5px;">
+                <strong style="color:#f2cf83; font-size:12.5px;">${it.category ? '⚔️' : '📦'} ${escapeHtmlText(it.title || it.name)} ${Number(it.qty) > 1 ? `(${it.qty}x)` : ''}</strong>
+                <button type="button" class="btn-mini danger" onclick="removeDraftChestItem(${sItemId})" title="Remover">✕</button>
+            </div>
+        `;
+    }).join('') || `<div style="color:#8e92a8; font-size:12px; font-style:italic;">Nenhum item adicionado ainda (você pode adicionar antes ou depois).</div>`;
+
+    container.innerHTML = `
+        <div class="studio-header">
+            <h2>🧰 Configurar Novo Baú antes de Posicionar</h2>
+            <button class="btn-close-modal" type="button" onclick="closeChestTokenModal()">✕</button>
+        </div>
+        <div class="studio-form-pane" style="border-right:none; max-height:76vh; overflow-y:auto;">
+            <div class="form-section">
+                <h3 class="form-section-title">1. Conteúdo, Visibilidade &amp; Segurança</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Baú</label>
+                        <input type="text" class="form-control" value="${escapeHtmlText(draft.name)}" oninput="if(window._pendingChestCreateDraft) window._pendingChestCreateDraft.name = this.value">
+                    </div>
+                    <div class="form-group">
+                        <label>Ouro Guardado (PO)</label>
+                        <input type="number" class="form-control" min="0" value="${draft.chestGold}" oninput="if(window._pendingChestCreateDraft) window._pendingChestCreateDraft.chestGold = Math.max(0, Math.floor(Number(this.value)||0))">
+                    </div>
+                </div>
+                <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:10px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                        <input type="checkbox" ${draft.locked ? 'checked' : ''} onchange="if(window._pendingChestCreateDraft) window._pendingChestCreateDraft.locked = this.checked"> 🔒 Baú Trancado
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                        <input type="checkbox" ${draft.hiddenFromPlayers ? 'checked' : ''} onchange="if(window._pendingChestCreateDraft) window._pendingChestCreateDraft.hiddenFromPlayers = this.checked"> 🙈 Ocultar baú dos jogadores
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;" title="Por padrão o número de itens fica oculto para não-mestres">
+                        <input type="checkbox" ${draft.revealItemCountToPlayers ? 'checked' : ''} onchange="if(window._pendingChestCreateDraft) window._pendingChestCreateDraft.revealItemCountToPlayers = this.checked"> 🔢 Mostrar nº de itens aos jogadores
+                    </label>
+                </div>
+                ${_renderLootPermissionsEditorHtml(draft, 'chest-draft', 'draft')}
+            </div>
+
+            <div class="form-section">
+                <h3 class="form-section-title">2. Itens Dentro do Baú (${draft.chestItems.length})</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+                    <select class="form-control" style="flex:1; min-width:190px; padding:5px 8px; font-size:12px;" onchange="addDraftChestItemFromCompendium(this.value); this.value='';">${compItemOpts}</select>
+                    <input type="text" id="draft-chest-custom-name" class="form-control" style="flex:1; min-width:140px; padding:5px 8px; font-size:12px;" placeholder="Item custom (ex: Chave de Obsidiana)">
+                    <input type="number" id="draft-chest-custom-qty" class="form-control" style="width:62px; padding:5px; font-size:12px;" min="1" value="1" title="Qtd">
+                    <button type="button" class="btn-action-bar" onclick="addDraftCustomChestItem()">＋ Item</button>
+                </div>
+                ${itemsHtml}
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                <button type="button" class="btn-mini" onclick="closeChestTokenModal()">Cancelar</button>
+                <button type="button" class="btn-save-primary" onclick="confirmCreateChestTokenOnTabletop()">🧰 Posicionar Baú na Mesa</button>
+            </div>
+        </div>
+    `;
+}
+
+function addDraftChestItemFromCompendium(selectVal) {
+    if (!selectVal || !window._pendingChestCreateDraft) return;
+    const [cat, groupKey, itemKey, title] = selectVal.split('|');
+    window._pendingChestCreateDraft.chestItems.push({
+        id: 'ci-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+        title: title || itemKey,
+        qty: 1,
+        category: cat,
+        groupKey: groupKey || '',
+        itemKey
+    });
+    renderChestCreateModalBody();
+}
+
+function addDraftCustomChestItem() {
+    if (!window._pendingChestCreateDraft) return;
+    const title = (document.getElementById('draft-chest-custom-name')?.value || '').trim();
+    const qty = Math.max(1, Math.floor(Number(document.getElementById('draft-chest-custom-qty')?.value) || 1));
+    if (!title) return;
+    window._pendingChestCreateDraft.chestItems.push({
+        id: 'ci-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+        title,
+        qty
+    });
+    renderChestCreateModalBody();
+}
+
+function removeDraftChestItem(itemId) {
+    if (!window._pendingChestCreateDraft) return;
+    window._pendingChestCreateDraft.chestItems = window._pendingChestCreateDraft.chestItems.filter(i => i.id !== itemId);
+    renderChestCreateModalBody();
+}
+
+function confirmCreateChestTokenOnTabletop() {
+    const draft = window._pendingChestCreateDraft;
+    if (!draft) return;
+    const cfg = Object.assign({}, draft, { skipOpenAfterSpawn: true });
+    closeChestTokenModal();
+    spawnChestTokenOnTabletop(cfg);
 }
 
 function openChestTokenModal(tokenId) {
@@ -2603,15 +3044,26 @@ function openChestTokenModal(tokenId) {
     const backdrop = document.getElementById('tt-chest-backdrop');
     const container = document.getElementById('tt-chest-modal-content');
     if (!tok || !backdrop || !container) return;
+    if (!isTokenVisibleToCurrentUser(tok)) {
+        showToast('🙈 Este baú está oculto pelo Mestre.');
+        return;
+    }
+    window._pendingChestCreateDraft = null;
     window._activeChestOrGoldTokenId = tok.id;
     if (!Array.isArray(tok.chestItems)) tok.chestItems = [];
     tok.chestGold = Math.max(0, Number(tok.chestGold) || 0);
 
     const p = getActivePlayer();
-    const isGm = p && p.role === 'gm';
-    const targetChar = _resolveTargetLootCharacterForCurrentUser();
-    const charOptions = charactersData
-        .filter(c => canAccessFullCharacterSheet(c))
+    const isGm = _isVttEffectiveGm(p);
+    const canLoot = canCurrentUserLootToken(tok, p);
+    const allowedC = Array.isArray(tok.allowedCharIds) ? tok.allowedCharIds : [];
+    const eligibleChars = charactersData.filter(c => {
+        if (!canAccessFullCharacterSheet(c)) return false;
+        if (!isGm && tok.lootPolicy === 'characters') return allowedC.includes(c.id);
+        return true;
+    });
+    const targetChar = eligibleChars.find(c => c.id === activeCharacterId) || eligibleChars[0] || _resolveTargetLootCharacterForCurrentUser();
+    const charOptions = eligibleChars
         .map(c => `<option value="${c.id}" ${targetChar && c.id === targetChar.id ? 'selected' : ''}>🛡️ ${escapeHtmlText(c.name)}</option>`)
         .join('');
 
@@ -2619,7 +3071,8 @@ function openChestTokenModal(tokenId) {
     const compItemOpts = `<option value="">🎒 + Adicionar Item do Compêndio...</option>` +
         compItems.map(i => `<option value="${i.category}|${i.groupKey}|${i.itemKey}|${escapeHtmlText(i.title)}">⚔️ ${escapeHtmlText(i.title)}</option>`).join('');
 
-    const canOpenContents = !tok.locked || isGm;
+    const canOpenContents = isGm || (!tok.locked && canLoot);
+    const itemsKnown = Boolean(isGm || tok.revealItemCountToPlayers);
     const itemsHtml = tok.chestItems.map(it => {
         const sItemId = `'${String(it.id).replace(/'/g, "\\'")}'`;
         return `
@@ -2638,11 +3091,12 @@ function openChestTokenModal(tokenId) {
 
     container.innerHTML = `
         <div class="studio-header">
-            <h2>🧰 ${escapeHtmlText(tok.name)} ${tok.locked ? '🔒' : '🔓'}</h2>
+            <h2>🧰 ${escapeHtmlText(tok.name)} ${tok.locked ? '🔒' : '🔓'}${itemsKnown ? ` (${tok.chestItems.length} itens)` : ''}${tok.hiddenFromPlayers && isGm ? ' 🙈' : ''}</h2>
             <button class="btn-close-modal" type="button" onclick="closeChestTokenModal()">✕</button>
         </div>
         <div class="studio-form-pane" style="border-right:none; max-height:76vh; overflow-y:auto;">
             ${tok.locked ? `<div style="background:rgba(198,40,40,0.2); border:1px solid #c62828; color:#ff9e9e; padding:8px 10px; border-radius:6px; margin-bottom:12px; font-size:12px;">🔒 Baú trancado! ${isGm ? 'Como Mestre, você ainda pode editar ou destrancar abaixo.' : 'Apenas o Mestre pode destrancá-lo.'}</div>` : ''}
+            ${(!isGm && !tok.locked && !canLoot) ? `<div style="background:rgba(198,40,40,0.18); border:1px solid #8b6b35; color:#f2cf83; padding:8px 10px; border-radius:6px; margin-bottom:12px; font-size:12px;">🚫 O Mestre restringiu a coleta deste baú a jogadores ou personagens específicos.</div>` : ''}
 
             ${isGm ? `
                 <div class="form-section">
@@ -2662,6 +3116,15 @@ function openChestTokenModal(tokenId) {
                             </label>
                         </div>
                     </div>
+                    <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:6px;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                            <input type="checkbox" ${tok.hiddenFromPlayers ? 'checked' : ''} onchange="updateChestSettings('${tok.id}', { hiddenFromPlayers: this.checked })"> 🙈 Ocultar dos jogadores
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+                            <input type="checkbox" ${tok.revealItemCountToPlayers ? 'checked' : ''} onchange="updateChestSettings('${tok.id}', { revealItemCountToPlayers: this.checked })"> 🔢 Mostrar nº de itens aos jogadores
+                        </label>
+                    </div>
+                    ${_renderLootPermissionsEditorHtml(tok, 'chest-token', tok.id)}
                     <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                         <select class="form-control" style="flex:1; min-width:190px; padding:5px 8px; font-size:12px;" onchange="addChestItemFromCompendium('${tok.id}', this.value); this.value='';">${compItemOpts}</select>
                         <input type="text" id="chest-custom-item-name" class="form-control" style="flex:1; min-width:140px; padding:5px 8px; font-size:12px;" placeholder="Item custom (ex: Poção de Cura)">
@@ -2674,7 +3137,7 @@ function openChestTokenModal(tokenId) {
             ${canOpenContents ? `
                 <div class="form-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-                        <h3 class="form-section-title" style="margin:0; border:none; padding:0;">💰 Conteúdo & Saque</h3>
+                        <h3 class="form-section-title" style="margin:0; border:none; padding:0;">💰 Conteúdo &amp; Saque</h3>
                         ${charOptions ? `<div style="display:flex; align-items:center; gap:6px;"><span style="font-size:11.5px; color:#b8b2a6;">Entregar para:</span><select id="chest-loot-target-char" class="form-control" style="width:auto; padding:4px 8px; font-size:12px;">${charOptions}</select></div>` : ''}
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; background:#1c1a11; border:1px solid #d4ac0d; border-radius:6px; padding:8px 12px; margin-bottom:10px;">
@@ -2703,22 +3166,29 @@ function refreshOpenChestOrGoldModal(tokenId) {
 
 function updateChestSettings(tokenId, patch) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
+    const prevHidden = Boolean(tok.hiddenFromPlayers);
+    const prevReveal = Boolean(tok.revealItemCountToPlayers);
     Object.assign(tok, patch);
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.sendDelta) {
-        CompendioNetAdapter.sendDelta({ type: 'CHEST_UPDATE', tokenId: tok.id, patch });
+        if (prevHidden !== Boolean(tok.hiddenFromPlayers) || prevReveal !== Boolean(tok.revealItemCountToPlayers)) {
+            CompendioNetAdapter.broadcastTokenDelta('upsert', tok);
+        } else {
+            CompendioNetAdapter.sendDelta({ type: 'CHEST_UPDATE', tokenId: tok.id, patch });
+        }
     }
-    updateTabletopTokenDom(tok.id);
+    if (prevHidden !== Boolean(tok.hiddenFromPlayers)) renderTabletopModule();
+    else updateTabletopTokenDom(tok.id);
     openChestTokenModal(tok.id);
 }
 
 function addChestItemFromCompendium(tokenId, selectVal) {
     if (!selectVal) return;
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
     const [cat, groupKey, itemKey, title] = selectVal.split('|');
@@ -2741,7 +3211,7 @@ function addChestItemFromCompendium(tokenId, selectVal) {
 
 function addCustomChestItem(tokenId) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     const nameEl = document.getElementById('chest-custom-item-name');
     const qtyEl = document.getElementById('chest-custom-item-qty');
@@ -2764,7 +3234,7 @@ function addCustomChestItem(tokenId) {
 
 function removeChestItemById(tokenId, itemId) {
     const p = getActivePlayer();
-    if (!p || p.role !== 'gm') return;
+    if (!_isVttEffectiveGm(p)) return;
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok) return;
     tok.chestItems = (tok.chestItems || []).filter(i => i.id !== itemId);
@@ -2779,7 +3249,7 @@ function removeChestItemById(tokenId, itemId) {
 async function lootChestGold(tokenId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok || (Number(tok.chestGold) || 0) <= 0) return;
-    const isGm = (typeof getActivePlayer === 'function') ? getActivePlayer()?.role === 'gm' : true;
+    const isGm = _isVttEffectiveGm();
     if (tok.locked && !isGm) {
         showToast('🔒 Este baú está trancado pelo Mestre.');
         return;
@@ -2787,11 +3257,14 @@ async function lootChestGold(tokenId) {
     const targetCharId = document.getElementById('chest-loot-target-char')?.value || _resolveTargetLootCharacterForCurrentUser()?.id;
     const targetChar = charactersData.find(c => c.id === targetCharId);
     if (!targetChar) return showToast('Selecione um personagem para receber o ouro.');
+    if (!canCurrentUserLootToken(tok, getActivePlayer(), targetChar)) {
+        return showToast('🚫 Você ou este personagem não tem permissão para saquear este baú.');
+    }
 
     let takenGold = Number(tok.chestGold) || 0;
     let remainingGold = 0;
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastChestLoot) {
-        const res = await CompendioNetAdapter.broadcastChestLoot({ tokenId: tok.id, lootGold: true, amount: 'all' });
+        const res = await CompendioNetAdapter.broadcastChestLoot({ tokenId: tok.id, lootGold: true, amount: 'all', targetCharId: targetChar.id });
         if (!res || res.ok === false) {
             showToast(`⚠️ ${res?.error || 'Não foi possível saquear ouro deste baú.'}`);
             openChestTokenModal(tok.id);
@@ -2817,7 +3290,7 @@ async function lootChestGold(tokenId) {
 async function lootChestItem(tokenId, itemId) {
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (!tok || !Array.isArray(tok.chestItems)) return;
-    const isGm = (typeof getActivePlayer === 'function') ? getActivePlayer()?.role === 'gm' : true;
+    const isGm = _isVttEffectiveGm();
     if (tok.locked && !isGm) {
         showToast('🔒 Este baú está trancado pelo Mestre.');
         return;
@@ -2825,13 +3298,16 @@ async function lootChestItem(tokenId, itemId) {
     const targetCharId = document.getElementById('chest-loot-target-char')?.value || _resolveTargetLootCharacterForCurrentUser()?.id;
     const targetChar = charactersData.find(c => c.id === targetCharId);
     if (!targetChar) return showToast('Selecione um personagem para receber o item.');
+    if (!canCurrentUserLootToken(tok, getActivePlayer(), targetChar)) {
+        return showToast('🚫 Você ou este personagem não tem permissão para saquear este baú.');
+    }
 
     const idx = tok.chestItems.findIndex(it => it.id === itemId);
     if (idx < 0) return showToast('Item já foi saqueado!');
     let takenItem = tok.chestItems[idx];
 
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastChestLoot) {
-        const res = await CompendioNetAdapter.broadcastChestLoot({ tokenId: tok.id, takeItemId: itemId });
+        const res = await CompendioNetAdapter.broadcastChestLoot({ tokenId: tok.id, takeItemId: itemId, targetCharId: targetChar.id });
         if (!res || res.ok === false) {
             showToast(`⚠️ ${res?.error || 'Este item já foi saqueado ou o baú está trancado.'}`);
             openChestTokenModal(tok.id);
@@ -2874,14 +3350,14 @@ async function lootChestItem(tokenId, itemId) {
 /* ------------------ BARRA DE CONTROLE DE TOKEN/FORMA SELECIONADA & PLAYERS ------------------ */
 function buildSelectedControlBarHtml(isGm) {
     const selectedTok = tabletopState.tokens.find(t => String(t.id) === String(selectedTabletopTokenId));
-    if (selectedTok) {
+    if (selectedTok && isTokenVisibleToCurrentUser(selectedTok)) {
         const showExact = canSeeTokenExactStats(selectedTok);
         const canCtrl = CompendioNetAdapter.canControlEntity(selectedTok.ownerId);
         const sq = Number(selectedTok.sizeSquares) || 1;
         const hpDisplay = selectedTok.type === 'gold'
             ? `🪙 ${Number(selectedTok.goldAmount) || 0} PO`
             : (selectedTok.type === 'chest'
-                ? `🧰 ${(selectedTok.chestItems || []).length} itens · ${selectedTok.chestGold || 0} PO`
+                ? formatChestSummaryText(selectedTok, isGm, 'bar')
                 : (selectedTok.type === 'item'
                     ? '📦 Objeto/Item'
                     : (showExact ? `${selectedTok.hpCurrent}/${selectedTok.hpMax} PV (CA ${selectedTok.ac || '?'})` : describeQualitativeHealth(selectedTok.hpCurrent, selectedTok.hpMax, selectedTok.type))));
@@ -2890,6 +3366,9 @@ function buildSelectedControlBarHtml(isGm) {
             : '';
         const playerStudyBtn = (!isGm && !showExact && selectedTok.category && selectedTok.itemKey)
             ? `<button type="button" class="btn-mini" onclick="CompendioNetAdapter.sendStudyRequest('${selectedTok.category}:${selectedTok.itemKey}', '${escapeHtmlText(selectedTok.name)}')">🔍 Estudar</button>`
+            : '';
+        const visBtn = isGm
+            ? `<button type="button" class="btn-mini ${selectedTok.hiddenFromPlayers ? 'is-active' : ''}" onclick="toggleTabletopTokenVisibility('${selectedTok.id}')" title="Ocultar ou mostrar este token para jogadores">${selectedTok.hiddenFromPlayers ? '🙈 Oculto' : '👁️ Visível'}</button>`
             : '';
         const lockBtn = (isGm || canCtrl)
             ? `<button type="button" class="btn-mini ${selectedTok.locked ? 'is-active' : ''}" onclick="toggleTabletopTokenLock('${selectedTok.id}')" title="Travar/Destravar token no mapa">${selectedTok.locked ? '🔒 Travado' : '🔓 Livre'}</button>`
@@ -2905,6 +3384,7 @@ function buildSelectedControlBarHtml(isGm) {
                 ${isCombatant ? `<button type="button" class="btn-mini" onclick="if(typeof openCombatRuneForToken==='function') openCombatRuneForToken('${selectedTok.id}')" title="Abrir/focar este combatente na Runa de Combate">🔮 Runa</button>` : ''}
                 ${gmRevealBtn}
                 ${playerStudyBtn}
+                ${visBtn}
                 ${lockBtn}
                 ${(canCtrl && isCombatant) ? `
                     <select class="form-control" style="width:auto; padding:2px 4px; font-size:11px;" onchange="setTokenFootprintSize('${selectedTok.id}', this.value)" title="Tamanho do Token no Grid">
@@ -2942,21 +3422,46 @@ function buildSelectedControlBarHtml(isGm) {
     return '';
 }
 
-function renderTabletopConnectedPlayersBarHtml() {
+function _resolveVttPresenceSummary() {
     const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
     const rc = window.onlineRoomConfig || {};
-    const maxPlayers = rc.maxPlayers || 8;
-    const rawOnline = (Array.isArray(window.onlinePlayersList) && window.onlinePlayersList.length > 0)
+    const maxP = rc.maxPlayers || 8;
+    const playerShownName = typeof getPlayerDisplayName === 'function'
+        ? getPlayerDisplayName(activePl, activePl?.isUnauthenticated ? 'Visitante' : 'Jogador')
+        : (activePl?.name || 'Jogador');
+    const onlineCount = (typeof serverWritable !== 'undefined' && serverWritable && Array.isArray(window.onlinePlayersList))
+        ? window.onlinePlayersList.length
+        : ((Array.isArray(window.onlinePlayersList) && window.onlinePlayersList.length) ? window.onlinePlayersList.length : (activePl && !activePl.isUnauthenticated && activePl.id ? 1 : 0));
+    return { activePl, rc, maxP, playerShownName, onlineCount };
+}
+
+function updateConnectedPlayersPresenceUI() {
+    const barRoot = document.getElementById('tt-connected-players-root');
+    if (barRoot) {
+        barRoot.innerHTML = renderTabletopConnectedPlayersBarHtml();
+    }
+    const badgeEl = document.getElementById('tt-online-count-badge');
+    if (badgeEl) {
+        const { maxP, playerShownName, onlineCount } = _resolveVttPresenceSummary();
+        badgeEl.textContent = `📡 ${onlineCount}/${maxP} Online | 👤 ${playerShownName}`;
+    }
+}
+
+function renderTabletopConnectedPlayersBarHtml() {
+    const { activePl, rc, maxP: maxPlayers } = _resolveVttPresenceSummary();
+    const rawOnline = (typeof serverWritable !== 'undefined' && serverWritable && Array.isArray(window.onlinePlayersList))
         ? window.onlinePlayersList
-        : (activePl ? [{
-            clientId: window.localClientId || 'local',
-            playerId: activePl.id,
-            playerName: activePl.name,
-            role: activePl.role,
-            color: typeof getPlayerColor === 'function' ? getPlayerColor(activePl) : '#d8b467',
-            avatarEmoji: typeof getPlayerAvatar === 'function' ? getPlayerAvatar(activePl) : '👑',
-            isHost: Boolean(window.isHostClient)
-        }] : []);
+        : ((Array.isArray(window.onlinePlayersList) && window.onlinePlayersList.length > 0)
+            ? window.onlinePlayersList
+            : ((activePl && !activePl.isUnauthenticated && activePl.id) ? [{
+                clientId: window.localClientId || 'local',
+                playerId: activePl.id,
+                playerName: activePl.name,
+                role: activePl.role,
+                color: typeof getPlayerColor === 'function' ? getPlayerColor(activePl) : '#d8b467',
+                avatarEmoji: typeof getPlayerAvatar === 'function' ? getPlayerAvatar(activePl) : '🎮',
+                isHost: Boolean(window.isHostClient)
+            }] : []));
 
     const streamerOn = typeof isStreamerModeEnabled === 'function' && isStreamerModeEnabled();
     const roomBadge = !serverWritable
@@ -2969,7 +3474,7 @@ function renderTabletopConnectedPlayersBarHtml() {
         const shownName = typeof getPlayerDisplayName === 'function'
             ? getPlayerDisplayName({ id: op.playerId || op.clientId, name: op.playerName, role: op.role }, 'Jogador')
             : (op.playerName || 'Jogador');
-        const isSelf = (op.clientId && op.clientId === window.localClientId) || (!window.onlinePlayersList?.length && op.playerId === activePl?.id);
+        const isSelf = (op.clientId && op.clientId === window.localClientId) || (!window.onlinePlayersList?.length && activePl && op.playerId === activePl.id);
         return `
             <span class="tt-player-chip ${isSelf ? 'is-self' : ''}" style="border-color:${escapeHtmlText(pColor)};" onclick="openMultiplayerRoomModal('room')" title="Clique para gerenciar sala / jogadores">
                 <span class="player-color-dot" style="background:${escapeHtmlText(pColor)};"></span>
@@ -2986,7 +3491,7 @@ function renderTabletopConnectedPlayersBarHtml() {
                 <button type="button" class="btn-mini" style="flex:0 0 auto; border-color:#5a617a;" onclick="openMultiplayerRoomModal('room')" title="Gerenciar Sala, IP e Kick/Ban">${roomBadge}</button>
                 ${streamerOn ? `<button type="button" class="btn-mini active-streamer" style="flex:0 0 auto;" onclick="toggleStreamerMode()">📺 Streamer ON</button>` : ''}
                 <span style="font-size:11px; color:#9da3b8;">Conectados:</span>
-                ${chipsHtml}
+                ${chipsHtml || '<span style="font-size:11px; color:#828699;">Aguardando conexões...</span>'}
             </div>
         </div>
     `;
@@ -2996,13 +3501,14 @@ function renderTabletopConnectedPlayersBarHtml() {
 function renderTabletopModule() {
     ensureTabletopExtendedState();
     const player = getActivePlayer();
-    const isGm = player && player.role === 'gm';
+    const isGm = _isVttEffectiveGm(player);
     const playerShownName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(player, 'Jogador') : (player ? player.name : 'Jogador');
     const gmMetrics = getTabletopGridMetrics();
 
+    const visibleTokens = tabletopState.tokens.filter(t => isTokenVisibleToCurrentUser(t, player));
     const listTitleEl = document.getElementById('dynamic-list-title');
     if (listTitleEl) {
-        listTitleEl.textContent = `Tokens na Mesa (${tabletopState.tokens.length})`;
+        listTitleEl.textContent = `Tokens na Mesa (${visibleTokens.length})`;
     }
 
     const activeTurnCard = (typeof combatCards !== 'undefined' && window.combatTurnState?.activeCardId)
@@ -3011,21 +3517,22 @@ function renderTabletopModule() {
 
     const listEl = document.getElementById('dynamic-item-list');
     if (listEl) {
-        listEl.innerHTML = tabletopState.tokens.map(t => {
+        listEl.innerHTML = visibleTokens.map(t => {
             const isSel = t.id === selectedTabletopTokenId ? 'active' : '';
             const icon = t.type === 'pc' ? '🛡️' : (t.type === 'gold' ? '🪙' : (t.type === 'chest' ? '🧰' : (t.type === 'item' ? '⚔️' : (t.type === 'npc' ? '🧙‍♂️' : '🐉'))));
             const showExact = canSeeTokenExactStats(t);
             const statusText = t.type === 'gold'
                 ? `${Number(t.goldAmount) || 0} PO`
                 : (t.type === 'chest'
-                    ? `${(t.chestItems || []).length} itens`
+                    ? formatChestSummaryText(t, isGm, 'list')
                     : (t.type === 'item' ? 'Item' : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type))));
             const canDel = CompendioNetAdapter.canControlEntity(t.ownerId);
             return `
                 <li class="list-item ${isSel}" data-title="${escapeHtmlText(t.name.toLowerCase())}" onclick="selectTabletopToken('${t.id}')">
-                    <span>${icon} ${t.locked ? '🔒 ' : ''}${escapeHtmlText(t.name)}</span>
+                    <span>${icon} ${t.hiddenFromPlayers && isGm ? '🙈 ' : ''}${t.locked ? '🔒 ' : ''}${escapeHtmlText(t.name)}</span>
                     <div class="list-item-right">
                         <span class="list-item-folder-badge" style="color:#8df596;">${statusText}</span>
+                        ${isGm ? `<button type="button" class="btn-quick-del" style="color:${t.hiddenFromPlayers ? '#ffd54f' : '#9da3b8'};" onclick="event.stopPropagation(); toggleTabletopTokenVisibility('${t.id}')" title="${t.hiddenFromPlayers ? 'Mostrar token' : 'Ocultar token'}">${t.hiddenFromPlayers ? '🙈' : '👁️'}</button>` : ''}
                         ${canDel ? `<button type="button" class="btn-quick-del" onclick="event.stopPropagation(); removeTabletopToken('${t.id}')" title="Remover token">✕</button>` : ''}
                     </div>
                 </li>
@@ -3067,7 +3574,7 @@ function renderTabletopModule() {
         }).join('')
         : '';
 
-    const tokensHtml = tabletopState.tokens.map(t => {
+    const tokensHtml = visibleTokens.map(t => {
         const isSel = String(t.id) === String(selectedTabletopTokenId) ? 'selected-token' : '';
         const isTurnActive = activeTurnCard && (
             String(activeTurnCard.tokenId) === String(t.id) ||
@@ -3076,6 +3583,7 @@ function renderTabletopModule() {
         const turnCls = isTurnActive ? 'tt-token-active-turn' : '';
         const typeCls = t.type === 'monster' ? 'monster-token' : (t.type === 'npc' ? 'npc-token' : (t.type === 'item' ? 'item-token' : (t.type === 'gold' ? 'gold-token' : (t.type === 'chest' ? 'chest-token' : ''))));
         const lockCls = t.locked ? 'is-locked-token' : '';
+        const hiddenCls = t.hiddenFromPlayers ? 'is-hidden-token' : '';
         const initials = t.type === 'gold' ? '🪙' : (t.type === 'chest' ? '🧰' : String(t.name || '?').trim().slice(0, 2).toUpperCase());
         const footprint = Math.max(1, Number(t.sizeSquares) || 1);
         const sz = Math.max(24, (gmMetrics.gx * footprint) - 6);
@@ -3084,7 +3592,7 @@ function renderTabletopModule() {
         const badgeText = t.type === 'gold'
             ? `🪙 ${Number(t.goldAmount) || 0} PO`
             : (t.type === 'chest'
-                ? `🧰 ${(t.chestItems || []).length} itens`
+                ? formatChestSummaryText(t, isGm, 'badge')
                 : (t.type === 'item'
                     ? '⚔️ Item'
                     : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type))));
@@ -3093,15 +3601,17 @@ function renderTabletopModule() {
         const ownerBorderStyle = ownerColor && !isTurnActive ? `border-color:${ownerColor}; box-shadow:0 0 10px ${ownerColor}66;` : '';
         const ownerDotHtml = ownerColor ? `<span class="tt-token-owner-dot" style="background:${escapeHtmlText(ownerColor)};"></span>` : '';
         const lockBadgeHtml = t.locked ? `<span class="tt-token-lock-badge" title="Travado pelo Mestre">🔒</span>` : '';
+        const hiddenBadgeHtml = (isGm && t.hiddenFromPlayers) ? `<span class="tt-token-hidden-badge" title="Oculto dos jogadores">🙈</span>` : '';
         return `
-            <div class="tt-token ${typeCls} ${isSel} ${turnCls} ${lockCls}"
+            <div class="tt-token ${typeCls} ${isSel} ${turnCls} ${lockCls} ${hiddenCls}"
                  data-token-id="${escapeHtmlText(t.id)}"
-                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${canMove ? '1' : '0.94'}; ${ownerBorderStyle} ${bgImgStyle}"
+                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${t.hiddenFromPlayers ? '0.48' : (canMove ? '1' : '0.94')}; ${ownerBorderStyle} ${bgImgStyle}"
                  onmousedown="startDragTabletopToken(event, '${t.id}')"
                  ondblclick="openSheetFromTabletopToken('${t.id}')"
                  title="${escapeHtmlText(t.name)} (Clique seleciona • 2º clique arrasta • Duplo-clique abre)">
                 ${ownerDotHtml}
                 ${lockBadgeHtml}
+                ${hiddenBadgeHtml}
                 <span class="tt-token-hp">${badgeText}</span>
                 ${t.imgSrc ? '' : `<span>${escapeHtmlText(initials)}</span>`}
                 <span class="tt-token-label">${isTurnActive ? '⚔️ ' : ''}${escapeHtmlText(t.name)}</span>
@@ -3109,8 +3619,7 @@ function renderTabletopModule() {
         `;
     }).join('');
 
-    const onlineCount = (window.onlinePlayersList && window.onlinePlayersList.length) ? window.onlinePlayersList.length : 1;
-    const maxP = window.onlineRoomConfig?.maxPlayers || 8;
+    const { maxP, onlineCount } = _resolveVttPresenceSummary();
     const initiativeHudHtml = typeof renderDynamicInitiativeTrackerHtml === 'function' ? renderDynamicInitiativeTrackerHtml() : '';
     const zoomPct = Math.round((window.tabletopCamera?.scale || 1) * 100);
 
@@ -3138,7 +3647,7 @@ function renderTabletopModule() {
             <div class="tabletop-toolbar">
                 <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;" id="tt-toolbar-tools-root">
                     ${isGm ? `<select class="form-control" style="width:auto; min-width:155px; padding:4px 8px;" onchange="onTabletopMapChange(this.value)">${mapOptions}</select>` : ''}
-                    <button type="button" class="btn-mini ${window.ttDrawerOpen ? 'is-active' : ''}" style="flex:0 0 auto; border-color:#d8b467;" onclick="toggleTokenDrawer()" title="Abrir gaveta scrollável de PJs, Monstros, NPCs, Itens, Ouro e Baús">📦 Gaveta (${tabletopState.tokens.length})</button>
+                    <button type="button" id="tt-btn-drawer-toggle" class="btn-mini ${window.ttDrawerOpen ? 'is-active' : ''}" style="flex:0 0 auto; border-color:#d8b467;" onclick="toggleTokenDrawer()" title="Abrir gaveta scrollável de PJs, Monstros, NPCs, Itens, Ouro e Baús">📦 Gaveta (${visibleTokens.length})</button>
                     <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="addActiveCharacterToTabletop()">🛡️ + Meu PJ</button>
 
                     <!-- Ferramentas Táticas de VTT -->
@@ -3164,14 +3673,14 @@ function renderTabletopModule() {
                     <button type="button" id="tt-btn-grid-toggle" class="btn-mini ${gmMetrics.enabled ? 'is-active' : ''}" ${isGm ? '' : 'disabled'} onclick="toggleTabletopGridEnabled()" title="${isGm ? 'Mestre: Ativar/Desativar exibição da Grade' : 'Apenas o Mestre pode desabilitar a grade'}">
                         ${gmMetrics.enabled ? `🕸️ Grade (${gmMetrics.gx}px)` : '🕸️ Grade OFF'}
                     </button>
-                    <label style="display:flex; align-items:center; gap:4px; font-size:11px; color:#c2c6d6; cursor:pointer;" title="Grudar tokens nos quadrados da grade ao soltar">
-                        <input type="checkbox" ${gmMetrics.snap ? 'checked' : ''} onchange="toggleTabletopSnap(this.checked)"> Snap
+                    <label style="display:flex; align-items:center; gap:4px; font-size:11px; color:#c2c6d6; cursor:${isGm ? 'pointer' : 'not-allowed'}; opacity:${isGm ? '1' : '0.55'};" title="${isGm ? 'Mestre: Grudar tokens nos quadrados da grade ao soltar' : 'Apenas o Mestre pode alterar o Snap da grade'}">
+                        <input type="checkbox" id="tt-snap-checkbox" ${gmMetrics.snap ? 'checked' : ''} ${isGm ? '' : 'disabled'} onchange="toggleTabletopSnap(this.checked)"> Snap
                     </label>
                     <button type="button" class="vis-pill ${window.tabletopCursorShareEnabled ? 'active-studied' : ''}" onclick="toggleTabletopCursorShare()" title="Mostrar sua mãozinha colorida no mapa para os outros jogadores">🖐️ Mãozinha</button>
                 </div>
                 <div id="tt-selection-bar-root">${buildSelectedControlBarHtml(isGm)}</div>
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                    <span style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px; cursor:pointer;" onclick="openMultiplayerRoomModal('room')" title="Jogadores sincronizados em tempo real">
+                    <span id="tt-online-count-badge" style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px; cursor:pointer;" onclick="openMultiplayerRoomModal('room')" title="Jogadores sincronizados em tempo real">
                         📡 ${onlineCount}/${maxP} Online | 👤 ${escapeHtmlText(playerShownName)}
                     </span>
                     ${isGm ? `<button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="clearAllTabletopTacticalOverlays()" title="Limpar Formas e Névoa">🧹 AoE/Névoa</button>` : ''}
@@ -3180,8 +3689,7 @@ function renderTabletopModule() {
             </div>
 
             ${calibrateBarHtml}
-            ${renderTokenDrawerPanelHtml(isGm)}
-            ${renderTabletopConnectedPlayersBarHtml()}
+            <div id="tt-connected-players-root">${renderTabletopConnectedPlayersBarHtml()}</div>
 
             <div class="tabletop-stage-shell">
                 <div class="tabletop-board-viewport" id="tabletop-viewport"
@@ -3202,6 +3710,7 @@ function renderTabletopModule() {
                         <div id="tt-remote-cursors-layer" class="tt-remote-cursors-layer"></div>
                     </div>
                 </div>
+                <div id="tt-token-drawer-root">${renderTokenDrawerPanelHtml(isGm)}</div>
                 <div class="tt-gmaps-nav-cluster" title="Controles de câmera (ou use o scroll do mouse e arraste o mapa)">
                     <button type="button" class="tt-gmaps-nav-btn" onclick="zoomTabletop(1.18)" title="Aproximar Zoom">＋</button>
                     <button type="button" id="tt-gmaps-zoom-pct" class="tt-gmaps-zoom-pill" onclick="zoomTabletop(1, true)" title="Resetar Zoom para 100%">${zoomPct}%</button>

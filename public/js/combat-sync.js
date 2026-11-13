@@ -556,23 +556,32 @@ function renderDynamicInitiativeTrackerHtml() {
     const roundNum = window.combatTurnState?.round || 1;
     const activeId = window.combatTurnState?.activeCardId;
     const isCollapsed = Boolean(window.ttInitiativeCollapsed);
-    const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : { id: 'gm-master', role: 'gm' };
-    const isGm = activePl?.role === 'gm';
+    const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+    const isGm = typeof isEffectiveGmUser === 'function'
+        ? isEffectiveGmUser(activePl)
+        : Boolean(activePl && !activePl.isUnauthenticated && activePl.role === 'gm' && window.isHostClient !== false);
+    const visibleCards = isGm
+        ? combatCards
+        : combatCards.filter(card => {
+            if (!card || !card.tokenId || typeof tabletopState === 'undefined' || !Array.isArray(tabletopState?.tokens)) return true;
+            const tok = tabletopState.tokens.find(t => String(t.id) === String(card.tokenId));
+            return !tok || !tok.hiddenFromPlayers;
+        });
 
     if (isCollapsed) {
-        const activeCard = combatCards.find(c => String(c.id) === String(activeId));
+        const activeCard = visibleCards.find(c => String(c.id) === String(activeId));
         return `
             <div class="tt-initiative-hud is-collapsed">
                 <button type="button" class="btn-mini" style="border-color:#d8b467; color:#f2cf83;" onclick="toggleTabletopInitiativeCollapsed()" title="Expandir Mostrador de Iniciativa">
-                    ⚡ Iniciativa • Rd ${roundNum} (${combatCards.length})${activeCard ? ` — ▶ ${escapeHtmlText(activeCard.name)}` : ''}
+                    ⚡ Iniciativa • Rd ${roundNum} (${visibleCards.length})${activeCard ? ` — ▶ ${escapeHtmlText(activeCard.name)}` : ''}
                 </button>
             </div>
         `;
     }
 
-    const rowsHtml = combatCards.length === 0
+    const rowsHtml = visibleCards.length === 0
         ? `<div class="tt-init-empty">Sem combatentes na fila. Use <strong>+PJ</strong> ou invoque tokens pela <strong>🔮 Runa</strong>.</div>`
-        : combatCards.map((card, index) => {
+        : visibleCards.map((card, index) => {
             const isCurrent = String(card.id) === String(activeId);
             const isDead = Number(card.hp) <= 0;
             const safeId = `'${String(card.id).replace(/'/g, "\\'")}'`;

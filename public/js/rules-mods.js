@@ -307,6 +307,7 @@ const CompendioRules = {
         if (typeof activeModule !== 'undefined') {
             if (activeModule === 'character' && typeof renderCharacterModule === 'function') renderCharacterModule();
             else if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
+            else if (activeModule === 'curio_rules' && typeof renderCurioRulesModule === 'function') renderCurioRulesModule(window._curioRulesTab || null);
             else if (typeof currentCategory !== 'undefined' && currentCategory === 'hitdice' && typeof renderHitDiceScreen === 'function') renderHitDiceScreen();
         }
     }

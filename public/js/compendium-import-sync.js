@@ -65,9 +65,17 @@
             .replace(/\b\w/g, c => c.toUpperCase()) || 'Sem Título';
     }
 
+    function _isImportEffectiveGm() {
+        if (typeof isEffectiveGmUser === 'function') return isEffectiveGmUser();
+        const p = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+        if (!p || p.isUnauthenticated || !p.id) return false;
+        if (window.isHostClient === false) return false;
+        return p.role === 'gm';
+    }
+
     function hasVisibleEntryInSubtree(cat, nodeObj) {
         if (!nodeObj || typeof nodeObj !== 'object') return false;
-        const isGm = typeof getActivePlayer === 'function' && getActivePlayer()?.role === 'gm';
+        const isGm = _isImportEffectiveGm();
         for (const [k, v] of Object.entries(nodeObj)) {
             if (!v) continue;
             if (v.children && typeof v.children === 'object') {
@@ -108,9 +116,15 @@
             }
             return;
         }
+        if (typeof activeModule !== 'undefined' && activeModule === 'curio_rules') {
+            if ((catalogChanged || knowledgeChanged) && typeof renderCurioRulesModule === 'function') {
+                renderCurioRulesModule(window._curioRulesTab || null);
+            }
+            return;
+        }
         if (typeof activeModule !== 'undefined' && activeModule !== 'compendium') return;
 
-        const isGm = typeof getActivePlayer === 'function' && getActivePlayer()?.role === 'gm';
+        const isGm = _isImportEffectiveGm();
         if (!isGm && currentCategory === 'session') {
             const mNav = document.querySelector('.sidebar .nav-item[data-cat="monsters"]');
             if (typeof navigateCategory === 'function') navigateCategory('monsters', mNav);
@@ -165,7 +179,7 @@
     };
 
     window.openFolderImportModal = function(initialTab) {
-        if (typeof getActivePlayer === 'function' && getActivePlayer()?.role !== 'gm') {
+        if (!_isImportEffectiveGm()) {
             if (typeof showToast === 'function') showToast('🔒 Apenas o Mestre pode importar pastas para o Compêndio.');
             return;
         }
