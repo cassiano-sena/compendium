@@ -12,9 +12,14 @@
 </head>
 <body onload="initCompendium()">
 
+    <button type="button" id="btn-expand-main-sidebar" class="sidebar-expand-fab" onclick="toggleMainSidebar(false)" title="Expandir barra lateral principal">▶ Menu</button>
+
     <!-- BARRA LATERAL (Módulos / Diretórios Principais) -->
     <aside class="sidebar">
-        <div class="sidebar-header">⚔️ Compêndio RPG</div>
+        <div class="sidebar-header">
+            <span>⚔️ Compêndio RPG</span>
+            <button type="button" class="sidebar-collapse-btn" onclick="toggleMainSidebar(true)" title="Retrair barra lateral principal">◀</button>
+        </div>
 
         <!-- Identidade Local do Jogador, Lobby Online & Streamer Mode -->
         <div class="identity-bar">
@@ -130,9 +135,10 @@
         <div class="item-list-sidebar">
             <div class="list-header">
                 <span id="dynamic-list-title">Lista</span>
-                <div style="display:flex; gap:4px;">
+                <div style="display:flex; gap:4px; align-items:center;">
                     <button class="btn-mini" id="btn-header-add" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="onHeaderAddClick()" title="Adicionar nesta seção">＋</button>
                     <button class="btn-mini danger" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="clearCurrentCategory()" title="Excluir registros desta seção">🗑️</button>
+                    <button class="btn-mini" id="btn-collapse-subsidebar" style="flex:0 0 auto; padding:2px 6px;" type="button" onclick="toggleSubSidebar(true)" title="Retrair apenas esta lista secundária">◀</button>
                 </div>
             </div>
             <div class="search-box-wrap">
@@ -143,6 +149,8 @@
                 <ul class="item-list" id="dynamic-item-list"></ul>
             </div>
         </div>
+
+        <button type="button" id="btn-expand-sub-sidebar" class="subsidebar-expand-tab" onclick="toggleSubSidebar(false)" title="Expandir lista lateral secundária">▶ Lista</button>
         
         <!-- Onde a Ficha (HTML Externo, JSON, Quests ou Dados de Vida) vai aparecer -->
         <div class="item-display-area" id="dynamic-display-area"></div>
@@ -152,6 +160,7 @@
     <div class="rune-dock-wrapper dock-collapsed" id="combat-dock">
         <div class="rune-popup-container">
             <div class="rune-popup-toolbar">
+                <button type="button" class="btn-mini" id="btn-combat-mode-toggle" style="flex:0 0 auto;" onclick="if(typeof toggleCombatIndividualMode==='function') toggleCombatIndividualMode()" title="Alternar entre modo Foco Individual e todos os cards">🎯 Individual</button>
                 <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(true)" title="Compactar todos os cards">🗕 Compactar</button>
                 <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(false)" title="Expandir todos os cards">🗖 Expandir</button>
                 <button type="button" class="btn-mini" style="flex:0 0 auto; background:#454857; border-color:#d8b467; color:#fff;" id="btn-advance-turn" onclick="nextCombatTurn()">⏭️ Avançar Turno</button>
@@ -584,6 +593,21 @@
         <div class="studio-modal" id="folder-scan-modal-content" style="max-width:860px; height:auto; max-height:88vh;"></div>
     </div>
 
+    <!-- MODAL DE BAÚ INTERATIVO NO TABLETOP -->
+    <div class="modal-backdrop" id="tt-chest-backdrop" onclick="if(event.target===this && typeof closeChestTokenModal==='function') closeChestTokenModal()">
+        <div class="studio-modal" id="tt-chest-modal-content" style="max-width:680px; height:auto; max-height:86vh;"></div>
+    </div>
+
+    <!-- MODAL DE TOKEN DE OURO NO TABLETOP -->
+    <div class="modal-backdrop" id="tt-gold-backdrop" onclick="if(event.target===this && typeof closeGoldTokenModal==='function') closeGoldTokenModal()">
+        <div class="studio-modal" id="tt-gold-modal-content" style="max-width:520px; height:auto; max-height:80vh;"></div>
+    </div>
+
+    <!-- MODAL DE MACROS DE ROLAGEM DE DADOS -->
+    <div class="modal-backdrop" id="dice-macro-backdrop" onclick="if(event.target===this && typeof CompendioDice!=='undefined') CompendioDice.closeDiceMacroModal()">
+        <div class="studio-modal" id="dice-macro-modal-content" style="max-width:820px; height:auto; max-height:88vh;"></div>
+    </div>
+
     <!-- TORRE DE DADOS FLUTUANTE & LOG COMPARTILHADO -->
     <div id="dice-tower-floating-root"></div>
 
@@ -994,9 +1018,21 @@
                         const msg = ev.data;
                         if (!msg || !msg.type) return;
                         if (msg.type === 'TABLETOP_SYNC' && msg.state) {
+                            const inter = window.ttActiveInteraction;
+                            const prevTokens = Array.isArray(tabletopState?.tokens) ? tabletopState.tokens : [];
+                            const prevShapes = Array.isArray(tabletopState?.aoeTemplates) ? tabletopState.aoeTemplates : [];
                             tabletopState = msg.state;
+                            if (inter?.type === 'token' && inter.id && Array.isArray(tabletopState.tokens)) {
+                                const mine = prevTokens.find(t => t.id === inter.id);
+                                const idx = tabletopState.tokens.findIndex(t => t.id === inter.id);
+                                if (mine && idx >= 0) tabletopState.tokens[idx] = mine;
+                            } else if (inter?.type === 'shape' && inter.id && Array.isArray(tabletopState.aoeTemplates)) {
+                                const mine = prevShapes.find(s => s.id === inter.id);
+                                const idx = tabletopState.aoeTemplates.findIndex(s => s.id === inter.id);
+                                if (mine && idx >= 0) tabletopState.aoeTemplates[idx] = mine;
+                            }
                             localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
-                            if (activeModule === 'tabletop') renderTabletopModule();
+                            if (activeModule === 'tabletop' && !inter) renderTabletopModule();
                         } else if (msg.type === 'CHARACTERS_SYNC' && Array.isArray(msg.characters)) {
                             charactersData = msg.characters;
                             localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(charactersData));
@@ -1123,7 +1159,33 @@
             }
         };
 
+        function toggleMainSidebar(force = null) {
+            const next = (force === null) ? !document.body.classList.contains('sidebar-collapsed') : Boolean(force);
+            document.body.classList.toggle('sidebar-collapsed', next);
+            try { localStorage.setItem('compendio_ui_sidebar_collapsed', next ? '1' : '0'); } catch (e) {}
+            return next;
+        }
+
+        function toggleSubSidebar(force = null) {
+            const next = (force === null) ? !document.body.classList.contains('subsidebar-collapsed') : Boolean(force);
+            document.body.classList.toggle('subsidebar-collapsed', next);
+            try { localStorage.setItem('compendio_ui_subsidebar_collapsed', next ? '1' : '0'); } catch (e) {}
+            return next;
+        }
+
+        function restoreSidebarLayoutState() {
+            try {
+                if (localStorage.getItem('compendio_ui_sidebar_collapsed') === '1') {
+                    document.body.classList.add('sidebar-collapsed');
+                }
+                if (localStorage.getItem('compendio_ui_subsidebar_collapsed') === '1') {
+                    document.body.classList.add('subsidebar-collapsed');
+                }
+            } catch (e) {}
+        }
+
         async function initCompendium() {
+            restoreSidebarLayoutState();
             if (typeof compendioData === 'undefined') {
                 window.compendioData = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
             }

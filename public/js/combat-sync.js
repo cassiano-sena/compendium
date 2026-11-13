@@ -389,9 +389,137 @@ function prevCombatTurn() {
     _commitTurnAdvance(aliveCards[currentIdx], false);
 }
 
+window.combatIndividualMode = typeof window.combatIndividualMode === 'boolean' ? window.combatIndividualMode : false;
+window.combatFocusedCardId = window.combatFocusedCardId || null;
+
+function toggleCombatIndividualMode(force = null) {
+    window.combatIndividualMode = (force === null) ? !window.combatIndividualMode : Boolean(force);
+    if (window.combatIndividualMode && (!window.combatFocusedCardId || !combatCards.some(c => String(c.id) === String(window.combatFocusedCardId)))) {
+        window.combatFocusedCardId = window.combatTurnState?.activeCardId || (combatCards[0]?.id || null);
+    }
+    renderCombatHand();
+}
+
+function selectCombatFocusedCard(cardId) {
+    window.combatFocusedCardId = cardId;
+    const card = combatCards.find(c => String(c.id) === String(cardId));
+    if (card && card.tokenId && typeof tabletopState !== 'undefined' && Array.isArray(tabletopState.tokens)) {
+        const tok = tabletopState.tokens.find(t => String(t.id) === String(card.tokenId));
+        if (tok) {
+            selectedTabletopTokenId = tok.id;
+            if (typeof activeModule !== 'undefined' && activeModule === 'tabletop' && typeof updateTabletopSelectionUI === 'function') {
+                updateTabletopSelectionUI();
+            }
+        }
+    }
+    renderCombatHand();
+}
+
+function stepFocusedCombatCard(dir = 1) {
+    if (!combatCards.length) return;
+    let idx = combatCards.findIndex(c => String(c.id) === String(window.combatFocusedCardId));
+    if (idx < 0) idx = 0;
+    const nextIdx = (idx + dir + combatCards.length) % combatCards.length;
+    selectCombatFocusedCard(combatCards[nextIdx].id);
+}
+
+function openCombatRuneForToken(tokenId) {
+    if (typeof tabletopState === 'undefined' || !Array.isArray(tabletopState.tokens)) return;
+    const tok = tabletopState.tokens.find(t => String(t.id) === String(tokenId));
+    if (!tok) return;
+
+    if (tok.type === 'gold' || tok.type === 'chest') {
+        if (typeof openInteractiveTokenModal === 'function') openInteractiveTokenModal(tok.id);
+        return;
+    }
+
+    const isPcTok = (tok.type === 'pc' || tok.type === 'character' || tok.category === 'character');
+    let card = combatCards.find(c =>
+        (c.tokenId && String(c.tokenId) === String(tok.id)) ||
+        (tok.cardId && String(c.id) === String(tok.cardId)) ||
+        (isPcTok && c.charId && String(c.charId) === String(tok.itemKey || tok.refId))
+    );
+
+    if (!card) {
+        let linkedChar = null;
+        if (isPcTok && typeof charactersData !== 'undefined') {
+            linkedChar = charactersData.find(ch => String(ch.id) === String(tok.refId || tok.itemKey));
+        }
+        const initMod = linkedChar ? Math.floor(((Number(linkedChar.dex) || 10) - 10) / 2) : (Number(tok.initMod) || 0);
+        const hpMax = Math.max(1, Number(tok.hpMax) || Number(linkedChar?.hpMax) || Number(tok.hpCurrent) || 20);
+        const hpCur = Math.max(0, Number(tok.hpCurrent ?? linkedChar?.hpCurrent ?? hpMax));
+        const cardId = 'card-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
+        card = {
+            id: cardId,
+            tokenId: tok.id,
+            charId: linkedChar ? linkedChar.id : (isPcTok ? (tok.refId || tok.itemKey) : null),
+            ownerId: tok.ownerId || linkedChar?.ownerId || 'gm-master',
+            baseName: tok.name || 'Combatente',
+            name: tok.name || 'Combatente',
+            hp: hpCur,
+            maxHp: hpMax,
+            ac: Number(tok.ac) || Number(linkedChar?.ac) || 12,
+            initiative: 0,
+            initMod,
+            isPc: isPcTok,
+            isElite: false,
+            collapsed: false,
+            calc: '',
+            effects: [],
+            sourceRef: (tok.category && tok.itemKey && tok.type !== 'character') ? {
+                category: tok.category,
+                groupKey: tok.groupKey || '',
+                itemKey: tok.itemKey
+            } : null
+        };
+        tok.cardId = cardId;
+        combatCards.push(card);
+        if (typeof saveLocalPersistence === 'function') saveLocalPersistence();
+        if (typeof CompendioNetAdapter !== 'undefined') {
+            if (CompendioNetAdapter.broadcastCombatPatch) CompendioNetAdapter.broadcastCombatPatch({ card });
+            if (CompendioNetAdapter.broadcastTokenDelta) CompendioNetAdapter.broadcastTokenDelta('upsert', tok);
+        }
+    }
+
+    dockCollapsed = false;
+    window.combatIndividualMode = true;
+    window.combatFocusedCardId = card.id;
+    renderCombatHand();
+}
+
+function jumpFromTokenToSheet(tokenId) {
+    if (typeof tabletopState === 'undefined' || !Array.isArray(tabletopState.tokens)) return;
+    const tok = tabletopState.tokens.find(t => String(t.id) === String(tokenId));
+    if (!tok) {
+        if (typeof showToast === 'function') showToast('Token não encontrado.');
+        return;
+    }
+    if (tok.type === 'gold' || tok.type === 'chest') {
+        if (typeof openInteractiveTokenModal === 'function') openInteractiveTokenModal(tok.id);
+        return;
+    }
+    const charId = (tok.type === 'pc' || tok.type === 'character' || tok.category === 'character') ? (tok.refId || tok.itemKey) : null;
+    if (charId && typeof charactersData !== 'undefined' && charactersData.some(c => String(c.id) === String(charId))) {
+        activeCharacterId = charId;
+        if (typeof switchMainModule === 'function') switchMainModule('character');
+        return;
+    }
+    if (tok.category && tok.itemKey && typeof jumpToCatalogEntity === 'function') {
+        jumpToCatalogEntity(tok.category, tok.groupKey || '', tok.itemKey);
+        return;
+    }
+    const linkedCard = combatCards.find(c => String(c.tokenId) === String(tok.id) || String(c.id) === String(tok.cardId));
+    if (linkedCard) {
+        jumpFromCardToMonsterSheet(linkedCard.id);
+        return;
+    }
+    if (typeof showToast === 'function') showToast('ℹ️ Este token não tem ficha vinculada.');
+}
+
 function focusCombatantTokenOnTabletop(cardId) {
     const card = combatCards.find(c => String(c.id) === String(cardId));
     if (!card || typeof tabletopState === 'undefined' || !Array.isArray(tabletopState.tokens)) return;
+    window.combatFocusedCardId = card.id;
 
     const tok = tabletopState.tokens.find(t =>
         (card.tokenId && String(t.id) === String(card.tokenId)) ||
@@ -403,26 +531,20 @@ function focusCombatantTokenOnTabletop(cardId) {
     }
 
     selectedTabletopTokenId = tok.id;
-    if (typeof activeModule !== 'undefined' && activeModule !== 'tabletop' && typeof switchMainModule === 'function') {
+    const needSwitch = (typeof activeModule !== 'undefined' && activeModule !== 'tabletop');
+    if (needSwitch && typeof switchMainModule === 'function') {
         switchMainModule('tabletop');
     } else if (typeof renderTabletopModule === 'function') {
         renderTabletopModule();
     }
 
     setTimeout(() => {
-        const scroller = document.getElementById('tabletop-scroll-container') || document.querySelector('.tabletop-viewport');
-        const tokEl = document.querySelector(`.tt-token[data-token-id="${tok.id}"]`);
-        if (tokEl && tokEl.scrollIntoView) {
-            tokEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        } else if (scroller) {
-            const zoom = Number(tabletopState.zoom) || 1;
-            scroller.scrollTo({
-                left: Math.max(0, (Number(tok.x) || 0) * zoom - scroller.clientWidth / 2),
-                top: Math.max(0, (Number(tok.y) || 0) * zoom - scroller.clientHeight / 2),
-                behavior: 'smooth'
-            });
+        if (typeof centerTabletopCameraOnWorld === 'function') {
+            const gs = Number(tabletopState.gridSize) || 50;
+            const span = (Number(tok.sizeSquares) || 1) * gs;
+            centerTabletopCameraOnWorld((Number(tok.x) || 0) + span / 2, (Number(tok.y) || 0) + span / 2);
         }
-    }, 60);
+    }, needSwitch ? 80 : 20);
 }
 
 function toggleTabletopInitiativeCollapsed() {
@@ -436,9 +558,6 @@ function renderDynamicInitiativeTrackerHtml() {
     const isCollapsed = Boolean(window.ttInitiativeCollapsed);
     const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : { id: 'gm-master', role: 'gm' };
     const isGm = activePl?.role === 'gm';
-    const gmIds = new Set((typeof playersData !== 'undefined' && Array.isArray(playersData))
-        ? playersData.filter(p => p.role === 'gm').map(p => p.id)
-        : ['gm-master']);
 
     if (isCollapsed) {
         const activeCard = combatCards.find(c => String(c.id) === String(activeId));
@@ -452,13 +571,12 @@ function renderDynamicInitiativeTrackerHtml() {
     }
 
     const rowsHtml = combatCards.length === 0
-        ? `<div class="tt-init-empty">Sem combatentes na fila. Use <strong>🛡️ + PJs</strong> ou invoque monstros.</div>`
+        ? `<div class="tt-init-empty">Sem combatentes na fila. Use <strong>+PJ</strong> ou invoque tokens pela <strong>🔮 Runa</strong>.</div>`
         : combatCards.map((card, index) => {
             const isCurrent = String(card.id) === String(activeId);
             const isDead = Number(card.hp) <= 0;
             const safeId = `'${String(card.id).replace(/'/g, "\\'")}'`;
 
-            // Cor indicativa: do jogador dono para PJs ou vermelho para inimigos
             let ownerId = card.ownerId || null;
             if (!ownerId && card.charId && typeof charactersData !== 'undefined') {
                 ownerId = charactersData.find(ch => ch.id === card.charId)?.ownerId || null;
@@ -479,7 +597,7 @@ function renderDynamicInitiativeTrackerHtml() {
             ).join('');
 
             return `
-                <div class="tt-init-row ${isCurrent ? 'is-active-turn' : ''} ${isDead ? 'is-down' : ''}" onclick="focusCombatantTokenOnTabletop(${safeId})" title="Clique para centralizar no Token deste combatente">
+                <div class="tt-init-row ${isCurrent ? 'is-active-turn' : ''} ${isDead ? 'is-down' : ''}" onclick="focusCombatantTokenOnTabletop(${safeId})" title="Clique para centralizar a câmera no Token deste combatente">
                     <div class="tt-init-order">
                         ${isCurrent ? '<span class="tt-init-arrow">▶</span>' : `<span style="opacity:0.6;">#${index + 1}</span>`}
                     </div>
@@ -494,9 +612,8 @@ function renderDynamicInitiativeTrackerHtml() {
                         </div>
                         ${effTags ? `<div class="tt-init-conds">${effTags}</div>` : ''}
                     </div>
-                    <div class="tt-init-score" onclick="event.stopPropagation()">
-                        <input type="number" class="tt-init-val-input" value="${card.initiative || 0}" title="Editar iniciativa manualmente" onchange="setCardInitiativeManual(${safeId}, this.value)">
-                        <button type="button" class="card-mini-btn" style="padding:1px 4px;" onclick="rollInitiativeForCard(${safeId}, event)" title="Rolar 1d20 + Iniciativa">🎲</button>
+                    <div class="tt-init-score" onclick="event.stopPropagation(); dockCollapsed=false; window.combatIndividualMode=true; selectCombatFocusedCard(${safeId});" title="Abrir este combatente na Runa de Combate">
+                        <span class="tt-init-val-pill">${Number(card.initiative) || 0}</span>
                     </div>
                 </div>
             `;
@@ -512,7 +629,7 @@ function renderDynamicInitiativeTrackerHtml() {
                 <div style="display:flex; gap:3px; align-items:center;">
                     <button type="button" class="card-mini-btn" onclick="prevCombatTurn()" title="Turno Anterior">⏮️</button>
                     <button type="button" class="card-mini-btn" style="background:#54421d; color:#f6d98e;" onclick="nextCombatTurn()" title="Avançar Turno">⏭️</button>
-                    <button type="button" class="card-mini-btn" onclick="rollAllCombatInitiatives()" title="Rolar todas iniciativas e ordenar">🎲</button>
+                    <button type="button" class="card-mini-btn" onclick="dockCollapsed=false; renderCombatHand();" title="Abrir Runa de Combate (iniciativas e fichas)">🔮</button>
                     <button type="button" class="card-mini-btn" onclick="addPartyCharactersToCombatHand()" title="Adicionar Personagens do Grupo">+PJ</button>
                     <button type="button" class="card-mini-btn" onclick="toggleTabletopInitiativeCollapsed()" title="Recolher Mostrador">🗕</button>
                 </div>
@@ -543,42 +660,76 @@ function renderCombatHand() {
     countSpan.textContent = combatCards.length;
     dock.classList.toggle('dock-collapsed', dockCollapsed);
 
-    // Atualiza barra de ferramentas da Runa se ainda não tiver os botões novos
+    // Atualiza barra de ferramentas da Runa
     const toolbar = dock.querySelector('.rune-popup-toolbar');
     if (toolbar) {
         const roundNum = window.combatTurnState?.round || 1;
         toolbar.innerHTML = `
             <span class="list-item-folder-badge" style="background:#3d2d14; color:#f2cf83; border:1px solid #d8b467;">🔥 Rodada ${roundNum}</span>
+            <button type="button" class="btn-mini ${window.combatIndividualMode ? 'is-active' : ''}" id="btn-combat-mode-toggle" style="flex:0 0 auto;" onclick="toggleCombatIndividualMode()" title="Alternar entre Foco Individual (1 combatente ampliado) e todos os Cards">
+                ${window.combatIndividualMode ? '🎯 Individual (ON)' : '🗂️ Todos'}
+            </button>
             <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="addPartyCharactersToCombatHand()" title="Adicionar Personagens dos Jogadores à fila de Iniciativa">🛡️ + PJs</button>
             <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="rollAllCombatInitiatives()" title="Rolar 1d20 + Mod de Iniciativa para todos e ordenar a fila">🎲 Rolar Iniciativas</button>
             <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="prevCombatTurn()" title="Voltar para o Turno Anterior">⏮️ Anterior</button>
             <button type="button" class="btn-mini" style="flex:0 0 auto; background:#454857; border-color:#d8b467; color:#fff;" id="btn-advance-turn" onclick="nextCombatTurn()">⏭️ Avançar Turno</button>
-            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(true)" title="Compactar todos os cards">🗕</button>
-            <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(false)" title="Expandir todos os cards">🗖</button>
+            ${!window.combatIndividualMode ? `
+                <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(true)" title="Compactar todos os cards">🗕</button>
+                <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="setAllCardsCollapsed(false)" title="Expandir todos os cards">🗖</button>
+            ` : `
+                <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="stepFocusedCombatCard(-1)" title="Combatente anterior">◀ Ant.</button>
+                <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="stepFocusedCombatCard(1)" title="Próximo combatente">Próx. ▶</button>
+            `}
             <button type="button" class="btn-mini danger" style="flex:0 0 auto;" onclick="clearAllCombatCards()">🗑️</button>
             <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="toggleCombatDock()" title="Recolher para a Pedra Rúnica">▼</button>
         `;
     }
 
     if (combatCards.length === 0) {
-        hand.innerHTML = `<div style="color:#a0a4b8; font-size:12px; font-style:italic; padding:6px 12px;">Nenhum card ativo. Clique em "⚔️ Invocar Card" no topo da ficha de um monstro ou em "🛡️ + PJs" acima.</div>`;
+        hand.innerHTML = `<div style="color:#a0a4b8; font-size:12px; font-style:italic; padding:6px 12px;">Nenhum card ativo. Clique em "⚔️ Invocar Card" no topo da ficha de um monstro, "🛡️ + PJs" acima ou selecione um Token no Tabletop → "🔮 Runa".</div>`;
         refreshTabletopInitiativeWidget();
         return;
     }
+
+    if (!window.combatFocusedCardId || !combatCards.some(c => String(c.id) === String(window.combatFocusedCardId))) {
+        window.combatFocusedCardId = window.combatTurnState?.activeCardId || combatCards[0].id;
+    }
+
+    const selectorStripHtml = `
+        <div class="rune-individual-selector">
+            ${combatCards.map(c => {
+                const isFocus = String(c.id) === String(window.combatFocusedCardId);
+                const isTurn = String(window.combatTurnState?.activeCardId) === String(c.id);
+                const isDown = Number(c.hp) <= 0;
+                const sId = `'${String(c.id).replace(/'/g, "\\'")}'`;
+                return `
+                    <button type="button" class="rune-selector-pill ${isFocus ? 'active-focus' : ''} ${isTurn ? 'is-turn' : ''} ${isDown ? 'is-dead' : ''}" onclick="selectCombatFocusedCard(${sId})" title="Selecionar ${escapeHtmlText(c.name)} (${c.hp}/${c.maxHp} PV • Init ${c.initiative || 0})">
+                        ${isTurn ? '⚔️' : ''} ${escapeHtmlText(c.name)} · <span style="opacity:0.85;">${c.hp}/${c.maxHp}</span>
+                    </button>
+                `;
+            }).join('')}
+        </div>
+    `;
 
     const allConds = (typeof CompendioRules !== 'undefined')
         ? CompendioRules.getAllConditions()
         : ['Cego', 'Envenenado', 'Paralisado', 'Caído', 'Impedido', 'Concentração'];
     const effectOptions = allConds.map(c => `<option value="${escapeHtmlText(c)}">${escapeHtmlText(c)}</option>`).join('') + `<option value="Custom">+ Custom...</option>`;
 
-    hand.innerHTML = combatCards.map(mob => {
+    const cardsToRender = window.combatIndividualMode
+        ? [combatCards.find(c => String(c.id) === String(window.combatFocusedCardId)) || combatCards[0]]
+        : combatCards;
+
+    const cardsHtml = cardsToRender.map(mob => {
         if (!mob.effects) mob.effects = [];
         const isDead = mob.hp <= 0;
         const isBloodied = !isDead && mob.maxHp > 1 && mob.hp <= Math.floor(mob.maxHp / 2);
         const isCurrentTurn = String(window.combatTurnState?.activeCardId) === String(mob.id);
+        const isFocused = String(mob.id) === String(window.combatFocusedCardId);
         const stateClass = isDead ? 'dead' : (isBloodied ? 'bloodied' : '');
-        const collapseClass = mob.collapsed ? 'card-collapsed' : '';
+        const collapseClass = (!window.combatIndividualMode && mob.collapsed) ? 'card-collapsed' : '';
         const turnClass = isCurrentTurn ? 'active-turn-card' : '';
+        const focusClass = window.combatIndividualMode && isFocused ? 'focused-card' : '';
         const safeId = `'${String(mob.id).replace(/'/g, "\\'")}'`;
 
         const effectsHtml = mob.effects.map((eff, index) =>
@@ -586,11 +737,12 @@ function renderCombatHand() {
         ).join('');
 
         return `
-            <div class="playing-card ${stateClass} ${collapseClass} ${turnClass}">
-                <div class="card-header-bar" onclick="toggleCardCollapse(${safeId}, event)" title="Clique para retrair ou expandir este card">
-                    <span class="card-mob-name" title="${escapeHtmlText(mob.name)}">${isCurrentTurn ? '⚔️ ' : (mob.collapsed ? '▶ ' : '▼ ')}${escapeHtmlText(mob.name)}</span>
+            <div class="playing-card ${stateClass} ${collapseClass} ${turnClass} ${focusClass}">
+                <div class="card-header-bar" onclick="${window.combatIndividualMode ? `focusCombatantTokenOnTabletop(${safeId})` : `toggleCardCollapse(${safeId}, event)`}" title="${window.combatIndividualMode ? 'Clique para focar token no Tabletop' : 'Clique para retrair ou expandir este card'}">
+                    <span class="card-mob-name" title="${escapeHtmlText(mob.name)}">${isCurrentTurn ? '⚔️ ' : (mob.collapsed && !window.combatIndividualMode ? '▶ ' : '▼ ')}${escapeHtmlText(mob.name)}</span>
                     <div class="card-header-btns">
                         ${!mob.isPc ? `<button type="button" class="card-mini-btn" style="${mob.isElite ? 'background:#6b201b; color:#ffd584;' : ''}" onclick="toggleCardEliteMode(${safeId}, event)" title="Alternar Template Elite (+50% PV, +2 CA)">👑</button>` : ''}
+                        <button type="button" class="card-mini-btn" onclick="event.stopPropagation(); focusCombatantTokenOnTabletop(${safeId})" title="Centralizar no Token do Tabletop">📍</button>
                         <button type="button" class="card-mini-btn" onclick="jumpFromCardToMonsterSheet(${safeId}, event)" title="Abrir a Ficha deste combatente">📖</button>
                         <button type="button" class="card-mini-btn" style="color:#ff8a80;" onclick="removeCombatCard(${safeId}, event)" title="Descartar Card">✕</button>
                     </div>
@@ -650,6 +802,8 @@ function renderCombatHand() {
         `;
     }).join('');
 
+    hand.innerHTML = `<div style="display:flex; flex-direction:column; width:100%;">${selectorStripHtml}<div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;">${cardsHtml}</div></div>`;
+
     refreshTabletopInitiativeWidget();
 }
 
@@ -663,12 +817,19 @@ function jumpFromCardToMonsterSheet(cardId, event) {
         switchMainModule('character');
         return;
     }
-    if (!card.sourceRef) {
-        showToast('Ficha vinculada não encontrada.');
+    if (card.sourceRef && card.sourceRef.itemKey) {
+        const { category, groupKey, itemKey } = card.sourceRef;
+        jumpToCatalogEntity(category, groupKey, itemKey);
         return;
     }
-    const { category, groupKey, itemKey } = card.sourceRef;
-    jumpToCatalogEntity(category, groupKey, itemKey);
+    if (card.tokenId && typeof tabletopState !== 'undefined' && Array.isArray(tabletopState.tokens)) {
+        const tok = tabletopState.tokens.find(t => String(t.id) === String(card.tokenId));
+        if (tok && tok.category && tok.itemKey) {
+            jumpToCatalogEntity(tok.category, tok.groupKey || '', tok.itemKey);
+            return;
+        }
+    }
+    showToast('Ficha vinculada não encontrada.');
 }
 
 function toggleCardCollapse(cardId, event) {

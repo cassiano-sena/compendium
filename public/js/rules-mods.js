@@ -123,6 +123,9 @@ const CompendioRules = {
             console.warn('Erro ao carregar regras/mods locais:', e);
         }
         this.discoverServerMods();
+        if (typeof CompendioModAPI !== 'undefined' && CompendioModAPI.rebuildActiveModHooks) {
+            CompendioModAPI.rebuildActiveModHooks();
+        }
         this.updateRulesSidebarBadge();
     },
 
@@ -140,20 +143,39 @@ const CompendioRules = {
     getEffectiveRules() {
         const eff = JSON.parse(JSON.stringify(window.activeRulesConfig || RULESET_PRESETS.dnd2024));
         if (!Array.isArray(eff.extraConditions)) eff.extraConditions = [];
+        if (!Array.isArray(eff.diceMacros)) eff.diceMacros = [];
         for (const mod of window.installedMods) {
-            if (!mod || !mod.enabled || !mod.rulesPatch) continue;
-            const p = mod.rulesPatch;
+            if (!mod || !mod.enabled) continue;
+            const p = mod.rulesPatch || {};
             for (const [k, v] of Object.entries(p)) {
                 if (k === 'extraConditions' && Array.isArray(v)) {
                     v.forEach(c => {
                         if (!eff.extraConditions.includes(c)) eff.extraConditions.push(c);
                     });
+                } else if (k === 'baseConditions' && Array.isArray(v)) {
+                    eff.baseConditions = [...v];
+                } else if (k === 'attributeSchema' && Array.isArray(v)) {
+                    eff.attributeSchema = JSON.parse(JSON.stringify(v));
+                } else if (k === 'diceMacros' && Array.isArray(v)) {
+                    v.forEach(m => {
+                        if (m && m.name) eff.diceMacros.push(Object.assign({}, m, { fromMod: mod.name }));
+                    });
                 } else if (v !== undefined) {
                     eff[k] = v;
                 }
             }
+            if (Array.isArray(mod.diceMacros)) {
+                mod.diceMacros.forEach(m => {
+                    if (m && m.name) eff.diceMacros.push(Object.assign({}, m, { fromMod: mod.name }));
+                });
+            }
         }
         return eff;
+    },
+
+    getActiveModMacros() {
+        const eff = this.getEffectiveRules();
+        return Array.isArray(eff.diceMacros) ? eff.diceMacros : [];
     },
 
     applyPreset(presetKey) {
@@ -255,8 +277,14 @@ const CompendioRules = {
                             sourcePath: m.path
                         }, m.manifest));
                         changed = true;
+                    } else if (exists.sourcePath && exists.sourcePath === m.path && !exists.userEdited) {
+                        const wasEnabled = Boolean(exists.enabled);
+                        Object.assign(exists, m.manifest, { enabled: wasEnabled, sourcePath: m.path });
                     }
                 }
+            }
+            if (typeof CompendioModAPI !== 'undefined' && CompendioModAPI.rebuildActiveModHooks) {
+                CompendioModAPI.rebuildActiveModHooks();
             }
             if (changed) this.save();
         } catch (e) {}
@@ -273,6 +301,9 @@ const CompendioRules = {
     refreshAllScreens() {
         this.updateRulesSidebarBadge();
         if (typeof renderCombatHand === 'function') renderCombatHand();
+        if (typeof CompendioDice !== 'undefined' && typeof CompendioDice.renderWidget === 'function') {
+            CompendioDice.renderWidget();
+        }
         if (typeof activeModule !== 'undefined') {
             if (activeModule === 'character' && typeof renderCharacterModule === 'function') renderCharacterModule();
             else if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
@@ -294,31 +325,98 @@ window.CompendioModAPI = {
         onApplyDamage: [],
         onTurnAdvance: []
     },
+    _activeLoadingModId: null,
 
-    registerHook(hookName, callback) {
+    registerHook(hookName, callback, explicitModId = null) {
         if (!this.hooks[hookName]) this.hooks[hookName] = [];
         if (typeof callback === 'function') {
-            this.hooks[hookName].push(callback);
+            this.hooks[hookName].push({
+                fn: callback,
+                modId: explicitModId || this._activeLoadingModId || 'global'
+            });
         }
+    },
+
+    unregisterModHooks(modId) {
+        if (!modId) return;
+        for (const hookName of Object.keys(this.hooks)) {
+            this.hooks[hookName] = (this.hooks[hookName] || []).filter(entry => {
+                if (typeof entry === 'function') return true;
+                return entry && entry.modId !== modId;
+            });
+        }
+    },
+
+    clearAllModHooks() {
+        for (const hookName of Object.keys(this.hooks)) {
+            this.hooks[hookName] = (this.hooks[hookName] || []).filter(entry => {
+                if (typeof entry === 'function') return true;
+                return entry && entry.modId === 'global';
+            });
+        }
+    },
+
+    rebuildActiveModHooks() {
+        this.clearAllModHooks();
+        for (const mod of (window.installedMods || [])) {
+            if (!mod) continue;
+            mod.lastError = null;
+            if (!mod.enabled) continue;
+            if (Array.isArray(mod.customResources) && typeof charactersData !== 'undefined') {
+                this.syncModResourcesToCharacters(mod);
+            }
+            if (mod.scriptCode) {
+                this.executeModScript(mod);
+            }
+        }
+    },
+
+    syncModResourcesToCharacters(mod) {
+        if (!mod || !Array.isArray(mod.customResources) || typeof charactersData === 'undefined') return;
+        let touched = false;
+        charactersData.forEach(c => {
+            if (!Array.isArray(c.customResources)) c.customResources = [];
+            mod.customResources.forEach(cr => {
+                if (cr && cr.name && !c.customResources.some(x => x.name === cr.name)) {
+                    c.customResources.push({
+                        id: 'res-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                        name: cr.name,
+                        current: cr.max || 1,
+                        max: cr.max || 1,
+                        recharge: cr.recharge || 'long'
+                    });
+                    touched = true;
+                }
+            });
+        });
+        if (touched && typeof saveLocalPersistence === 'function') saveLocalPersistence();
     },
 
     runHooks(hookName, payload) {
         const list = this.hooks[hookName] || [];
         let current = payload;
-        for (const fn of list) {
+        const effRules = CompendioRules.getEffectiveRules();
+        for (const entry of list) {
+            const fn = typeof entry === 'function' ? entry : entry?.fn;
+            const modId = typeof entry === 'object' ? entry?.modId : null;
+            if (typeof fn !== 'function') continue;
             try {
-                const res = fn(current, CompendioRules.getEffectiveRules());
+                const res = fn(current, effRules);
                 if (res !== undefined) current = res;
             } catch (e) {
                 console.warn(`Erro no hook ${hookName}:`, e);
+                if (modId && modId !== 'global') {
+                    const m = (window.installedMods || []).find(x => x.id === modId);
+                    if (m) m.lastError = `[${hookName}] ${e.message}`;
+                }
             }
         }
         return current;
     },
 
     installMod(modObject, enableImmediately = true) {
-        if (!modObject || typeof modObject !== 'object') {
-            throw new Error('O Mod precisa ser um objeto JSON válido.');
+        if (!modObject || typeof modObject !== 'object' || Array.isArray(modObject)) {
+            throw new Error('O Mod precisa ser um objeto JSON válido com "id" ou "name".');
         }
         const id = modObject.id || ('mod-' + Date.now().toString(36));
         const existingIdx = window.installedMods.findIndex(m => m.id === id);
@@ -328,11 +426,14 @@ window.CompendioModAPI = {
             version: modObject.version || '1.0.0',
             author: modObject.author || 'Comunidade',
             description: modObject.description || '',
-            enabled: enableImmediately,
             rulesPatch: modObject.rulesPatch || {},
             customResources: modObject.customResources || [],
-            scriptCode: modObject.scriptCode || ''
+            diceMacros: modObject.diceMacros || [],
+            scriptCode: modObject.scriptCode || '',
+            lastError: null
         }, modObject);
+        normalized.id = id;
+        normalized.enabled = Boolean(enableImmediately);
 
         if (existingIdx >= 0) {
             window.installedMods[existingIdx] = normalized;
@@ -340,22 +441,37 @@ window.CompendioModAPI = {
             window.installedMods.push(normalized);
         }
 
-        if (normalized.enabled && normalized.scriptCode) {
-            this.executeModScript(normalized);
-        }
-
+        this.rebuildActiveModHooks();
         CompendioRules.save();
         CompendioRules.refreshAllScreens();
         return normalized;
     },
 
+    installModInput(parsedInput, enableImmediately = true) {
+        if (Array.isArray(parsedInput)) {
+            if (parsedInput.length === 0) throw new Error('Lista de mods vazia.');
+            return parsedInput.map(m => this.installMod(m, enableImmediately));
+        }
+        if (parsedInput && Array.isArray(parsedInput.mods)) {
+            if (parsedInput.mods.length === 0) throw new Error('Pacote sem nenhum mod em "mods".');
+            return parsedInput.mods.map(m => this.installMod(m, enableImmediately));
+        }
+        return [this.installMod(parsedInput, enableImmediately)];
+    },
+
     executeModScript(mod) {
         if (!mod || !mod.scriptCode) return;
+        const prevLoadingId = this._activeLoadingModId;
+        this._activeLoadingModId = mod.id;
+        mod.lastError = null;
         try {
             const fn = new Function('CompendioModAPI', 'CompendioRules', mod.scriptCode);
             fn(window.CompendioModAPI, CompendioRules);
         } catch (err) {
+            mod.lastError = err.message || String(err);
             console.warn(`Erro ao executar script do Mod "${mod.name}":`, err);
+        } finally {
+            this._activeLoadingModId = prevLoadingId;
         }
     },
 
@@ -363,27 +479,7 @@ window.CompendioModAPI = {
         const mod = window.installedMods.find(m => m.id === modId);
         if (!mod) return;
         mod.enabled = Boolean(enabled);
-        if (mod.enabled && mod.scriptCode) {
-            this.executeModScript(mod);
-        }
-        // Se o mod possui customResources e foi ativado, adiciona aos personagens que ainda não têm
-        if (mod.enabled && Array.isArray(mod.customResources) && typeof charactersData !== 'undefined') {
-            charactersData.forEach(c => {
-                if (!Array.isArray(c.customResources)) c.customResources = [];
-                mod.customResources.forEach(cr => {
-                    if (!c.customResources.some(x => x.name === cr.name)) {
-                        c.customResources.push({
-                            id: 'res-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
-                            name: cr.name,
-                            current: cr.max || 1,
-                            max: cr.max || 1,
-                            recharge: cr.recharge || 'long'
-                        });
-                    }
-                });
-            });
-            if (typeof saveLocalPersistence === 'function') saveLocalPersistence();
-        }
+        this.rebuildActiveModHooks();
         CompendioRules.save();
         CompendioRules.refreshAllScreens();
         renderRulesAndModsModalBody();
@@ -391,6 +487,8 @@ window.CompendioModAPI = {
 
     removeMod(modId) {
         window.installedMods = window.installedMods.filter(m => m.id !== modId);
+        this.unregisterModHooks(modId);
+        this.rebuildActiveModHooks();
         CompendioRules.save();
         CompendioRules.refreshAllScreens();
         renderRulesAndModsModalBody();
@@ -598,27 +696,39 @@ function renderRulesAndModsModalBody() {
     // ABA DE MODS
     const modsListHtml = window.installedMods.map(m => {
         const safeId = escapeHtmlText(m.id);
+        const badges = [];
+        if (m.scriptCode) badges.push('⚡ Script JS');
+        if (m.rulesPatch?.attributeSchema) badges.push('📋 Atributos Custom');
+        if (m.rulesPatch?.defaultDiceFormula) badges.push(`🎲 ${escapeHtmlText(m.rulesPatch.defaultDiceFormula)}`);
+        if (Array.isArray(m.customResources) && m.customResources.length) badges.push(`🔋 ${m.customResources.length} Recurso(s)`);
+        if ((Array.isArray(m.diceMacros) && m.diceMacros.length) || (Array.isArray(m.rulesPatch?.diceMacros) && m.rulesPatch.diceMacros.length)) badges.push('⚡ Macros');
+        const badgesHtml = badges.map(b => `<span class="list-item-folder-badge" style="background:rgba(216,180,103,0.14); color:#f2cf83;">${b}</span>`).join('');
+        const errHtml = m.lastError ? `<div style="margin-top:6px; font-size:11.5px; color:#ff9e9e; background:rgba(166,40,40,0.22); border:1px solid #a62828; border-radius:4px; padding:4px 8px;">⚠️ Erro no script/hook: ${escapeHtmlText(m.lastError)}</div>` : '';
+
         return `
-            <div class="form-section" style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-color:${m.enabled ? '#d8b467' : '#3c3e4a'};">
+            <div class="form-section" style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; border-color:${m.lastError ? '#c94040' : (m.enabled ? '#d8b467' : '#3c3e4a')};">
                 <div style="flex:1;">
                     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                         <strong style="font-size:14px; color:${m.enabled ? '#f2cf83' : '#e2e4ec'};">${escapeHtmlText(m.name)}</strong>
                         <span class="list-item-folder-badge">v${escapeHtmlText(m.version || '1.0')}</span>
                         <span style="font-size:11px; color:#9da2b8;">por ${escapeHtmlText(m.author || 'Comunidade')}</span>
+                        ${badgesHtml}
                     </div>
                     <p style="margin:5px 0 0 0; font-size:12px; color:#c2c6d6;">${escapeHtmlText(m.description || 'Sem descrição.')}</p>
+                    ${errHtml}
                 </div>
-                <div style="display:flex; gap:8px; align-items:center;">
+                <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                     <label style="display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:bold; color:${m.enabled ? '#8df596' : '#a0a4b8'};">
                         <input type="checkbox" ${m.enabled ? 'checked' : ''} onchange="CompendioModAPI.toggleMod('${safeId}', this.checked)">
                         ${m.enabled ? 'ATIVO' : 'Inativo'}
                     </label>
+                    <button type="button" class="btn-mini" onclick="editInstalledMod('${safeId}')" title="Editar JSON / Script deste Mod">✏️</button>
                     <button type="button" class="btn-mini" onclick="exportSingleModJson('${safeId}')" title="Exportar Mod .json">📤</button>
                     <button type="button" class="btn-mini danger" onclick="CompendioModAPI.removeMod('${safeId}')" title="Remover Mod">✕</button>
                 </div>
             </div>
         `;
-    }).join('') || `<div class="info-container"><p class="info-text">Nenhum Mod instalado ainda. Importe um arquivo <code>.json</code> abaixo ou crie seu próprio Mod!</p></div>`;
+    }).join('') || `<div class="info-container"><p class="info-text">Nenhum Mod instalado ainda. Importe um arquivo <code>.json</code> / <code>.js</code> abaixo ou crie seu próprio Mod!</p></div>`;
 
     container.innerHTML = `
         <div class="studio-header">
@@ -632,7 +742,8 @@ function renderRulesAndModsModalBody() {
                 <button type="button" class="btn-save-primary" onclick="switchRulesModalTab('mods')">🧩 Mods & Pacotes (${window.installedMods.filter(m => m.enabled).length}/${window.installedMods.length})</button>
                 <button type="button" class="btn-action-bar" onclick="switchRulesModalTab('legal')">🛡️ Privacidade & Licenças</button>
             </div>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn-mini" onclick="loadFateStarterModTemplate()" title="Carrega modelo declarativo completo de outro sistema (Fate 4dF)">🧩 Modelo Fate (4dF)</button>
                 <button type="button" class="btn-mini" onclick="document.getElementById('mod-file-upload-input').click()">📂 Importar Mod (.JSON / .JS)</button>
                 <input type="file" id="mod-file-upload-input" accept=".json,.js" style="display:none" onchange="handleModFileUpload(event)">
             </div>
@@ -641,14 +752,15 @@ function renderRulesAndModsModalBody() {
         ${modsListHtml}
 
         <div class="form-section">
-            <h3 class="form-section-title">➕ Criar ou Colar Novo Mod (JSON / Script Hook)</h3>
+            <h3 class="form-section-title" id="mod-editor-heading">➕ Criar, Editar ou Colar Mod (JSON / Sistema Alternativo / Script Hook)</h3>
+            <input type="hidden" id="editing-mod-id" value="">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Nome do Mod</label>
+                    <label>Nome do Mod (criação rápida)</label>
                     <input type="text" id="new-mod-name" class="form-control" placeholder="Ex: Regras de Sanidade de Baróvia">
                 </div>
                 <div class="form-group">
-                    <label>Recurso Extra p/ Ficha de Personagem (Opcional)</label>
+                    <label>Recurso Extra p/ Ficha (Opcional)</label>
                     <input type="text" id="new-mod-resource" class="form-control" placeholder="Ex: Pontos de Sanidade (Máx 10)">
                 </div>
                 <div class="form-group full">
@@ -656,12 +768,13 @@ function renderRulesAndModsModalBody() {
                     <input type="text" id="new-mod-desc" class="form-control" placeholder="Ex: Adiciona contador de Sanidade nas fichas e condição Enlouquecido">
                 </div>
                 <div class="form-group full">
-                    <label>Ou cole um Manifesto JSON completo de Mod (opcional):</label>
-                    <textarea id="new-mod-json-raw" class="form-control code-area" style="min-height:95px;" placeholder='{"id":"meu-mod","name":"Meu Mod","rulesPatch":{"critRule":"max-plus-roll","extraConditions":["Congelado"]}}'></textarea>
+                    <label>Manifesto JSON completo do Mod (suporta <code>attributeSchema</code>, <code>defaultDiceFormula</code>, <code>baseConditions</code>, <code>diceMacros</code>, <code>scriptCode</code>):</label>
+                    <textarea id="new-mod-json-raw" class="form-control code-area" style="min-height:135px; font-family:monospace; font-size:12px;" placeholder='{"id":"meu-mod","name":"Meu Mod","rulesPatch":{"critRule":"max-plus-roll","extraConditions":["Congelado"]}}'></textarea>
                 </div>
             </div>
-            <div style="margin-top:10px; display:flex; justify-content:flex-end;">
-                <button type="button" class="btn-save-primary" onclick="createOrImportModFromModal()">🧩 Instalar e Ativar Mod</button>
+            <div style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" class="btn-mini" onclick="clearModEditorForm()">Limpar Editor</button>
+                <button type="button" class="btn-save-primary" onclick="createOrImportModFromModal()">🧩 Salvar / Instalar e Ativar Mod</button>
             </div>
         </div>
         </div>
@@ -678,13 +791,86 @@ function updateSingleRuleField(field, value) {
     renderRulesAndModsModalBody();
 }
 
+function editInstalledMod(modId) {
+    const mod = window.installedMods.find(m => m.id === modId);
+    if (!mod) return;
+    const rawBox = document.getElementById('new-mod-json-raw');
+    const idInput = document.getElementById('editing-mod-id');
+    const heading = document.getElementById('mod-editor-heading');
+    if (idInput) idInput.value = mod.id;
+    if (heading) heading.textContent = `✏️ Editando Mod: ${mod.name}`;
+    if (rawBox) {
+        const cleanCopy = Object.assign({}, mod);
+        delete cleanCopy.lastError;
+        rawBox.value = JSON.stringify(cleanCopy, null, 2);
+        rawBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function clearModEditorForm() {
+    const idInput = document.getElementById('editing-mod-id');
+    const rawBox = document.getElementById('new-mod-json-raw');
+    const heading = document.getElementById('mod-editor-heading');
+    if (idInput) idInput.value = '';
+    if (rawBox) rawBox.value = '';
+    if (heading) heading.textContent = '➕ Criar, Editar ou Colar Mod (JSON / Sistema Alternativo / Script Hook)';
+}
+
+function loadFateStarterModTemplate() {
+    const fateSample = {
+        id: 'mod-sistema-fate-4df',
+        name: '🎲 Fate Acelerado (4dF + Abordagens)',
+        version: '1.0.0',
+        author: 'Comunidade / Sistema Alternativo',
+        description: 'Converte a ficha para Fate Acelerado com 6 Abordagens diretas, 4dF padrão, Pontos de Destino, Consequências e Macro de Ataque Fate.',
+        rulesPatch: {
+            presetName: 'Fate Acelerado (Mod)',
+            defaultDiceFormula: '4dF',
+            modifierCalculation: 'direct',
+            hideDndSpellSlots: true,
+            hideDndDeathSaves: true,
+            customSheetBanner: 'Modo Sistema Alternativo: Fate Acelerado (4dF + Abordagem Direta)',
+            attributeSchema: [
+                { key: 'str', label: 'Poderoso', short: 'POD' },
+                { key: 'dex', label: 'Ágil', short: 'AGI' },
+                { key: 'con', label: 'Cuidadoso', short: 'CUI' },
+                { key: 'int', label: 'Esperto', short: 'ESP' },
+                { key: 'wis', label: 'Estiloso', short: 'EST' },
+                { key: 'cha', label: 'Sorrateiro', short: 'SOR' }
+            ],
+            baseConditions: [
+                'Estresse 1', 'Estresse 2', 'Estresse 3',
+                'Consequência Leve (-2)', 'Consequência Moderada (-4)', 'Consequência Severa (-6)',
+                'Impulso (+2)', 'Concedido / Fora de Cena'
+            ]
+        },
+        customResources: [
+            { name: 'Pontos de Destino (Fate)', max: 3, recharge: 'long' }
+        ],
+        diceMacros: [
+            { id: 'macro-fate-4df', name: '🎲 Ação Fate (+2)', steps: [{ label: 'Teste Fate Base', formula: '4dF+2', mode: 'normal' }] }
+        ],
+        scriptCode: 'CompendioModAPI.registerHook("onCalculateDerived", (ctx) => { if (ctx && ctx.character) { ctx.bannerExtra = "Destino ativo na mesa"; } return ctx; });'
+    };
+    const rawBox = document.getElementById('new-mod-json-raw');
+    if (rawBox) {
+        rawBox.value = JSON.stringify(fateSample, null, 2);
+        rawBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof showToast === 'function') showToast('🧩 Modelo Fate (4dF) carregado no editor! Clique em Salvar / Instalar para aplicar.');
+    }
+}
+
 function createOrImportModFromModal() {
-    const rawJson = (document.getElementById('new-mod-json-raw')?.value || '').trim();
+    const rawJson = (document.getElementById('new-mod-json-raw')?.value || '').replace(/^\uFEFF/, '').trim();
+    const editingId = (document.getElementById('editing-mod-id')?.value || '').trim();
     try {
         if (rawJson) {
             const parsed = JSON.parse(rawJson);
-            const mod = CompendioModAPI.installMod(parsed, true);
-            showToast(`🧩 Mod "${mod.name}" instalado e ativado!`);
+            if (editingId && parsed && !Array.isArray(parsed) && !parsed.id) parsed.id = editingId;
+            if (parsed && !Array.isArray(parsed) && !Array.isArray(parsed.mods)) parsed.userEdited = true;
+            const installed = CompendioModAPI.installModInput(parsed, true);
+            const names = installed.map(m => m.name).join(', ');
+            showToast(`🧩 Mod "${names}" instalado e ativado!`);
             renderRulesAndModsModalBody();
             return;
         }
@@ -706,13 +892,13 @@ function createOrImportModFromModal() {
             });
         }
         const mod = CompendioModAPI.installMod({
-            id: 'mod-' + slugify(name),
+            id: editingId || ('mod-' + slugify(name)),
             name,
             description: desc || 'Mod criado pelo usuário no Compêndio.',
             customResources,
-            rulesPatch: {}
+            rulesPatch: {},
+            userEdited: true
         }, true);
-        CompendioModAPI.toggleMod(mod.id, true);
         showToast(`🧩 Mod "${mod.name}" criado e ativado!`);
         renderRulesAndModsModalBody();
     } catch (e) {
@@ -724,7 +910,8 @@ async function handleModFileUpload(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     try {
-        const text = await file.text();
+        const rawText = await file.text();
+        const text = rawText.replace(/^\uFEFF/, '');
         if (file.name.toLowerCase().endsWith('.js')) {
             const modName = file.name.replace(/\.js$/i, '');
             const mod = CompendioModAPI.installMod({
@@ -736,8 +923,8 @@ async function handleModFileUpload(event) {
             showToast(`🧩 Script Mod "${mod.name}" ativado!`);
         } else {
             const parsed = JSON.parse(text);
-            const mod = CompendioModAPI.installMod(parsed, true);
-            showToast(`🧩 Mod "${mod.name}" importado com sucesso!`);
+            const installed = CompendioModAPI.installModInput(parsed, true);
+            showToast(`🧩 Mod "${installed.map(m => m.name).join(', ')}" importado com sucesso!`);
         }
         renderRulesAndModsModalBody();
     } catch (err) {

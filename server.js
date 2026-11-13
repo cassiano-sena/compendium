@@ -312,6 +312,8 @@ function sanitizeSessionForClient(isHost = false) {
         activeMods: sessionState.activeMods,
         lastPing: sessionState.lastPing,
         lastStudyRequest: sessionState.lastStudyRequest,
+        ephemeralCursors: Array.from(ephemeralCursors.values()),
+        ephemeralRulers: Array.from(ephemeralRulers.values()),
         roomConfig: sanitizeRoomForClient(isHost),
         updatedAt: sessionState.updatedAt
     };
@@ -319,6 +321,36 @@ function sanitizeSessionForClient(isHost = false) {
 
 // Clientes conectados via Server-Sent Events (SSE) para Multiplayer Real-Time (até 8+ jogadores)
 const sseClients = new Map();
+// Estado efêmero por cliente conectado (cursor "Mãozinha" + régua persistente por cliente)
+const ephemeralCursors = new Map();
+const ephemeralRulers = new Map();
+
+function ensureTabletopContainer() {
+    if (!sessionState.tabletop || typeof sessionState.tabletop !== 'object') {
+        sessionState.tabletop = {
+            tokens: [],
+            aoeTemplates: [],
+            fogRects: [],
+            gridSize: 50,
+            gridSizeY: 50,
+            gridOffsetX: 0,
+            gridOffsetY: 0,
+            gridEnabled: true,
+            gridSnap: true,
+            fogEnabled: false,
+            mapBg: ''
+        };
+    }
+    if (!Array.isArray(sessionState.tabletop.tokens)) sessionState.tabletop.tokens = [];
+    if (!Array.isArray(sessionState.tabletop.aoeTemplates)) sessionState.tabletop.aoeTemplates = [];
+    if (!Array.isArray(sessionState.tabletop.fogRects)) sessionState.tabletop.fogRects = [];
+    return sessionState.tabletop;
+}
+
+function isEffectiveGmSender(isHost, incoming) {
+    if (isHost) return incoming?.senderRole !== 'player';
+    return !sessionState.roomConfig.blockRemoteGm && incoming?.senderRole === 'gm';
+}
 
 function getOnlinePlayersList() {
     const list = [];
@@ -928,6 +960,16 @@ const server = http.createServer((req, res) => {
 
         req.on('close', () => {
             sseClients.delete(clientId);
+            const hadCursor = ephemeralCursors.delete(clientId);
+            const hadRuler = ephemeralRulers.delete(clientId);
+            if (hadCursor || hadRuler) {
+                broadcastSseEvent('delta', {
+                    senderId: 'server',
+                    senderClientId: clientId,
+                    delta: { type: 'CLIENT_EPHEMERAL_CLEAR', clientId },
+                    updatedAt: Date.now()
+                });
+            }
             broadcastSseEvent('presence', {
                 onlinePlayers: getOnlinePlayersList(),
                 updatedAt: Date.now()
@@ -1017,16 +1059,55 @@ const server = http.createServer((req, res) => {
                 const ext = path.extname(ent.name).toLowerCase();
                 if (ext === '.json' || ext === '.js') {
                     const fullPath = path.join(modsDir, ent.name);
-                    const content = fs.readFileSync(fullPath, 'utf8');
+                    const rawContent = fs.readFileSync(fullPath, 'utf8');
+                    const content = rawContent.replace(/^\uFEFF/, '');
                     let parsed = null;
+                    let parseError = null;
                     if (ext === '.json') {
-                        try { parsed = JSON.parse(content); } catch (e) {}
+                        try {
+                            parsed = JSON.parse(content);
+                            if (parsed && Array.isArray(parsed.mods)) {
+                                parsed.mods.forEach((subMod, idx) => {
+                                    mods.push({
+                                        fileName: `${ent.name}#${idx + 1}`,
+                                        path: `./mods/${ent.name}`,
+                                        type: 'json',
+                                        manifest: subMod
+                                    });
+                                });
+                                continue;
+                            }
+                            if (Array.isArray(parsed)) {
+                                parsed.forEach((subMod, idx) => {
+                                    mods.push({
+                                        fileName: `${ent.name}#${idx + 1}`,
+                                        path: `./mods/${ent.name}`,
+                                        type: 'json',
+                                        manifest: subMod
+                                    });
+                                });
+                                continue;
+                            }
+                        } catch (e) {
+                            parseError = e.message;
+                        }
+                    } else if (ext === '.js') {
+                        const baseName = ent.name.replace(/\.js$/i, '');
+                        parsed = {
+                            id: 'mod-script-' + baseName.toLowerCase().replace(/[^a-z0-9_-]/g, '-'),
+                            name: baseName.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                            version: '1.0',
+                            description: `Script JS carregado de ${ent.name}`,
+                            scriptCode: content,
+                            sourceFile: ent.name
+                        };
                     }
                     mods.push({
                         fileName: ent.name,
                         path: `./mods/${ent.name}`,
                         type: ext.slice(1),
-                        manifest: parsed
+                        manifest: parsed,
+                        error: parseError
                     });
                 }
             }
@@ -1096,15 +1177,185 @@ const server = http.createServer((req, res) => {
                     if (incoming.senderAvatar) cl.avatarEmoji = incoming.senderAvatar;
                 }
 
+                const isEffectiveGm = isEffectiveGmSender(isHost, incoming);
+
                 // 1. Deltas cirúrgicos (evitam condição de corrida entre múltiplos jogadores)
                 if (incoming.delta && typeof incoming.delta === 'object') {
                     const d = incoming.delta;
-                    if (d.type === 'TOKEN_MOVE' && d.token && sessionState.tabletop && Array.isArray(sessionState.tabletop.tokens)) {
-                        const idx = sessionState.tabletop.tokens.findIndex(t => t.id === d.token.id);
+                    const now = Date.now();
+
+                    // Deltas efêmeros de altíssima frequência (cursor "Mãozinha" + régua por cliente): não persistem em disco
+                    if (d.type === 'CURSOR_MOVE' || d.type === 'RULER_UPDATE' || d.type === 'RULER_CLEAR' || d.type === 'CLIENT_EPHEMERAL_CLEAR') {
+                        const cid = d.clientId || senderClientId || senderId;
+                        if (d.type === 'CURSOR_MOVE') {
+                            if (d.visible === false) {
+                                ephemeralCursors.delete(cid);
+                            } else {
+                                ephemeralCursors.set(cid, {
+                                    clientId: cid,
+                                    playerId: d.playerId || senderId,
+                                    playerName: d.playerName || incoming.senderName || 'Jogador',
+                                    color: d.color || incoming.senderColor || '#d8b467',
+                                    x: Number(d.x) || 0,
+                                    y: Number(d.y) || 0,
+                                    visible: true,
+                                    updatedAt: now
+                                });
+                            }
+                            d.clientId = cid;
+                        } else if (d.type === 'RULER_UPDATE' && d.ruler) {
+                            const rObj = Object.assign({}, d.ruler, { clientId: cid, updatedAt: now });
+                            ephemeralRulers.set(cid, rObj);
+                            d.clientId = cid;
+                            d.ruler = rObj;
+                        } else if (d.type === 'RULER_CLEAR' || d.type === 'CLIENT_EPHEMERAL_CLEAR') {
+                            ephemeralRulers.delete(cid);
+                            if (d.type === 'CLIENT_EPHEMERAL_CLEAR') ephemeralCursors.delete(cid);
+                            d.clientId = cid;
+                        }
+                        broadcastSseEvent('delta', {
+                            senderId,
+                            senderClientId,
+                            delta: d,
+                            updatedAt: now
+                        }, senderClientId);
+                        return sendJson(res, 200, { ok: true, ephemeral: true, updatedAt: now });
+                    }
+
+                    const tt = ensureTabletopContainer();
+
+                    if (d.type === 'TOKEN_MOVE' && d.token) {
+                        const idx = tt.tokens.findIndex(t => t.id === d.token.id);
                         if (idx >= 0) {
-                            Object.assign(sessionState.tabletop.tokens[idx], d.token);
+                            const curTok = tt.tokens[idx];
+                            if (!isEffectiveGm && (curTok.locked || (curTok.ownerId && curTok.ownerId !== senderId && !curTok.allowPlayersMove))) {
+                                return sendJson(res, 403, { ok: false, error: 'Token travado ou pertence a outro jogador.' });
+                            }
+                            Object.assign(curTok, d.token);
                         } else {
-                            sessionState.tabletop.tokens.push(d.token);
+                            tt.tokens.push(d.token);
+                        }
+                    } else if (d.type === 'TOKEN_UPSERT' && d.token) {
+                        const idx = tt.tokens.findIndex(t => t.id === d.token.id);
+                        if (idx >= 0) {
+                            const curTok = tt.tokens[idx];
+                            if (!isEffectiveGm && (curTok.locked || (curTok.ownerId && curTok.ownerId !== senderId && !curTok.allowPlayersMove))) {
+                                return sendJson(res, 403, { ok: false, error: 'Sem permissão para alterar este token.' });
+                            }
+                            tt.tokens[idx] = Object.assign({}, curTok, d.token);
+                        } else {
+                            tt.tokens.push(d.token);
+                        }
+                    } else if (d.type === 'TOKEN_DELETE' && d.tokenId) {
+                        const idx = tt.tokens.findIndex(t => t.id === d.tokenId);
+                        if (idx >= 0) {
+                            const curTok = tt.tokens[idx];
+                            if (!isEffectiveGm && (curTok.locked || (curTok.ownerId && curTok.ownerId !== senderId))) {
+                                return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre ou o dono pode remover este token.' });
+                            }
+                            tt.tokens.splice(idx, 1);
+                        }
+                    } else if (d.type === 'SHAPE_UPSERT' && d.shape) {
+                        const idx = tt.aoeTemplates.findIndex(s => s.id === d.shape.id);
+                        if (idx >= 0) {
+                            tt.aoeTemplates[idx] = Object.assign({}, tt.aoeTemplates[idx], d.shape);
+                        } else {
+                            tt.aoeTemplates.push(d.shape);
+                        }
+                    } else if (d.type === 'SHAPE_DELETE' && d.shapeId) {
+                        tt.aoeTemplates = tt.aoeTemplates.filter(s => s.id !== d.shapeId);
+                    } else if (d.type === 'FOG_UPSERT' && d.fog) {
+                        if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode editar a Névoa de Guerra.' });
+                        const idx = tt.fogRects.findIndex(f => f.id === d.fog.id);
+                        if (idx >= 0) tt.fogRects[idx] = Object.assign({}, tt.fogRects[idx], d.fog);
+                        else tt.fogRects.push(d.fog);
+                    } else if (d.type === 'FOG_DELETE' && d.fogId) {
+                        if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode remover a Névoa de Guerra.' });
+                        tt.fogRects = tt.fogRects.filter(f => f.id !== d.fogId);
+                    } else if (d.type === 'FOG_TOGGLE') {
+                        if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode alternar a Névoa de Guerra.' });
+                        tt.fogEnabled = Boolean(d.fogEnabled);
+                    } else if (d.type === 'TABLETOP_META' && d.meta && typeof d.meta === 'object') {
+                        if (!isEffectiveGm) {
+                            return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode alterar grade, calibração ou mapa do Tabletop.' });
+                        }
+                        const allowedKeys = ['gridEnabled', 'gridSize', 'gridSizeY', 'gridOffsetX', 'gridOffsetY', 'gridSnap', 'fogEnabled', 'mapBg', 'activeMapKey', 'activeMapName', 'stageWidth', 'stageHeight'];
+                        for (const k of allowedKeys) {
+                            if (d.meta[k] !== undefined) tt[k] = d.meta[k];
+                        }
+                    } else if (d.type === 'CHEST_UPDATE' && d.tokenId) {
+                        if (!isEffectiveGm) {
+                            return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode editar o conteúdo ou tranca do baú.' });
+                        }
+                        const tok = tt.tokens.find(t => t.id === d.tokenId);
+                        if (!tok) return sendJson(res, 404, { ok: false, error: 'Baú não encontrado no tabletop.' });
+                        if (d.patch && typeof d.patch === 'object') Object.assign(tok, d.patch);
+                    } else if (d.type === 'CHEST_LOOT' && d.tokenId) {
+                        const tok = tt.tokens.find(t => t.id === d.tokenId);
+                        if (!tok) return sendJson(res, 404, { ok: false, error: 'Baú não encontrado no tabletop.' });
+                        if (tok.locked && !isEffectiveGm) {
+                            return sendJson(res, 403, { ok: false, error: 'Este baú está trancado pelo Mestre.' });
+                        }
+                        if (!Array.isArray(tok.chestItems)) tok.chestItems = [];
+                        tok.chestGold = Math.max(0, Number(tok.chestGold) || 0);
+
+                        if (d.lootGold) {
+                            const reqAmt = d.amount === 'all' ? tok.chestGold : Math.max(0, Math.floor(Number(d.amount) || 0));
+                            if (tok.chestGold <= 0 || reqAmt <= 0) {
+                                return sendJson(res, 409, { ok: false, error: 'Não há mais ouro disponível neste baú.' });
+                            }
+                            const takenGold = Math.min(tok.chestGold, reqAmt);
+                            tok.chestGold -= takenGold;
+                            d.takenGold = takenGold;
+                            d.remainingGold = tok.chestGold;
+                        } else {
+                            let itemIdx = -1;
+                            if (d.takeItemId) {
+                                itemIdx = tok.chestItems.findIndex(it => it && it.id === d.takeItemId);
+                            } else if (typeof d.takeItemIdx === 'number' && d.takeItemIdx >= 0 && d.takeItemIdx < tok.chestItems.length) {
+                                itemIdx = d.takeItemIdx;
+                            }
+                            if (itemIdx < 0) {
+                                return sendJson(res, 409, { ok: false, error: 'Este item já foi saqueado por outro jogador.' });
+                            }
+                            const [taken] = tok.chestItems.splice(itemIdx, 1);
+                            d.takenItem = taken;
+                        }
+                        d.updatedToken = { id: tok.id, chestItems: tok.chestItems, chestGold: tok.chestGold, locked: Boolean(tok.locked) };
+                    } else if (d.type === 'GOLD_COLLECT' && d.tokenId) {
+                        const idx = tt.tokens.findIndex(t => t.id === d.tokenId);
+                        if (idx < 0) {
+                            return sendJson(res, 409, { ok: false, error: 'Este ouro já foi recolhido!' });
+                        }
+                        const tok = tt.tokens[idx];
+                        if (tok.locked && !isEffectiveGm) {
+                            return sendJson(res, 403, { ok: false, error: 'Este token de ouro está bloqueado pelo Mestre.' });
+                        }
+                        const avail = Math.max(0, Number(tok.goldAmount) || 0);
+                        if (avail <= 0) {
+                            return sendJson(res, 409, { ok: false, error: 'Este ouro já está zerado!' });
+                        }
+                        const wanted = (d.amount === 'all' || !d.amount) ? avail : Math.max(1, Math.floor(Number(d.amount) || 0));
+                        const collected = Math.min(avail, wanted);
+                        tok.goldAmount = avail - collected;
+                        d.collectedAmount = collected;
+                        d.remainingGold = tok.goldAmount;
+                        if (tok.goldAmount <= 0 && d.removeIfEmpty !== false) {
+                            tt.tokens.splice(idx, 1);
+                            d.removed = true;
+                        }
+                    } else if (d.type === 'COMBAT_PATCH') {
+                        if (!Array.isArray(sessionState.combatCards)) sessionState.combatCards = [];
+                        if (d.card && d.card.id) {
+                            const cidx = sessionState.combatCards.findIndex(c => c.id === d.card.id);
+                            if (cidx >= 0) sessionState.combatCards[cidx] = Object.assign({}, sessionState.combatCards[cidx], d.card);
+                            else sessionState.combatCards.push(d.card);
+                        }
+                        if (d.removeCardId) {
+                            sessionState.combatCards = sessionState.combatCards.filter(c => c.id !== d.removeCardId);
+                        }
+                        if (d.combatTurn && typeof d.combatTurn === 'object') {
+                            sessionState.combatTurn = Object.assign({}, sessionState.combatTurn || {}, d.combatTurn);
                         }
                     } else if (d.type === 'CHARACTER_UPDATE' && d.character && Array.isArray(sessionState.characters)) {
                         const idx = sessionState.characters.findIndex(c => c.id === d.character.id);
@@ -1123,15 +1374,15 @@ const server = http.createServer((req, res) => {
                     } else if (d.type === 'MAP_PING' && d.ping) {
                         sessionState.lastPing = d.ping;
                     } else if (d.type === 'STUDY_REQUEST') {
-                        sessionState.lastStudyRequest = Object.assign({ id: 'study-' + Date.now(), at: Date.now() }, d);
+                        sessionState.lastStudyRequest = Object.assign({ id: 'study-' + now, at: now }, d);
                     } else if (d.type === 'PRESENCE_UPDATE') {
                         broadcastSseEvent('presence', {
                             onlinePlayers: getOnlinePlayersList(),
-                            updatedAt: Date.now()
+                            updatedAt: now
                         });
-                        return sendJson(res, 200, { ok: true, updatedAt: Date.now() });
+                        return sendJson(res, 200, { ok: true, updatedAt: now });
                     }
-                    sessionState.updatedAt = Date.now();
+                    sessionState.updatedAt = now;
                     schedulePersistSession();
                     broadcastSseEvent('delta', {
                         senderId,
@@ -1139,7 +1390,16 @@ const server = http.createServer((req, res) => {
                         delta: d,
                         updatedAt: sessionState.updatedAt
                     }, senderClientId);
-                    return sendJson(res, 200, { ok: true, updatedAt: sessionState.updatedAt });
+                    return sendJson(res, 200, {
+                        ok: true,
+                        updatedAt: sessionState.updatedAt,
+                        takenItem: d.takenItem || null,
+                        takenGold: d.takenGold || 0,
+                        collectedAmount: d.collectedAmount || 0,
+                        remainingGold: d.remainingGold !== undefined ? d.remainingGold : null,
+                        removed: Boolean(d.removed),
+                        token: d.updatedToken || null
+                    });
                 }
 
                 // 2. Sincronização de estado de módulos
@@ -1155,7 +1415,27 @@ const server = http.createServer((req, res) => {
                     });
                 }
                 if (Array.isArray(incoming.characters)) sessionState.characters = incoming.characters;
-                if (incoming.tabletop && typeof incoming.tabletop === 'object') sessionState.tabletop = incoming.tabletop;
+                if (incoming.tabletop && typeof incoming.tabletop === 'object') {
+                    if (isEffectiveGm) {
+                        sessionState.tabletop = incoming.tabletop;
+                    } else if (sessionState.tabletop) {
+                        // Jogadores não podem desativar grade, alterar calibração, mapa ou névoa em sync completo
+                        const prev = sessionState.tabletop;
+                        sessionState.tabletop = Object.assign({}, incoming.tabletop, {
+                            gridEnabled: prev.gridEnabled,
+                            gridSize: prev.gridSize,
+                            gridSizeY: prev.gridSizeY,
+                            gridOffsetX: prev.gridOffsetX,
+                            gridOffsetY: prev.gridOffsetY,
+                            gridSnap: prev.gridSnap,
+                            fogEnabled: prev.fogEnabled,
+                            fogRects: prev.fogRects,
+                            mapBg: prev.mapBg
+                        });
+                    } else {
+                        sessionState.tabletop = incoming.tabletop;
+                    }
+                }
                 if (isAuthorizedHostGm) {
                     if (incoming.knowledge && typeof incoming.knowledge === 'object') sessionState.knowledge = incoming.knowledge;
                     if (incoming.compendioData && typeof incoming.compendioData === 'object') sessionState.compendioData = incoming.compendioData;

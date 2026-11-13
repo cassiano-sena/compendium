@@ -5,7 +5,10 @@
    ========================================================================= */
 
 window.onlinePlayersList = window.onlinePlayersList || [];
-window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 10000);
+window.localClientId = window.localClientId || ('cl-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 10000));
+window.ttActiveInteraction = window.ttActiveInteraction || null;
+window.remoteTabletopCursors = window.remoteTabletopCursors || {};
+window.activeTabletopRulers = window.activeTabletopRulers || {};
 
 (function upgradeNetAdapter() {
     if (typeof CompendioNetAdapter === 'undefined') return;
@@ -13,6 +16,8 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
     CompendioNetAdapter.sse = null;
     CompendioNetAdapter.lastServerUpdatedAt = 0;
     CompendioNetAdapter.pollTimer = null;
+    CompendioNetAdapter._cursorLastSentAt = 0;
+    CompendioNetAdapter._rulerLastSentAt = 0;
 
     const origInit = CompendioNetAdapter.init.bind(CompendioNetAdapter);
 
@@ -76,6 +81,9 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             const data = await res.json().catch(() => null);
             if (!res.ok) {
                 this._handleServerRejection(res.status, data);
+                if (extraBody && extraBody.returnErrorObject) {
+                    return Object.assign({ ok: false, status: res.status }, data || {});
+                }
                 return null;
             }
             if (data && data.updatedAt) this.lastServerUpdatedAt = data.updatedAt;
@@ -88,6 +96,12 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
     CompendioNetAdapter.handleIncomingRealtimeMessage = function(msg) {
         if (!msg) return;
         const isTyping = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+
+        if (msg.type === 'DELTA' && msg.delta) {
+            if (msg.clientId && msg.clientId === window.localClientId) return;
+            this.applyIncomingDelta(msg.delta, msg);
+            return;
+        }
 
         if (msg.type === 'COMBAT_SYNC') {
             if (Array.isArray(msg.combatCards)) {
@@ -131,6 +145,9 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
         } else if (msg.type === 'RULES_SYNC') {
             if (msg.rules) window.activeRulesConfig = msg.rules;
             if (Array.isArray(msg.activeMods)) window.installedMods = msg.activeMods;
+            if (typeof CompendioModAPI !== 'undefined' && CompendioModAPI.rebuildActiveModHooks) {
+                CompendioModAPI.rebuildActiveModHooks();
+            }
             if (typeof CompendioRules !== 'undefined') CompendioRules.refreshAllScreens();
         } else if (msg.type === 'STUDY_REQUEST') {
             if (getActivePlayer()?.role === 'gm' && typeof showToast === 'function') {
@@ -168,8 +185,44 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             if (!isTyping && activeModule === 'character') renderCharacterModule();
         }
         if (sess.tabletop && typeof sess.tabletop === 'object' && Array.isArray(sess.tabletop.tokens)) {
+            const inter = window.ttActiveInteraction;
+            const prevLocalTokens = (tabletopState && Array.isArray(tabletopState.tokens)) ? tabletopState.tokens : [];
+            const prevLocalShapes = (tabletopState && Array.isArray(tabletopState.aoeTemplates)) ? tabletopState.aoeTemplates : [];
             tabletopState = sess.tabletop;
-            if (!isTyping && activeModule === 'tabletop') renderTabletopModule();
+            // Preserva objeto sendo arrastado/editado localmente para nunca cancelar ações simultâneas
+            if (inter && inter.type === 'token' && inter.id) {
+                const mine = prevLocalTokens.find(t => t.id === inter.id);
+                const idx = tabletopState.tokens.findIndex(t => t.id === inter.id);
+                if (mine && idx >= 0) tabletopState.tokens[idx] = mine;
+            } else if (inter && inter.type === 'shape' && inter.id && Array.isArray(tabletopState.aoeTemplates)) {
+                const mine = prevLocalShapes.find(s => s.id === inter.id);
+                const idx = tabletopState.aoeTemplates.findIndex(s => s.id === inter.id);
+                if (mine && idx >= 0) tabletopState.aoeTemplates[idx] = mine;
+            }
+            if (!isTyping && !inter && activeModule === 'tabletop') renderTabletopModule();
+        }
+
+        if (Array.isArray(sess.ephemeralCursors)) {
+            const nextCursors = {};
+            sess.ephemeralCursors.forEach(c => {
+                if (c && c.clientId && c.clientId !== window.localClientId) {
+                    nextCursors[c.clientId] = c;
+                }
+            });
+            window.remoteTabletopCursors = nextCursors;
+            if (typeof renderRemoteCursorsLayer === 'function') renderRemoteCursorsLayer();
+        }
+        if (Array.isArray(sess.ephemeralRulers)) {
+            const myRuler = window.activeTabletopRulers[window.localClientId];
+            const nextRulers = {};
+            if (myRuler) nextRulers[window.localClientId] = myRuler;
+            sess.ephemeralRulers.forEach(r => {
+                if (r && r.clientId && r.clientId !== window.localClientId) {
+                    nextRulers[r.clientId] = r;
+                }
+            });
+            window.activeTabletopRulers = nextRulers;
+            if (typeof renderTabletopRulersLayer === 'function') renderTabletopRulersLayer();
         }
 
         if (sess.knowledge && typeof sess.knowledge === 'object') {
@@ -231,15 +284,35 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             combatCards = sess.combatCards;
             if (sess.combatTurn) window.combatTurnState = sess.combatTurn;
             if (!isTyping && typeof renderCombatHand === 'function') renderCombatHand();
-            if (!isTyping && activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
+            if (!isTyping && !window.ttActiveInteraction && activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
         }
         if (Array.isArray(sess.diceLog) && sess.diceLog.length > window.diceLogData.length) {
             window.diceLogData = sess.diceLog;
             if (typeof CompendioDice !== 'undefined') CompendioDice.renderWidget();
         }
+        let rulesOrModsChanged = false;
         if (sess.rules && typeof sess.rules === 'object') {
-            window.activeRulesConfig = sess.rules;
-            if (typeof CompendioRules !== 'undefined') CompendioRules.updateRulesSidebarBadge();
+            const nextRJson = JSON.stringify(sess.rules);
+            if (nextRJson !== this._lastRulesJson) {
+                this._lastRulesJson = nextRJson;
+                window.activeRulesConfig = sess.rules;
+                rulesOrModsChanged = true;
+            }
+        }
+        if (Array.isArray(sess.activeMods)) {
+            const nextMJson = JSON.stringify(sess.activeMods.map(m => ({ id: m.id, enabled: m.enabled, version: m.version, scriptCode: m.scriptCode, rulesPatch: m.rulesPatch })));
+            if (nextMJson !== this._lastModsJson) {
+                this._lastModsJson = nextMJson;
+                window.installedMods = sess.activeMods;
+                if (typeof CompendioModAPI !== 'undefined' && CompendioModAPI.rebuildActiveModHooks) {
+                    CompendioModAPI.rebuildActiveModHooks();
+                }
+                rulesOrModsChanged = true;
+            }
+        }
+        if (rulesOrModsChanged && typeof CompendioRules !== 'undefined') {
+            CompendioRules.updateRulesSidebarBadge();
+            if (!isTyping && !window.ttActiveInteraction && CompendioRules.refreshAllScreens) CompendioRules.refreshAllScreens();
         }
 
         if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
@@ -370,27 +443,7 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                         if (!data || data.senderClientId === window.localClientId) return;
                         const d = data.delta;
                         if (!d) return;
-                        if (d.type === 'DICE_ROLL' && d.roll) {
-                            this.handleIncomingRealtimeMessage({ type: 'DICE_ROLL', senderId: data.senderId, roll: d.roll });
-                        } else if (d.type === 'DICE_CLEAR') {
-                            this.handleIncomingRealtimeMessage({ type: 'DICE_CLEAR' });
-                        } else if (d.type === 'MAP_PING' && d.ping) {
-                            this.handleIncomingRealtimeMessage({ type: 'MAP_PING', ping: d.ping });
-                        } else if (d.type === 'STUDY_REQUEST') {
-                            if (d.id) this._lastStudyReqId = d.id;
-                            this.handleIncomingRealtimeMessage({
-                                type: 'STUDY_REQUEST',
-                                entityKey: d.entityKey,
-                                entityTitle: d.entityTitle,
-                                playerId: d.playerId || data.senderId,
-                                playerName: d.playerName || data.senderName
-                            });
-                        } else if (d.type === 'TOKEN_MOVE' && d.token && tabletopState && Array.isArray(tabletopState.tokens)) {
-                            const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
-                            if (idx >= 0) Object.assign(tabletopState.tokens[idx], d.token);
-                            else tabletopState.tokens.push(d.token);
-                            if (activeModule === 'tabletop') renderTabletopModule();
-                        }
+                        this.applyIncomingDelta(d, data);
                     } catch (e) {}
                 });
 
@@ -453,6 +506,264 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
         }
     };
 
+    CompendioNetAdapter.applyIncomingDelta = function(d, data = {}) {
+        if (!d || typeof d !== 'object') return;
+        const inter = window.ttActiveInteraction;
+
+        if (d.type === 'DICE_ROLL' && d.roll) {
+            this.handleIncomingRealtimeMessage({ type: 'DICE_ROLL', senderId: data.senderId, roll: d.roll });
+            return;
+        }
+        if (d.type === 'DICE_CLEAR') {
+            this.handleIncomingRealtimeMessage({ type: 'DICE_CLEAR' });
+            return;
+        }
+        if (d.type === 'MAP_PING' && d.ping) {
+            this.handleIncomingRealtimeMessage({ type: 'MAP_PING', ping: d.ping });
+            return;
+        }
+        if (d.type === 'STUDY_REQUEST') {
+            if (d.id) this._lastStudyReqId = d.id;
+            this.handleIncomingRealtimeMessage({
+                type: 'STUDY_REQUEST',
+                entityKey: d.entityKey,
+                entityTitle: d.entityTitle,
+                playerId: d.playerId || data.senderId,
+                playerName: d.playerName || data.senderName
+            });
+            return;
+        }
+        if (d.type === 'CURSOR_MOVE') {
+            const cid = d.clientId || data.senderClientId || data.senderId;
+            if (!cid || cid === window.localClientId) return;
+            if (d.visible === false) delete window.remoteTabletopCursors[cid];
+            else window.remoteTabletopCursors[cid] = Object.assign({ clientId: cid }, d);
+            if (typeof renderRemoteCursorsLayer === 'function') renderRemoteCursorsLayer();
+            return;
+        }
+        if (d.type === 'RULER_UPDATE' && d.ruler) {
+            const cid = d.clientId || d.ruler.clientId || data.senderClientId || data.senderId;
+            if (!cid || cid === window.localClientId) return;
+            window.activeTabletopRulers[cid] = Object.assign({ clientId: cid }, d.ruler);
+            if (typeof renderTabletopRulersLayer === 'function') renderTabletopRulersLayer();
+            return;
+        }
+        if (d.type === 'RULER_CLEAR') {
+            const cid = d.clientId || data.senderClientId || data.senderId;
+            if (!cid || cid === window.localClientId) return;
+            delete window.activeTabletopRulers[cid];
+            if (typeof renderTabletopRulersLayer === 'function') renderTabletopRulersLayer();
+            return;
+        }
+        if (d.type === 'CLIENT_EPHEMERAL_CLEAR') {
+            const cid = d.clientId;
+            if (!cid) return;
+            delete window.remoteTabletopCursors[cid];
+            delete window.activeTabletopRulers[cid];
+            if (typeof renderRemoteCursorsLayer === 'function') renderRemoteCursorsLayer();
+            if (typeof renderTabletopRulersLayer === 'function') renderTabletopRulersLayer();
+            return;
+        }
+
+        if (!tabletopState || typeof tabletopState !== 'object') return;
+        if (!Array.isArray(tabletopState.tokens)) tabletopState.tokens = [];
+        if (!Array.isArray(tabletopState.aoeTemplates)) tabletopState.aoeTemplates = [];
+        if (!Array.isArray(tabletopState.fogRects)) tabletopState.fogRects = [];
+
+        if (d.type === 'TOKEN_MOVE' && d.token) {
+            if (inter && inter.type === 'token' && inter.id === d.token.id) return;
+            const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
+            if (idx >= 0) Object.assign(tabletopState.tokens[idx], d.token);
+            else tabletopState.tokens.push(d.token);
+            if (activeModule === 'tabletop') {
+                if (typeof updateTabletopTokenDom === 'function' && updateTabletopTokenDom(d.token.id)) return;
+                if (!inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            }
+            return;
+        }
+        if (d.type === 'TOKEN_UPSERT' && d.token) {
+            if (inter && inter.type === 'token' && inter.id === d.token.id) return;
+            const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
+            if (idx >= 0) tabletopState.tokens[idx] = Object.assign({}, tabletopState.tokens[idx], d.token);
+            else tabletopState.tokens.push(d.token);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'TOKEN_DELETE' && d.tokenId) {
+            tabletopState.tokens = tabletopState.tokens.filter(t => t.id !== d.tokenId);
+            if (typeof window !== 'undefined' && window.selectedTabletopTokenId === d.tokenId) window.selectedTabletopTokenId = null;
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'SHAPE_UPSERT' && d.shape) {
+            if (inter && inter.type === 'shape' && inter.id === d.shape.id) return;
+            const idx = tabletopState.aoeTemplates.findIndex(s => s.id === d.shape.id);
+            if (idx >= 0) tabletopState.aoeTemplates[idx] = Object.assign({}, tabletopState.aoeTemplates[idx], d.shape);
+            else tabletopState.aoeTemplates.push(d.shape);
+            if (activeModule === 'tabletop') {
+                if (typeof updateTabletopShapeDom === 'function' && updateTabletopShapeDom(d.shape.id)) return;
+                if (!inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            }
+            return;
+        }
+        if (d.type === 'SHAPE_DELETE' && d.shapeId) {
+            tabletopState.aoeTemplates = tabletopState.aoeTemplates.filter(s => s.id !== d.shapeId);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'FOG_UPSERT' && d.fog) {
+            const idx = tabletopState.fogRects.findIndex(f => f.id === d.fog.id);
+            if (idx >= 0) tabletopState.fogRects[idx] = Object.assign({}, tabletopState.fogRects[idx], d.fog);
+            else tabletopState.fogRects.push(d.fog);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'FOG_DELETE' && d.fogId) {
+            tabletopState.fogRects = tabletopState.fogRects.filter(f => f.id !== d.fogId);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'FOG_TOGGLE') {
+            tabletopState.fogEnabled = Boolean(d.fogEnabled);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'TABLETOP_META' && d.meta) {
+            Object.assign(tabletopState, d.meta);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if ((d.type === 'CHEST_UPDATE' || d.type === 'CHEST_LOOT') && d.tokenId) {
+            const tok = tabletopState.tokens.find(t => t.id === d.tokenId);
+            if (tok) {
+                if (d.patch && typeof d.patch === 'object') Object.assign(tok, d.patch);
+                if (d.updatedToken && typeof d.updatedToken === 'object') Object.assign(tok, d.updatedToken);
+            }
+            if (typeof refreshOpenChestOrGoldModal === 'function') refreshOpenChestOrGoldModal(d.tokenId);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'GOLD_COLLECT' && d.tokenId) {
+            if (d.removed) {
+                tabletopState.tokens = tabletopState.tokens.filter(t => t.id !== d.tokenId);
+            } else {
+                const tok = tabletopState.tokens.find(t => t.id === d.tokenId);
+                if (tok && d.remainingGold !== undefined) tok.goldAmount = d.remainingGold;
+            }
+            if (typeof refreshOpenChestOrGoldModal === 'function') refreshOpenChestOrGoldModal(d.tokenId);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'COMBAT_PATCH') {
+            if (!Array.isArray(combatCards)) combatCards = [];
+            if (d.card && d.card.id) {
+                const idx = combatCards.findIndex(c => c.id === d.card.id);
+                if (idx >= 0) combatCards[idx] = Object.assign({}, combatCards[idx], d.card);
+                else combatCards.push(d.card);
+            }
+            if (d.removeCardId) combatCards = combatCards.filter(c => c.id !== d.removeCardId);
+            if (d.combatTurn && typeof d.combatTurn === 'object') {
+                window.combatTurnState = Object.assign({}, window.combatTurnState || {}, d.combatTurn);
+            }
+            try { localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(combatCards)); } catch (e) {}
+            if (typeof renderCombatHand === 'function') renderCombatHand();
+            if (activeModule === 'tabletop') {
+                const initHud = document.querySelector('.tt-init-tracker');
+                if (initHud && typeof renderDynamicInitiativeTrackerHtml === 'function') {
+                    initHud.outerHTML = renderDynamicInitiativeTrackerHtml();
+                }
+            }
+        }
+    };
+
+    CompendioNetAdapter.sendDelta = async function(deltaObj, opts = {}) {
+        if (!deltaObj || !deltaObj.type) return null;
+        if (this.channel && !opts.skipChannel) {
+            this.channel.postMessage({
+                type: 'DELTA',
+                clientId: window.localClientId,
+                senderId: typeof activePlayerId !== 'undefined' ? activePlayerId : 'gm-master',
+                delta: deltaObj
+            });
+        }
+        if (!serverWritable) return { ok: true, localOnly: true };
+        return await this.postSessionPayload({
+            delta: deltaObj,
+            returnErrorObject: Boolean(opts.returnErrorObject)
+        });
+    };
+
+    CompendioNetAdapter.sendCursorMove = function(x, y, visible = true) {
+        const now = Date.now();
+        if (visible && now - (this._cursorLastSentAt || 0) < 55) return;
+        this._cursorLastSentAt = now;
+        const p = typeof getActivePlayer === 'function' ? getActivePlayer() : { id: 'gm-master', name: 'Mestre', color: '#d8b467' };
+        const pName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(p) : (p?.name || 'Jogador');
+        this.sendDelta({
+            type: 'CURSOR_MOVE',
+            clientId: window.localClientId,
+            playerId: p?.id || 'gm-master',
+            playerName: pName,
+            color: p?.color || '#d8b467',
+            x: Math.round(x),
+            y: Math.round(y),
+            visible
+        });
+    };
+
+    CompendioNetAdapter.sendRulerUpdate = function(rulerObj, force = false) {
+        const now = Date.now();
+        if (!force && now - (this._rulerLastSentAt || 0) < 55) return;
+        this._rulerLastSentAt = now;
+        this.sendDelta({
+            type: 'RULER_UPDATE',
+            clientId: window.localClientId,
+            ruler: Object.assign({}, rulerObj, { clientId: window.localClientId })
+        });
+    };
+
+    CompendioNetAdapter.sendRulerClear = function(cid = null) {
+        this.sendDelta({
+            type: 'RULER_CLEAR',
+            clientId: cid || window.localClientId
+        });
+    };
+
+    CompendioNetAdapter.broadcastTokenDelta = function(action, tokenOrId) {
+        if (action === 'delete') return this.sendDelta({ type: 'TOKEN_DELETE', tokenId: tokenOrId });
+        if (action === 'move') return this.sendDelta({ type: 'TOKEN_MOVE', token: tokenOrId });
+        return this.sendDelta({ type: 'TOKEN_UPSERT', token: tokenOrId });
+    };
+
+    CompendioNetAdapter.broadcastShapeDelta = function(action, shapeOrId) {
+        if (action === 'delete') return this.sendDelta({ type: 'SHAPE_DELETE', shapeId: shapeOrId });
+        return this.sendDelta({ type: 'SHAPE_UPSERT', shape: shapeOrId });
+    };
+
+    CompendioNetAdapter.broadcastFogDelta = function(action, fogOrFlag) {
+        if (action === 'toggle') return this.sendDelta({ type: 'FOG_TOGGLE', fogEnabled: Boolean(fogOrFlag) });
+        if (action === 'delete') return this.sendDelta({ type: 'FOG_DELETE', fogId: fogOrFlag });
+        return this.sendDelta({ type: 'FOG_UPSERT', fog: fogOrFlag });
+    };
+
+    CompendioNetAdapter.broadcastTabletopMeta = function(metaObj) {
+        return this.sendDelta({ type: 'TABLETOP_META', meta: metaObj });
+    };
+
+    CompendioNetAdapter.broadcastChestLoot = async function(payload) {
+        if (!serverWritable) return { ok: true, localOnly: true };
+        return await this.sendDelta(Object.assign({ type: 'CHEST_LOOT' }, payload), { returnErrorObject: true });
+    };
+
+    CompendioNetAdapter.broadcastGoldCollect = async function(payload) {
+        if (!serverWritable) return { ok: true, localOnly: true };
+        return await this.sendDelta(Object.assign({ type: 'GOLD_COLLECT' }, payload), { returnErrorObject: true });
+    };
+
+    CompendioNetAdapter.broadcastCombatPatch = function(patch) {
+        return this.sendDelta(Object.assign({ type: 'COMBAT_PATCH' }, patch));
+    };
+
     CompendioNetAdapter.broadcastCombat = function() {
         if (this.channel) {
             this.channel.postMessage({
@@ -462,7 +773,10 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                 combatTurn: window.combatTurnState
             });
         }
-        this.syncServerSession();
+        this.postSessionPayload({
+            combatCards,
+            combatTurn: window.combatTurnState
+        });
     };
 
     CompendioNetAdapter.broadcastRules = function() {
@@ -474,7 +788,10 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                 activeMods: window.installedMods
             });
         }
-        this.syncServerSession();
+        this.postSessionPayload({
+            rules: window.activeRulesConfig,
+            activeMods: window.installedMods
+        });
     };
 
     CompendioNetAdapter.sendDiceRoll = async function(rollRecord) {
