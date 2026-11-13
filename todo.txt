@@ -6,3 +6,6 @@
 [x] motor universal de dados (Torre Flutuante + Vantagem/Desvantagem/Crítico/GM Oculto + Statblocks 5etools clicáveis)
 [x] sistema de regras & mods (Presets D&D 2024, D&D 2014, Modo Fatal 5.5e, Old-School 3.5e + API de Mods .json/.js)
 [x] multiplayer tempo real (SSE /api/events + deltas cirúrgicos até 8 jogadores)
+[x] perfis visuais & contas (Login visual sem prompt, criação/remoção de contas/personagens, edição de nome em cascata, cor indicativa e avatar)
+[x] lobby online & moderação (Criar/editar/trancar/fechar sala, card de IP LAN/VPN oculto por padrão + cópia furtiva, tutorial de entrada, Kick e Ban)
+[x] modo streamer & tabletop hud (Codinomes aleatórios e anti-IP em live + indicador colorido de conectados e Mostrador de Iniciativa Dinâmico no Tabletop)

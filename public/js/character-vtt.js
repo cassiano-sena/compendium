@@ -350,12 +350,14 @@ function longRestCharacter(charId, silent = false) {
 function renderCharacterModule() {
     const player = getActivePlayer();
     const isGm = player && player.role === 'gm';
+    const playerShownName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(player, 'Jogador') : (player ? player.name : 'Jogador');
+    const getOwnerShown = (ch) => typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(ch.ownerId, ch.ownerName || 'Jogador') : (ch.ownerName || 'Jogador');
     const allChars = charactersData;
     const listTitleEl = document.getElementById('dynamic-list-title');
     if (listTitleEl) {
         listTitleEl.textContent = isGm
             ? `Personagens (Todos: ${allChars.length})`
-            : `Grupo (${player ? player.name : 'Jogador'})`;
+            : `Grupo (${playerShownName})`;
     }
 
     if (!activeCharacterId || !allChars.some(c => c.id === activeCharacterId)) {
@@ -371,11 +373,12 @@ function renderCharacterModule() {
             const statusBadge = isMine
                 ? `<span class="list-item-folder-badge" style="color:#8df596;">${c.hpCurrent}/${c.hpMax} PV</span>`
                 : `<span class="list-item-folder-badge" style="color:#f2cf83;">${describeQualitativeHealth(c.hpCurrent, c.hpMax, 'pc')}</span>`;
+            const ownerClr = typeof getPlayerColor === 'function' ? getPlayerColor(c.ownerId) : '#d8b467';
             return `
                 <li class="list-item ${isAct}" data-title="${escapeHtmlText(c.name.toLowerCase())}" onclick="selectCharacter('${c.id}')">
                     <span>${isMine ? '🛡️' : '👁️'} ${escapeHtmlText(c.name)}</span>
                     <div class="list-item-right">
-                        <span class="list-item-folder-badge">${escapeHtmlText(c.ownerName || 'Jogador')}</span>
+                        <span class="list-item-folder-badge" style="border-left:3px solid ${escapeHtmlText(ownerClr)};">${escapeHtmlText(getOwnerShown(c))}</span>
                         ${statusBadge}
                     </div>
                 </li>
@@ -402,7 +405,7 @@ function renderCharacterModule() {
     if (!activeChar) {
         displayArea.innerHTML = `
             <div class="info-container">
-                <h2 class="info-title">🛡️ Personagens (${escapeHtmlText(player ? player.name : '')})</h2>
+                <h2 class="info-title">🛡️ Personagens (${escapeHtmlText(playerShownName)})</h2>
                 <p class="info-text">Nenhum personagem cadastrado ainda. Crie uma ficha do zero ou importe um arquivo <strong>.JSON</strong>, <strong>.PDF</strong> ou <strong>.HTML</strong>.</p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                     <button type="button" class="btn-summon-card" style="padding:10px 18px;" onclick="createNewCharacterForActivePlayer()">＋ Criar Ficha de Personagem</button>
@@ -415,6 +418,7 @@ function renderCharacterModule() {
     }
 
     ensureCharacterExtendedFields(activeChar);
+    const activeOwnerShown = getOwnerShown(activeChar);
 
     if (!canAccessFullCharacterSheet(activeChar)) {
         displayArea.innerHTML = `
@@ -423,7 +427,7 @@ function renderCharacterModule() {
                     <div>
                         <h2 class="info-title" style="margin:0; border:none; padding:0;">👁️ ${escapeHtmlText(activeChar.name)} (Visão Pública de Grupo)</h2>
                         <div style="font-size:12px; color:#a0a4b8; margin-top:4px;">
-                            Personagem controlado por: <strong>${escapeHtmlText(activeChar.ownerName)}</strong>
+                            Personagem controlado por: <strong>${escapeHtmlText(activeOwnerShown)}</strong>
                         </div>
                     </div>
                     <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
@@ -440,7 +444,7 @@ function renderCharacterModule() {
                 <div class="knowledge-seal-box">
                     <strong>🔒 Ficha Privada de Outro Jogador</strong>
                     <p style="font-size:12.5px; margin:6px 0 0 0; color:#b8b2a6;">
-                        Atributos exatos, pontos de vida numéricos, inventário e anotações pessoais pertencem apenas a <strong>${escapeHtmlText(activeChar.ownerName)}</strong> e ao <strong>Mestre (GM)</strong>.
+                        Atributos exatos, pontos de vida numéricos, inventário e anotações pessoais pertencem apenas a <strong>${escapeHtmlText(activeOwnerShown)}</strong> e ao <strong>Mestre (GM)</strong>.
                     </p>
                 </div>
             </div>
@@ -456,9 +460,10 @@ function renderCharacterModule() {
     const passivePerception = 10 + wisMod + (Number(activeChar.passivePerceptionBonus) || 0) + exPen;
     const percMod = wisMod + (Number(activeChar.passivePerceptionBonus) || 0);
 
-    const ownerOptions = playersData.map(p =>
-        `<option value="${escapeHtmlText(p.id)}" ${p.id === activeChar.ownerId ? 'selected' : ''}>${escapeHtmlText(p.name)}</option>`
-    ).join('');
+    const ownerOptions = playersData.map(p => {
+        const pShown = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(p) : p.name;
+        return `<option value="${escapeHtmlText(p.id)}" ${p.id === activeChar.ownerId ? 'selected' : ''}>${escapeHtmlText(pShown)}</option>`;
+    }).join('');
 
     const statLabels = [
         { key: 'str', label: 'FOR', full: 'Força' },
@@ -529,7 +534,7 @@ function renderCharacterModule() {
                 <div>
                     <h2 class="info-title" style="margin:0; border:none; padding:0;">🛡️ ${escapeHtmlText(activeChar.name)}</h2>
                     <div style="font-size:11px; color:#a0a4b8; margin-top:2px;">
-                        Jogador Responsável: <strong>${escapeHtmlText(activeChar.ownerName)}</strong> (${escapeHtmlText(activeChar.ownerId)})
+                        Jogador Responsável: <strong>${escapeHtmlText(activeOwnerShown)}</strong>${(typeof isStreamerModeEnabled === 'function' && isStreamerModeEnabled()) ? '' : ` (${escapeHtmlText(activeChar.ownerId)})`}
                     </div>
                 </div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
@@ -856,15 +861,19 @@ function clearAllTabletopTacticalOverlays() {
     showToast('🧹 Áreas AoE e regiões de Névoa limpas.');
 }
 
-function triggerTabletopPingAt(x, y, senderName = null, broadcast = true) {
+function triggerTabletopPingAt(x, y, senderName = null, broadcast = true, pingColor = null) {
+    const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+    const resolvedColor = pingColor || (typeof getPlayerColor === 'function' && activePl ? getPlayerColor(activePl) : '#f1c40f');
+    const resolvedLabel = senderName || (typeof getPlayerDisplayName === 'function' && activePl ? getPlayerDisplayName(activePl) : (activePl?.name || 'Ping'));
     const stage = document.getElementById('tabletop-stage');
     if (stage) {
         const pingEl = document.createElement('div');
         pingEl.className = 'tt-map-ping';
         pingEl.style.left = `${x}px`;
         pingEl.style.top = `${y}px`;
-        const lbl = senderName || (getActivePlayer()?.name || 'Ping');
-        pingEl.innerHTML = `<span class="tt-map-ping-label">📍 ${escapeHtmlText(lbl)}</span>`;
+        pingEl.style.borderColor = resolvedColor;
+        pingEl.style.boxShadow = `0 0 18px ${resolvedColor}`;
+        pingEl.innerHTML = `<span class="tt-map-ping-label" style="border-color:${escapeHtmlText(resolvedColor)}; color:${escapeHtmlText(resolvedColor)};">📍 ${escapeHtmlText(resolvedLabel)}</span>`;
         stage.appendChild(pingEl);
         setTimeout(() => pingEl.remove(), 2600);
     }
@@ -873,7 +882,9 @@ function triggerTabletopPingAt(x, y, senderName = null, broadcast = true) {
             id: 'ping-' + Date.now(),
             x,
             y,
-            senderName: senderName || (getActivePlayer()?.name || 'Jogador')
+            senderId: activePl?.id || 'gm-master',
+            senderName: activePl?.name || 'Jogador',
+            color: resolvedColor
         });
     }
 }
@@ -1032,11 +1043,62 @@ function adjustTabletopTokenHp(tokenId, delta) {
     syncCombatEntityHp(tok.id, nextHp, tok.hpMax);
 }
 
+function renderTabletopConnectedPlayersBarHtml() {
+    const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+    const rc = window.onlineRoomConfig || {};
+    const maxPlayers = rc.maxPlayers || 8;
+    const rawOnline = (Array.isArray(window.onlinePlayersList) && window.onlinePlayersList.length > 0)
+        ? window.onlinePlayersList
+        : (activePl ? [{
+            clientId: window.localClientId || 'local',
+            playerId: activePl.id,
+            playerName: activePl.name,
+            role: activePl.role,
+            color: typeof getPlayerColor === 'function' ? getPlayerColor(activePl) : '#d8b467',
+            avatarEmoji: typeof getPlayerAvatar === 'function' ? getPlayerAvatar(activePl) : '👑',
+            isHost: Boolean(window.isHostClient)
+        }] : []);
+
+    const streamerOn = typeof isStreamerModeEnabled === 'function' && isStreamerModeEnabled();
+    const roomBadge = !serverWritable
+        ? '📡 Offline/Local'
+        : (!rc.isOpen ? '🔴 Sala Fechada' : (rc.isLocked ? '🔒 Trancada' : `🟢 Aberta (${rawOnline.length}/${maxPlayers})`));
+
+    const chipsHtml = rawOnline.map(op => {
+        const pColor = op.color || (typeof getPlayerColor === 'function' ? getPlayerColor(op.playerId) : '#d8b467');
+        const pAvatar = op.avatarEmoji || (op.role === 'gm' ? '👑' : '🎮');
+        const shownName = typeof getPlayerDisplayName === 'function'
+            ? getPlayerDisplayName({ id: op.playerId || op.clientId, name: op.playerName, role: op.role }, 'Jogador')
+            : (op.playerName || 'Jogador');
+        const isSelf = (op.clientId && op.clientId === window.localClientId) || (!window.onlinePlayersList?.length && op.playerId === activePl?.id);
+        return `
+            <span class="tt-player-chip ${isSelf ? 'is-self' : ''}" style="border-color:${escapeHtmlText(pColor)};" onclick="openMultiplayerRoomModal('room')" title="Clique para gerenciar sala / jogadores">
+                <span class="player-color-dot" style="background:${escapeHtmlText(pColor)};"></span>
+                <span>${escapeHtmlText(pAvatar)}</span>
+                <strong>${escapeHtmlText(shownName)}</strong>
+                ${isSelf ? '<em style="font-size:10px; opacity:0.8;">(Você)</em>' : ''}
+            </span>
+        `;
+    }).join('');
+
+    return `
+        <div class="tt-connected-players-bar">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn-mini" style="flex:0 0 auto; border-color:#5a617a;" onclick="openMultiplayerRoomModal('room')" title="Gerenciar Sala, IP e Kick/Ban">${roomBadge}</button>
+                ${streamerOn ? `<button type="button" class="btn-mini active-streamer" style="flex:0 0 auto;" onclick="toggleStreamerMode()">📺 Streamer ON</button>` : ''}
+                <span style="font-size:11px; color:#9da3b8;">Conectados:</span>
+                ${chipsHtml}
+            </div>
+        </div>
+    `;
+}
+
 // Sobrescreve renderTabletopModule para incluir Tamanhos 1x1..4x4, Régua, AoE, Fog of War, Ping e Turno Atual
 function renderTabletopModule() {
     ensureTabletopExtendedState();
     const player = getActivePlayer();
     const isGm = player && player.role === 'gm';
+    const playerShownName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(player, 'Jogador') : (player ? player.name : 'Jogador');
     const listTitleEl = document.getElementById('dynamic-list-title');
     if (listTitleEl) {
         listTitleEl.textContent = `Tokens na Mesa (${tabletopState.tokens.length})`;
@@ -1178,12 +1240,17 @@ function renderTabletopModule() {
             ? '⚔️ Item'
             : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type));
         const bgImgStyle = t.imgSrc ? `background-image:url('${t.imgSrc.replace(/'/g, "\\'")}');` : '';
+        const ownerColor = (t.type === 'pc' && t.ownerId && typeof getPlayerColor === 'function') ? getPlayerColor(t.ownerId) : '';
+        const ownerBorderStyle = ownerColor && !isTurnActive ? `border-color:${ownerColor}; box-shadow:0 0 10px ${ownerColor}66;` : '';
+        const ownerDotHtml = ownerColor ? `<span class="tt-token-owner-dot" style="background:${escapeHtmlText(ownerColor)};"></span>` : '';
         return `
             <div class="tt-token ${typeCls} ${isSel} ${turnCls}"
-                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${canMove ? '1' : '0.92'}; ${bgImgStyle}"
+                 data-token-id="${escapeHtmlText(t.id)}"
+                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${canMove ? '1' : '0.92'}; ${ownerBorderStyle} ${bgImgStyle}"
                  onmousedown="startDragTabletopToken(event, '${t.id}')"
                  ondblclick="openSheetFromTabletopToken('${t.id}')"
                  title="${escapeHtmlText(t.name)} (Duplo-clique abre a Ficha)">
+                ${ownerDotHtml}
                 <span class="tt-token-hp">${badgeText}</span>
                 ${t.imgSrc ? '' : `<span>${escapeHtmlText(initials)}</span>`}
                 <span class="tt-token-label">${isTurnActive ? '⚔️ ' : ''}${escapeHtmlText(t.name)}</span>
@@ -1192,6 +1259,8 @@ function renderTabletopModule() {
     }).join('');
 
     const onlineCount = (window.onlinePlayersList && window.onlinePlayersList.length) ? window.onlinePlayersList.length : 1;
+    const maxP = window.onlineRoomConfig?.maxPlayers || 8;
+    const initiativeHudHtml = typeof renderDynamicInitiativeTrackerHtml === 'function' ? renderDynamicInitiativeTrackerHtml() : '';
 
     const displayArea = document.getElementById('dynamic-display-area');
     displayArea.innerHTML = `
@@ -1231,8 +1300,8 @@ function renderTabletopModule() {
                 </div>
                 ${selectedTokBar}
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                    <span style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px;" title="Jogadores sincronizados em tempo real">
-                        📡 ${onlineCount}/8 Online | 👤 ${escapeHtmlText(player ? player.name : '')}
+                    <span style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px; cursor:pointer;" onclick="openMultiplayerRoomModal('room')" title="Jogadores sincronizados em tempo real">
+                        📡 ${onlineCount}/${maxP} Online | 👤 ${escapeHtmlText(playerShownName)}
                     </span>
                     <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="zoomTabletop(0.85)">➖</button>
                     <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="zoomTabletop(1, true)">${zoomPct}%</button>
@@ -1242,15 +1311,20 @@ function renderTabletopModule() {
                 </div>
             </div>
 
-            <div class="tabletop-board-viewport" id="tabletop-viewport" oncontextmenu="return false;">
-                <div class="tabletop-stage" id="tabletop-stage" style="${stageBgStyle} transform: scale(${zoomPct / 100});" onmousedown="onTabletopStageMouseDown(event)">
-                    <div class="tabletop-grid-overlay" style="background-size: ${gridPx}px ${gridPx}px;"></div>
-                    ${aoeHtml}
-                    ${tokensHtml}
-                    ${fogHtml}
-                    <svg id="tabletop-ruler-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;"></svg>
-                    <div id="tabletop-ruler-badge" style="display:none; position:absolute; background:#18191f; color:#f2cf83; border:2px solid #d8b467; border-radius:6px; padding:3px 8px; font-weight:bold; font-size:12px; pointer-events:none; z-index:45; box-shadow:0 4px 10px rgba(0,0,0,0.85);"></div>
+            ${renderTabletopConnectedPlayersBarHtml()}
+
+            <div class="tabletop-stage-shell">
+                <div class="tabletop-board-viewport" id="tabletop-viewport" oncontextmenu="return false;">
+                    <div class="tabletop-stage" id="tabletop-stage" style="${stageBgStyle} transform: scale(${zoomPct / 100});" onmousedown="onTabletopStageMouseDown(event)">
+                        <div class="tabletop-grid-overlay" style="background-size: ${gridPx}px ${gridPx}px;"></div>
+                        ${aoeHtml}
+                        ${tokensHtml}
+                        ${fogHtml}
+                        <svg id="tabletop-ruler-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;"></svg>
+                        <div id="tabletop-ruler-badge" style="display:none; position:absolute; background:#18191f; color:#f2cf83; border:2px solid #d8b467; border-radius:6px; padding:3px 8px; font-weight:bold; font-size:12px; pointer-events:none; z-index:45; box-shadow:0 4px 10px rgba(0,0,0,0.85);"></div>
+                    </div>
                 </div>
+                <div id="tt-initiative-hud-root" class="tt-initiative-hud-root">${initiativeHudHtml}</div>
             </div>
         </div>
     `;

@@ -70,13 +70,16 @@ const CompendioDice = {
 
         // Verifica se há personagem ativo para aplicar penalidade de Exaustão em testes de d20
         let exhaustionMod = 0;
-        let actorName = options.actorName || player.name;
+        const playerDisplay = (typeof getPlayerDisplayName === 'function') ? getPlayerDisplayName(player) : player.name;
+        let actorName = options.actorName || playerDisplay;
+        let rolledCharName = '';
         if (!options.skipExhaustion && typeof charactersData !== 'undefined') {
             const charObj = options.charId
                 ? charactersData.find(c => c.id === options.charId)
                 : (player.role !== 'gm' ? charactersData.find(c => c.ownerId === player.id) : null);
             if (charObj) {
-                if (!options.actorName) actorName = `${charObj.name} (${player.name})`;
+                rolledCharName = charObj.name || '';
+                if (!options.actorName) actorName = `${charObj.name} (${playerDisplay})`;
                 if (/d20/i.test(expr) && (Number(charObj.exhaustion) || 0) > 0 && typeof CompendioRules !== 'undefined') {
                     exhaustionMod = CompendioRules.getExhaustionPenalty(charObj.exhaustion);
                 }
@@ -183,6 +186,7 @@ const CompendioDice = {
             id: 'roll-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
             timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
             playerId: player.id,
+            charName: rolledCharName,
             actorName: hookPayload.actorName,
             label: hookPayload.label,
             formula: hookPayload.expr,
@@ -218,10 +222,20 @@ const CompendioDice = {
         if (typeof showToast === 'function') {
             const critBadge = rollRecord.isNat20 ? ' 🌟 CRÍTICO (20)!' : (rollRecord.isNat1 ? ' 💀 FALHA CRÍTICA (1)!' : (rollRecord.isCrit ? ' 💥 DANO CRÍTICO!' : ''));
             const secBadge = rollRecord.isSecret ? ' 🔒 [OCULTO GM]' : '';
-            showToast(`🎲 ${rollRecord.actorName} — ${rollRecord.label}: ${rollRecord.total} (${rollRecord.breakdown})${critBadge}${secBadge}`);
+            const actorShown = this.formatRollActorName(rollRecord);
+            showToast(`🎲 ${actorShown} — ${rollRecord.label}: ${rollRecord.total} (${rollRecord.breakdown})${critBadge}${secBadge}`);
         }
 
         return rollRecord;
+    },
+
+    formatRollActorName(rollRecord) {
+        if (!rollRecord) return 'Jogador';
+        if (typeof isStreamerModeEnabled === 'function' && isStreamerModeEnabled() && typeof getPlayerDisplayName === 'function') {
+            const safePlayer = getPlayerDisplayName(rollRecord.playerId, 'Jogador');
+            return rollRecord.charName ? `${rollRecord.charName} (${safePlayer})` : safePlayer;
+        }
+        return rollRecord.actorName || 'Jogador';
     },
 
     applyRollToTarget(amount, isHeal = false) {
@@ -283,10 +297,12 @@ const CompendioDice = {
 
             const natCls = r.isNat20 ? 'nat-20' : (r.isNat1 ? 'nat-1' : (r.isCrit ? 'crit-dmg' : ''));
             const badge = r.isNat20 ? '🌟 20 NATURAL' : (r.isNat1 ? '💀 1 NATURAL' : (r.isCrit ? '💥 CRÍTICO' : ''));
+            const actorShown = this.formatRollActorName(r);
+            const pColor = (typeof getPlayerColor === 'function' && r.playerId) ? getPlayerColor(r.playerId) : '#d8b467';
             return `
                 <div class="dice-log-item ${natCls}">
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:#a0a4b8;">
-                        <span><strong>${escapeHtmlText(r.actorName)}</strong> ${r.isSecret ? '🔒' : ''}</span>
+                        <span><span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:${escapeHtmlText(pColor)}; margin-right:4px;"></span><strong>${escapeHtmlText(actorShown)}</strong> ${r.isSecret ? '🔒' : ''}</span>
                         <span>${escapeHtmlText(r.timestamp || '')}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px; gap:6px;">

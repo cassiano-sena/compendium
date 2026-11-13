@@ -16,19 +16,28 @@
     <aside class="sidebar">
         <div class="sidebar-header">⚔️ Compêndio RPG</div>
 
-        <!-- Identidade Local do Jogador (Base para futura autenticação LAN/P2P/Servidor) -->
+        <!-- Identidade Local do Jogador, Lobby Online & Streamer Mode -->
         <div class="identity-bar">
             <div class="identity-bar-row">
-                <span style="color:#a0a4b8;">👤 Perfil / Login:</span>
+                <span style="color:#a0a4b8; display:flex; align-items:center; gap:5px;">
+                    <span id="active-player-color-dot" class="player-color-dot" style="background:#d8b467;"></span>
+                    Perfil / Login:
+                </span>
                 <div style="display:flex; gap:3px;">
-                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 5px;" onclick="configureActivePlayerPin()" title="Definir ou alterar PIN de segurança deste perfil">🔐 PIN</button>
-                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 5px;" onclick="promptAddPlayerIdentity()" title="Cadastrar novo jogador">＋ Jogador</button>
+                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 6px;" onclick="openProfileManagerModal('login')" title="Abrir painel visual de Login, Edição de Nome, Cores e Personagens">👤 Contas</button>
+                    <button type="button" class="btn-mini" style="flex:0 0 auto; padding:2px 6px;" onclick="openProfileManagerModal('manage')" title="Criar ou remover perfis de jogador">＋ Conta</button>
                 </div>
             </div>
             <div class="identity-bar-row">
                 <select id="active-player-select" class="identity-select" onchange="onPlayerIdentityChange(this.value)"></select>
             </div>
-            <div class="identity-bar-row" style="margin-top:2px;">
+            <div class="identity-bar-row" style="margin-top:3px; gap:4px;">
+                <button type="button" id="room-online-pill-btn" class="btn-mini room-pill-btn" style="flex:1; display:flex; justify-content:space-between; align-items:center; padding:4px 7px;" onclick="openMultiplayerRoomModal('room')" title="Abrir Sala Online, IP Oculto, Entrar em Sala, Kick/Ban e Tutorial">
+                    <span>🌐 Sala (0/8)</span><span class="room-pill-sub">🌐</span>
+                </button>
+                <button type="button" id="streamer-mode-toggle-btn" class="btn-mini streamer-pill-btn" style="flex:0 0 auto; padding:4px 7px;" onclick="toggleStreamerMode()" title="Modo Streamer: oculta IPs, códigos e troca nomes reais por codinomes aleatórios">📺 Modo Streamer</button>
+            </div>
+            <div class="identity-bar-row" style="margin-top:3px;">
                 <button type="button" class="btn-mini" style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:4px 8px; border-color:#8b6b35;" onclick="openRulesAndModsModal('rules')" title="Configurar Edição de Regras (2024, 2014, Modo Fatal, OSR, Custom) e Mods da Campanha">
                     <span>⚙️ Regras & Mods</span>
                     <span id="active-ruleset-badge" style="color:var(--accent-gold); font-size:10px; font-weight:bold;">D&D 2024</span>
@@ -541,6 +550,21 @@
         <div class="studio-modal" id="rules-mods-modal-content" style="max-width:860px; height:auto; max-height:88vh;"></div>
     </div>
 
+    <!-- MODAL VISUAL DE PERFIS, LOGIN, EDIÇÃO DE NOME E PERSONAGENS -->
+    <div class="modal-backdrop" id="profiles-lobby-backdrop" onclick="if(event.target===this) closeProfileManagerModal()">
+        <div class="studio-modal" id="profiles-lobby-modal-content" style="max-width:880px; height:auto; max-height:88vh;"></div>
+    </div>
+
+    <!-- MODAL DE SALA ONLINE, IP OCULTO, KICK/BAN E TUTORIAL -->
+    <div class="modal-backdrop" id="multiplayer-room-backdrop" onclick="if(event.target===this) closeMultiplayerRoomModal()">
+        <div class="studio-modal" id="multiplayer-room-modal-content" style="max-width:900px; height:auto; max-height:90vh;"></div>
+    </div>
+
+    <!-- MODAL DE PORTÃO DA SALA (SENHA / KICK / BAN / FECHADA / LOTADA) -->
+    <div class="modal-backdrop" id="room-gate-backdrop" style="z-index:10050;">
+        <div class="studio-modal" id="room-gate-modal-content" style="max-width:520px; height:auto; max-height:80vh;"></div>
+    </div>
+
     <!-- TORRE DE DADOS FLUTUANTE & LOG COMPARTILHADO -->
     <div id="dice-tower-floating-root"></div>
 
@@ -577,11 +601,11 @@
         let questStatusFilter = 'ALL';
 
         let playersData = [
-            { id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', authKey: 'local-gm-key' },
-            { id: 'player-1', name: 'Jogador 1 (Kael)', role: 'player', pin: '', authKey: 'local-p1-key' },
-            { id: 'player-2', name: 'Jogador 2 (Kiriton)', role: 'player', pin: '', authKey: 'local-p2-key' },
-            { id: 'player-3', name: 'Jogador 3 (Auxiz)', role: 'player', pin: '', authKey: 'local-p3-key' },
-            { id: 'player-4', name: 'Jogador 4 (La Loba)', role: 'player', pin: '', authKey: 'local-p4-key' }
+            { id: 'gm-master', name: 'Mestre (GM)', role: 'gm', pin: '', authKey: 'local-gm-key', color: '#d8b467', avatarEmoji: '👑' },
+            { id: 'player-1', name: 'Jogador 1 (Kael)', role: 'player', pin: '', authKey: 'local-p1-key', color: '#4fc3f7', avatarEmoji: '⚔️' },
+            { id: 'player-2', name: 'Jogador 2 (Kiriton)', role: 'player', pin: '', authKey: 'local-p2-key', color: '#81c784', avatarEmoji: '🛡️' },
+            { id: 'player-3', name: 'Jogador 3 (Auxiz)', role: 'player', pin: '', authKey: 'local-p3-key', color: '#e57373', avatarEmoji: '🧙' },
+            { id: 'player-4', name: 'Jogador 4 (La Loba)', role: 'player', pin: '', authKey: 'local-p4-key', color: '#ba68c8', avatarEmoji: '🐺' }
         ];
         let activePlayerId = 'gm-master';
 
@@ -1038,11 +1062,12 @@
                 window.compendioData = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
             }
             loadLocalPersistence();
+            if (typeof CompendioProfiles !== 'undefined') CompendioProfiles.init();
             if (typeof CompendioRules !== 'undefined') await CompendioRules.init();
             if (typeof CompendioDice !== 'undefined') CompendioDice.init();
+            await checkServerStatus();
             CompendioNetAdapter.init();
             renderPlayerIdentitySelector();
-            await checkServerStatus();
             renderCombatHand();
             navigateCategory('monsters', document.querySelector('.nav-item[data-cat="monsters"]'));
         }
@@ -1215,8 +1240,13 @@
                     const data = await res.json();
                     if (data && data.writable) {
                         serverWritable = true;
+                        window.isHostClient = data.isHostClient !== false;
+                        if (data.room) window.onlineRoomConfig = data.room;
+                        if (Array.isArray(data.onlinePlayers)) window.onlinePlayersList = data.onlinePlayers;
                         dot.className = 'status-dot online';
-                        text.textContent = 'Salvo automático no PC';
+                        text.textContent = window.isHostClient ? 'Host: Salvo no PC' : 'Conectado à Sala';
+                        if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
+                        if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
                         return;
                     }
                 }
@@ -1224,6 +1254,7 @@
             serverWritable = false;
             dot.className = 'status-dot local';
             text.textContent = 'Modo Navegador (Cache)';
+            if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
         }
 
         /* =========================================================
@@ -5786,7 +5817,7 @@
 
         async function persistToDiskIfAvailable(filesToWrite = [], deletePaths = []) {
             saveLocalPersistence();
-            if (!serverWritable) return false;
+            if (!serverWritable || window.isHostClient === false) return false;
 
             try {
                 const res = await fetch('/api/save', {
@@ -6125,8 +6156,9 @@
         }
     </script>
 
-    <!-- MÓDULOS DE EXPANSÃO VTT, MOTOR DE REGRAS, DADOS, COMBATE & MULTIPLAYER -->
+    <!-- MÓDULOS DE EXPANSÃO VTT, MOTOR DE REGRAS, DADOS, COMBATE, PERFIS & MULTIPLAYER -->
     <script src="js/rules-mods.js"></script>
+    <script src="js/profiles-lobby.js"></script>
     <script src="js/dice-engine.js"></script>
     <script src="js/combat-sync.js"></script>
     <script src="js/character-vtt.js"></script>

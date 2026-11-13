@@ -11,7 +11,7 @@
 | Componente / Component | Tecnologia / Technology | Observação / Note |
 | :--- | :--- | :--- |
 | **Frontend** | HTML5, CSS3 (`public/css/compendio.css`), Vanilla JS (`public/js/*.js`) | Zero bibliotecas externas / Zero external libraries |
-| **Servidor Principal / Main Server** | **Node.js** (`>= 18.x`) | Usa apenas módulos nativos (`http`, `fs`, `path`) + **SSE Real-Time** (`/api/events`) |
+| **Servidor Principal / Main Server** | **Node.js** (`>= 18.x`) | Usa apenas módulos nativos (`http`, `fs`, `path`, `os`, `crypto`) + **SSE Real-Time** (`/api/events`) |
 | **Modo Janela de App / App Mode** | **Microsoft Edge** + **PowerShell** | Abre o Compêndio como aplicativo dedicado no Windows |
 | **Alternativas / Alternatives** | **PowerShell 5.1+** ou **Docker** | Funciona mesmo sem Node.js (`server.ps1` ou `docker compose`) |
 
@@ -25,14 +25,15 @@
 2. **🎲 Motor Universal de Dados & Statblocks Clicáveis (`public/js/dice-engine.js`):**
    - Bandeja flutuante com **Normal / Vantagem / Desvantagem / Crítico / Rolagem Oculta do GM** e histórico compartilhado em tempo real.
    - Todas as fichas 5etools (`{@hit}`, `{@dice}`, `{@damage}`), atributos, perícias e salvaguardas são botões clicáveis que rolam direto no log e permitem aplicar **-Dano / +Cura** com 1 clique.
-3. **🔮 Runa de Combate, Iniciativa & Dados de Vida Unificados (`public/js/combat-sync.js`):**
-   - Fila de Iniciativa ordenada automaticamente, contador de Rodadas, destaque luminoso do combatente ativo no Card e no Token do Tabletop, e botão **👑 Elite** (+50% PV, +2 CA).
+3. **🔮 Runa de Combate, Mostrador de Iniciativa Dinâmico & Dados de Vida (`public/js/combat-sync.js`):**
+   - Fila de Iniciativa ordenada automaticamente com **Mostrador Dinâmico fixo no Tabletop** (avançar/voltar turno, rolagem/edição rápida de iniciativa e clique para focar no token) + botão **👑 Elite** (+50% PV, +2 CA).
    - Sincronização bidirecional instantânea de PV entre **Card da Runa ↔ Token do Tabletop ↔ Ficha de Personagem ↔ Dados de Vida**.
-4. **🛡️ Ficha de Personagem Avançada (`public/js/character-vtt.js`):**
+4. **🛡️ Ficha de Personagem & Perfis Visuais (`public/js/character-vtt.js`, `public/js/profiles-lobby.js`):**
+   - Criação, login visual (com PIN mascarado), edição de nome (sincronizada com as fichas e presença online), cor indicativa, avatar emoji e remoção segura de perfis/personagens.
    - Importação universal (`.json` 5etools/Foundry/D&D Beyond, `.pdf`, `.html`), rolagens em 1 clique, **Salvaguardas contra a Morte**, **Inspiração**, **Exaustão**, **Espaços de Magia (1º ao 9º círculo)**, **Recursos de Classe/Mods** e **PV Temporário**.
-5. **🗺️ Tabletop 2D Tático & Multiplayer Real-Time (`public/js/character-vtt.js`, `public/js/net-realtime.js`):**
-   - Tokens com tamanho em grade (`1x1` a `4x4`), **Régua Tática** (arraste com botão direito), **Templates de Área (AoE)** arrastáveis, **Névoa de Guerra (Fog of War)** do Mestre e **Ping Visual** (`Alt + Clique`).
-   - Sincronização em tempo real via **Server-Sent Events (`/api/events`)** e deltas cirúrgicos para até 8 jogadores na rede local/VPN.
+5. **🗺️ Tabletop 2D Tático, Lobby Online & Modo Streamer (`public/js/profiles-lobby.js`, `public/js/net-realtime.js`):**
+   - Tokens com tamanho em grade (`1x1` a `4x4`) e cor indicativa do jogador, barra de **Jogadores Conectados**, **Régua Tática** (botão direito), **Templates de Área (AoE)**, **Névoa de Guerra** do Mestre e **Ping Visual** colorido por jogador (`Alt + Clique`).
+   - Gestão de Sala Online (abrir, configurar senha, trancar, fechar, **Kick**, **Ban/Desbanir** sem expor IP real, bloqueio de GM remoto), card de convite LAN/VPN **oculto por padrão** com cópia furtiva no clipboard, tutorial de entrada e **📺 Modo Streamer** (oculta IPs e substitui nomes reais por codinomes aleatórios).
 
 ---
 

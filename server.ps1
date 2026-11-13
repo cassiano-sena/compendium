@@ -39,6 +39,8 @@ $MimeTypes = @{
     ".opus" = "audio/ogg"
 }
 
+$SessionStateFile = Join-Path $PublicDir "session-state.json"
+
 $SessionState = @{
     sessionId   = "local-session"
     players     = @()
@@ -51,8 +53,75 @@ $SessionState = @{
     rules       = $null
     activeMods  = @()
     lastPing    = $null
+    roomConfig  = @{
+        isOpen                 = $true
+        isLocked               = $false
+        roomName               = "Mesa de Campanha"
+        roomCode               = ("MESA-" + (Get-Random -Minimum 1000 -Maximum 9999))
+        passcode               = ""
+        maxPlayers             = 8
+        blockRemoteGm          = $true
+        allowSelfProfileCreate = $true
+        bannedEntries          = @()
+        createdAt              = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    }
     updatedAt   = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 }
+
+$ActiveClients = @{}
+$KickedDevices = @{}
+
+function Save-PersistedSession {
+    try {
+        $ToSave = @{
+            sessionId   = $SessionState.sessionId
+            roomConfig  = $SessionState.roomConfig
+            players     = $SessionState.players
+            characters  = $SessionState.characters
+            tabletop    = $SessionState.tabletop
+            knowledge   = $SessionState.knowledge
+            combatCards = $SessionState.combatCards
+            combatTurn  = $SessionState.combatTurn
+            rules       = $SessionState.rules
+            activeMods  = $SessionState.activeMods
+            updatedAt   = $SessionState.updatedAt
+        }
+        $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($SessionStateFile, ($ToSave | ConvertTo-Json -Depth 20), $Utf8NoBom)
+    } catch {}
+}
+
+function Load-PersistedSession {
+    if (-not (Test-Path $SessionStateFile -PathType Leaf)) { return }
+    try {
+        $Raw = [System.IO.File]::ReadAllText($SessionStateFile, [System.Text.Encoding]::UTF8)
+        $Parsed = $Raw | ConvertFrom-Json
+        if ($null -ne $Parsed) {
+            if ($null -ne $Parsed.roomConfig) {
+                $rc = $Parsed.roomConfig
+                if ($null -ne $rc.isOpen) { $SessionState.roomConfig.isOpen = [bool]$rc.isOpen }
+                if ($null -ne $rc.isLocked) { $SessionState.roomConfig.isLocked = [bool]$rc.isLocked }
+                if ($rc.roomName) { $SessionState.roomConfig.roomName = [string]$rc.roomName }
+                if ($rc.roomCode) { $SessionState.roomConfig.roomCode = [string]$rc.roomCode }
+                if ($null -ne $rc.passcode) { $SessionState.roomConfig.passcode = [string]$rc.passcode }
+                if ($rc.maxPlayers) { $SessionState.roomConfig.maxPlayers = [int]$rc.maxPlayers }
+                if ($null -ne $rc.blockRemoteGm) { $SessionState.roomConfig.blockRemoteGm = [bool]$rc.blockRemoteGm }
+                if ($null -ne $rc.allowSelfProfileCreate) { $SessionState.roomConfig.allowSelfProfileCreate = [bool]$rc.allowSelfProfileCreate }
+                if ($null -ne $rc.bannedEntries) { $SessionState.roomConfig.bannedEntries = @($rc.bannedEntries) }
+            }
+            if ($null -ne $Parsed.players) { $SessionState.players = @($Parsed.players) }
+            if ($null -ne $Parsed.characters) { $SessionState.characters = @($Parsed.characters) }
+            if ($null -ne $Parsed.tabletop) { $SessionState.tabletop = $Parsed.tabletop }
+            if ($null -ne $Parsed.knowledge) { $SessionState.knowledge = $Parsed.knowledge }
+            if ($null -ne $Parsed.combatCards) { $SessionState.combatCards = @($Parsed.combatCards) }
+            if ($null -ne $Parsed.combatTurn) { $SessionState.combatTurn = $Parsed.combatTurn }
+            if ($null -ne $Parsed.rules) { $SessionState.rules = $Parsed.rules }
+            if ($null -ne $Parsed.activeMods) { $SessionState.activeMods = @($Parsed.activeMods) }
+        }
+    } catch {}
+}
+
+Load-PersistedSession
 
 function Get-SafePublicPath([string]$RelPath) {
     $Clean = ($RelPath -replace '^\.?[\\/]+', '')
@@ -63,20 +132,336 @@ function Get-SafePublicPath([string]$RelPath) {
     return $Resolved
 }
 
+function Send-JsonResponse($Response, [int]$StatusCode, $Object) {
+    $JsonStr = $Object | ConvertTo-Json -Depth 20 -Compress
+    $Bytes = [System.Text.Encoding]::UTF8.GetBytes($JsonStr)
+    $Response.ContentType = "application/json; charset=utf-8"
+    $Response.Headers.Set("Cache-Control", "no-store")
+    $Response.StatusCode = $StatusCode
+    $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
+    $Response.Close()
+}
+
+function Get-ClientIp($Request) {
+    try {
+        if ($Request.RemoteEndPoint -and $Request.RemoteEndPoint.Address) {
+            return [string]$Request.RemoteEndPoint.Address.ToString()
+        }
+    } catch {}
+    return "unknown"
+}
+
+function Test-IsHostRequest($Request) {
+    $Ip = (Get-ClientIp $Request).ToLower()
+    return ($Ip -eq "127.0.0.1" -or $Ip -eq "::1" -or $Ip -eq "::ffff:127.0.0.1" -or $Ip.StartsWith("127."))
+}
+
+function Get-HashedIdentifier([string]$Raw) {
+    $Sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $Bytes = [System.Text.Encoding]::UTF8.GetBytes("compendio-rpg-privacy-salt:" + $Raw)
+        $Hash = $Sha.ComputeHash($Bytes)
+        return ([System.BitConverter]::ToString($Hash) -replace '-', '').ToLower().Substring(0, 24)
+    } finally {
+        $Sha.Dispose()
+    }
+}
+
+function Get-HostNetworkAddresses {
+    $Lan = @()
+    $Vpn = @()
+    try {
+        foreach ($Nic in [System.Net.NetworkInformation.NetworkInterface]::GetAllNetworkInterfaces()) {
+            if ($Nic.OperationalStatus -ne [System.Net.NetworkInformation.OperationalStatus]::Up) { continue }
+            if ($Nic.NetworkInterfaceType -eq [System.Net.NetworkInformation.NetworkInterfaceType]::Loopback) { continue }
+            $Name = $Nic.Name
+            $Props = $Nic.GetIPProperties()
+            foreach ($Uni in $Props.UnicastAddresses) {
+                if ($Uni.Address.AddressFamily -ne [System.Net.Sockets.AddressFamily]::InterNetwork) { continue }
+                $Ip = $Uni.Address.IPAddressToString
+                if ($Ip.StartsWith("127.")) { continue }
+                $Parts = $Ip.Split('.') | ForEach-Object { [int]$_ }
+                $IsCgnat = ($Parts[0] -eq 100 -and $Parts[1] -ge 64 -and $Parts[1] -le 127)
+                $IsRadmin = ($Parts[0] -eq 26)
+                $IsHamachi = ($Parts[0] -eq 25)
+                $IsVpnName = ($Name -imatch 'tailscale|radmin|zerotier|hamachi|wireguard|tun|tap|vpn|wg')
+                $Entry = @{
+                    interfaceName = $Name
+                    ip            = $Ip
+                    url           = "http://${Ip}:$Port"
+                }
+                if ($IsCgnat -or $IsRadmin -or $IsHamachi -or $IsVpnName) {
+                    $Vpn += $Entry
+                } else {
+                    $Lan += $Entry
+                }
+            }
+        }
+    } catch {}
+    return @{ port = [int]$Port; lan = @($Lan); vpn = @($Vpn) }
+}
+
+function Get-SanitizedRoom([bool]$IsHost) {
+    $Rc = $SessionState.roomConfig
+    $Bans = @($Rc.bannedEntries)
+    $Base = @{
+        isOpen                 = [bool]$Rc.isOpen
+        isLocked               = [bool]$Rc.isLocked
+        roomName               = if ($Rc.roomName) { [string]$Rc.roomName } else { "Mesa de Campanha" }
+        roomCode               = if ($Rc.roomCode) { [string]$Rc.roomCode } else { "MESA-0000" }
+        hasPasscode            = [bool]$Rc.passcode
+        maxPlayers             = [Math]::Max(1, [int]$Rc.maxPlayers)
+        blockRemoteGm          = ($Rc.blockRemoteGm -ne $false)
+        allowSelfProfileCreate = ($Rc.allowSelfProfileCreate -ne $false)
+        createdAt              = $Rc.createdAt
+        bannedCount            = $Bans.Count
+    }
+    if ($IsHost) {
+        $Base.passcode = if ($Rc.passcode) { [string]$Rc.passcode } else { "" }
+        $Base.bannedEntries = @($Bans | ForEach-Object {
+            @{
+                id       = $_.id
+                deviceId = $_.deviceId
+                playerId = $_.playerId
+                label    = if ($_.label) { $_.label } else { "Jogador Banido" }
+                reason   = if ($_.reason) { $_.reason } else { "Banido pelo Mestre" }
+                bannedAt = $_.bannedAt
+            }
+        })
+    }
+    return $Base
+}
+
+function Get-SanitizedSession([bool]$IsHost) {
+    $PlayersOut = if ($IsHost) {
+        @($SessionState.players)
+    } else {
+        @($SessionState.players | ForEach-Object {
+            @{
+                id            = $_.id
+                name          = $_.name
+                role          = $_.role
+                color         = $_.color
+                avatarEmoji   = $_.avatarEmoji
+                streamerAlias = $_.streamerAlias
+                hasPin        = [bool]$_.pin
+            }
+        })
+    }
+    return @{
+        sessionId   = $SessionState.sessionId
+        players     = $PlayersOut
+        characters  = @($SessionState.characters)
+        tabletop    = $SessionState.tabletop
+        knowledge   = $SessionState.knowledge
+        combatCards = @($SessionState.combatCards)
+        combatTurn  = $SessionState.combatTurn
+        diceLog     = @($SessionState.diceLog)
+        rules       = $SessionState.rules
+        activeMods  = @($SessionState.activeMods)
+        lastPing    = $SessionState.lastPing
+        roomConfig  = (Get-SanitizedRoom $IsHost)
+        updatedAt   = $SessionState.updatedAt
+    }
+}
+
+function Test-ClientBanned($Request, [string]$DeviceId, [string]$PlayerId = "") {
+    if (Test-IsHostRequest $Request) { return $null }
+    $IpHash = Get-HashedIdentifier (Get-ClientIp $Request)
+    foreach ($B in @($SessionState.roomConfig.bannedEntries)) {
+        if ($DeviceId -and $B.deviceId -and $B.deviceId -eq $DeviceId) { return $B }
+        if ($B.ipHash -and $B.ipHash -eq $IpHash) { return $B }
+        if ($PlayerId -and $PlayerId -ne "gm-master" -and $B.playerId -and $B.playerId -eq $PlayerId) { return $B }
+    }
+    return $null
+}
+
+function Test-RoomPasscode($Request, [string]$Passcode = "") {
+    if (Test-IsHostRequest $Request) { return $true }
+    $Expected = [string]$SessionState.roomConfig.passcode
+    if (-not $Expected) { return $true }
+    return ($Passcode -eq $Expected)
+}
+
+function Update-ActiveClientsCleanup {
+    $Now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    foreach ($Key in @($ActiveClients.Keys)) {
+        if (($Now - $ActiveClients[$Key].lastSeen) -gt 20000) {
+            $ActiveClients.Remove($Key)
+        }
+    }
+}
+
+function Get-OnlinePlayersList {
+    Update-ActiveClientsCleanup
+    return @($ActiveClients.Values | ForEach-Object {
+        @{
+            clientId    = $_.clientId
+            deviceId    = $_.deviceId
+            playerId    = $_.playerId
+            playerName  = $_.playerName
+            role        = $_.role
+            color       = $_.color
+            avatarEmoji = $_.avatarEmoji
+            isHost      = [bool]$_.isHost
+            connectedAt = $_.connectedAt
+        }
+    })
+}
+
+function Get-QueryParam($Request, [string]$Key) {
+    $RawQuery = $Request.Url.Query
+    if (-not $RawQuery) { return "" }
+    $Trimmed = $RawQuery.TrimStart('?')
+    foreach ($Pair in $Trimmed.Split('&')) {
+        if (-not $Pair) { continue }
+        $Kv = $Pair.Split('=', 2)
+        $K = [System.Uri]::UnescapeDataString($Kv[0] -replace '\+', ' ')
+        if ($K -eq $Key) {
+            if ($Kv.Count -gt 1) { return [System.Uri]::UnescapeDataString($Kv[1] -replace '\+', ' ') }
+            return ""
+        }
+    }
+    return ""
+}
+
 try {
     while ($Listener.IsListening) {
         $Context = $Listener.GetContext()
         $Request = $Context.Request
         $Response = $Context.Response
         $PathName = [System.Uri]::UnescapeDataString($Request.Url.AbsolutePath)
+        $IsHost = Test-IsHostRequest $Request
 
         try {
             if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/status") {
-                $Bytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"mode":"powershell","writable":true,"multiplayerReady":true,"sseReady":false}')
-                $Response.ContentType = "application/json; charset=utf-8"
-                $Response.StatusCode = 200
-                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
-                $Response.Close()
+                $Online = Get-OnlinePlayersList
+                Send-JsonResponse $Response 200 @{
+                    ok               = $true
+                    mode             = "powershell"
+                    writable         = $true
+                    multiplayerReady = $true
+                    sseReady         = $false
+                    isHostClient     = $IsHost
+                    port             = [int]$Port
+                    room             = (Get-SanitizedRoom $IsHost)
+                    onlineCount      = $Online.Count
+                    onlinePlayers    = $Online
+                }
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/host-network") {
+                if (-not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; error = "Apenas o computador Host pode consultar seus enderecos de rede." }
+                    continue
+                }
+                Send-JsonResponse $Response 200 @{ ok = $true; network = (Get-HostNetworkAddresses) }
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "POST" -and $PathName -eq "/api/room/verify-passcode") {
+                $Reader = New-Object System.IO.StreamReader($Request.InputStream, [System.Text.Encoding]::UTF8)
+                $Body = $Reader.ReadToEnd()
+                $Reader.Close()
+                $Incoming = if ($Body) { $Body | ConvertFrom-Json } else { @{} }
+                $DeviceId = [string]$Incoming.deviceId
+                $Banned = Test-ClientBanned $Request $DeviceId ""
+                if ($null -ne $Banned) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; banned = $true; error = $Banned.reason }
+                    continue
+                }
+                if (-not $SessionState.roomConfig.isOpen -and -not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; closed = $true; error = "A sala online foi encerrada pelo Mestre." }
+                    continue
+                }
+                if (-not (Test-RoomPasscode $Request ([string]$Incoming.passcode))) {
+                    Send-JsonResponse $Response 401 @{ ok = $false; error = "Senha ou codigo de acesso da sala incorreto." }
+                    continue
+                }
+                Send-JsonResponse $Response 200 @{ ok = $true; room = (Get-SanitizedRoom $IsHost) }
+                continue
+            }
+
+            if ($Request.HttpMethod -eq "POST" -and $PathName -eq "/api/room/manage") {
+                if (-not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; error = "Apenas o Mestre no computador Host pode gerenciar a sala online." }
+                    continue
+                }
+                $Reader = New-Object System.IO.StreamReader($Request.InputStream, [System.Text.Encoding]::UTF8)
+                $Body = $Reader.ReadToEnd()
+                $Reader.Close()
+                $Incoming = if ($Body) { $Body | ConvertFrom-Json } else { @{} }
+                $Action = [string]$Incoming.action
+                $Rc = $SessionState.roomConfig
+
+                if ($Action -eq "open" -or $Action -eq "create_or_update") {
+                    $Rc.isOpen = $true
+                    if ($Incoming.roomName) { $Rc.roomName = ([string]$Incoming.roomName).Trim() }
+                    if ($null -ne $Incoming.passcode) { $Rc.passcode = ([string]$Incoming.passcode).Trim() }
+                    if ($null -ne $Incoming.maxPlayers) { $Rc.maxPlayers = [Math]::Max(1, [Math]::Min(16, [int]$Incoming.maxPlayers)) }
+                    if ($null -ne $Incoming.isLocked) { $Rc.isLocked = [bool]$Incoming.isLocked }
+                    if ($null -ne $Incoming.blockRemoteGm) { $Rc.blockRemoteGm = [bool]$Incoming.blockRemoteGm }
+                    if ($null -ne $Incoming.allowSelfProfileCreate) { $Rc.allowSelfProfileCreate = [bool]$Incoming.allowSelfProfileCreate }
+                    if ($Incoming.regenerateCode) { $Rc.roomCode = ("MESA-" + (Get-Random -Minimum 1000 -Maximum 9999)) }
+                } elseif ($Action -eq "toggle_lock") {
+                    $Rc.isLocked = if ($null -ne $Incoming.locked) { [bool]$Incoming.locked } else { -not [bool]$Rc.isLocked }
+                } elseif ($Action -eq "close") {
+                    $Rc.isOpen = $false
+                    foreach ($K in @($ActiveClients.Keys)) {
+                        if (-not $ActiveClients[$K].isHost) { $ActiveClients.Remove($K) }
+                    }
+                } elseif ($Action -eq "kick") {
+                    $TargetCid = [string]$Incoming.targetClientId
+                    $TargetDid = [string]$Incoming.targetDeviceId
+                    foreach ($K in @($ActiveClients.Keys)) {
+                        if ($ActiveClients[$K].isHost) { continue }
+                        if (($TargetCid -and $ActiveClients[$K].clientId -eq $TargetCid) -or ($TargetDid -and $ActiveClients[$K].deviceId -eq $TargetDid)) {
+                            if ($ActiveClients[$K].deviceId) { $KickedDevices[$ActiveClients[$K].deviceId] = [string]$Incoming.reason }
+                            $ActiveClients.Remove($K)
+                        }
+                    }
+                } elseif ($Action -eq "ban") {
+                    $TargetCid = [string]$Incoming.targetClientId
+                    $TargetDid = [string]$Incoming.targetDeviceId
+                    $TargetPid = [string]$Incoming.targetPlayerId
+                    $Matched = $null
+                    foreach ($K in @($ActiveClients.Keys)) {
+                        if ($ActiveClients[$K].isHost) { continue }
+                        if (($TargetCid -and $ActiveClients[$K].clientId -eq $TargetCid) -or ($TargetDid -and $ActiveClients[$K].deviceId -eq $TargetDid)) {
+                            $Matched = $ActiveClients[$K]
+                            break
+                        }
+                    }
+                    $BanRecord = @{
+                        id       = ("ban-" + [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())
+                        deviceId = if ($Matched -and $Matched.deviceId) { $Matched.deviceId } else { $TargetDid }
+                        ipHash   = if ($Matched -and $Matched.ipHash) { $Matched.ipHash } else { "" }
+                        playerId = if ($Matched -and $Matched.playerId -and $Matched.playerId -ne "gm-master") { $Matched.playerId } elseif ($TargetPid -and $TargetPid -ne "gm-master") { $TargetPid } else { "" }
+                        label    = if ($Incoming.label) { [string]$Incoming.label } elseif ($Matched) { $Matched.playerName } else { "Jogador Banido" }
+                        reason   = if ($Incoming.reason) { [string]$Incoming.reason } else { "Acesso bloqueado pelo Mestre da sala." }
+                        bannedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                    }
+                    $Rc.bannedEntries = @($Rc.bannedEntries) + $BanRecord
+                    foreach ($K in @($ActiveClients.Keys)) {
+                        if ($ActiveClients[$K].isHost) { continue }
+                        $C = $ActiveClients[$K]
+                        if (($BanRecord.deviceId -and $C.deviceId -eq $BanRecord.deviceId) -or ($BanRecord.ipHash -and $C.ipHash -eq $BanRecord.ipHash) -or ($BanRecord.playerId -and $C.playerId -eq $BanRecord.playerId)) {
+                            $ActiveClients.Remove($K)
+                        }
+                    }
+                } elseif ($Action -eq "unban") {
+                    $BanId = [string]$Incoming.banId
+                    $Rc.bannedEntries = @($Rc.bannedEntries | Where-Object { $_.id -ne $BanId })
+                }
+
+                $SessionState.updatedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                Save-PersistedSession
+                Send-JsonResponse $Response 200 @{
+                    ok            = $true
+                    room          = (Get-SanitizedRoom $true)
+                    onlinePlayers = (Get-OnlinePlayersList)
+                }
                 continue
             }
 
@@ -102,22 +487,56 @@ try {
                         }
                     }
                 }
-                $RespJson = @{ ok = $true; mods = $ModList } | ConvertTo-Json -Depth 15
-                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
-                $Response.ContentType = "application/json; charset=utf-8"
-                $Response.StatusCode = 200
-                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
-                $Response.Close()
+                Send-JsonResponse $Response 200 @{ ok = $true; mods = $ModList }
                 continue
             }
 
             if ($Request.HttpMethod -eq "GET" -and $PathName -eq "/api/session") {
-                $RespJson = @{ ok = $true; session = $SessionState; onlinePlayers = @() } | ConvertTo-Json -Depth 20
-                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
-                $Response.ContentType = "application/json; charset=utf-8"
-                $Response.StatusCode = 200
-                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
-                $Response.Close()
+                $DeviceId = Get-QueryParam $Request "deviceId"
+                $Passcode = Get-QueryParam $Request "passcode"
+                if (-not $Passcode -and $Request.Headers["x-room-passcode"]) { $Passcode = [string]$Request.Headers["x-room-passcode"] }
+                $Banned = Test-ClientBanned $Request $DeviceId ""
+                if ($null -ne $Banned) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; banned = $true; error = $Banned.reason }
+                    continue
+                }
+                if ($DeviceId -and $KickedDevices.ContainsKey($DeviceId) -and -not $IsHost) {
+                    $KickMsg = $KickedDevices[$DeviceId]
+                    $KickedDevices.Remove($DeviceId)
+                    Send-JsonResponse $Response 403 @{ ok = $false; kicked = $true; error = if ($KickMsg) { $KickMsg } else { "Desconectado da sala pelo Mestre." } }
+                    continue
+                }
+                if (-not $SessionState.roomConfig.isOpen -and -not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; closed = $true; error = "Sala fechada." }
+                    continue
+                }
+                if (-not (Test-RoomPasscode $Request $Passcode)) {
+                    Send-JsonResponse $Response 401 @{ ok = $false; authRequired = $true; error = "Senha necessaria." }
+                    continue
+                }
+                $ClientId = Get-QueryParam $Request "clientId"
+                if ($ClientId) {
+                    $ActiveClients[$ClientId] = @{
+                        clientId    = $ClientId
+                        deviceId    = if ($DeviceId) { $DeviceId } else { $ClientId }
+                        ipHash      = (Get-HashedIdentifier (Get-ClientIp $Request))
+                        playerId    = (Get-QueryParam $Request "playerId")
+                        playerName  = (Get-QueryParam $Request "playerName")
+                        role        = if (-not $IsHost -and $SessionState.roomConfig.blockRemoteGm -and (Get-QueryParam $Request "role") -eq "gm") { "player" } else { (Get-QueryParam $Request "role") }
+                        color       = (Get-QueryParam $Request "color")
+                        avatarEmoji = (Get-QueryParam $Request "avatarEmoji")
+                        isHost      = $IsHost
+                        connectedAt = if ($ActiveClients.ContainsKey($ClientId)) { $ActiveClients[$ClientId].connectedAt } else { [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+                        lastSeen    = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                    }
+                }
+                Send-JsonResponse $Response 200 @{
+                    ok            = $true
+                    isHostClient  = $IsHost
+                    session       = (Get-SanitizedSession $IsHost)
+                    room          = (Get-SanitizedRoom $IsHost)
+                    onlinePlayers = (Get-OnlinePlayersList)
+                }
                 continue
             }
 
@@ -127,6 +546,43 @@ try {
                 $Reader.Close()
 
                 $Incoming = $Body | ConvertFrom-Json
+                $SenderCid = [string]$Incoming.clientId
+                $DeviceId = if ($Incoming.deviceId) { [string]$Incoming.deviceId } else { $SenderCid }
+                $SenderId = [string]$Incoming.senderId
+                $Passcode = if ($Incoming.passcode) { [string]$Incoming.passcode } elseif ($Request.Headers["x-room-passcode"]) { [string]$Request.Headers["x-room-passcode"] } else { "" }
+
+                $Banned = Test-ClientBanned $Request $DeviceId $SenderId
+                if ($null -ne $Banned) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; banned = $true; error = $Banned.reason }
+                    continue
+                }
+                if (-not $SessionState.roomConfig.isOpen -and -not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; closed = $true; error = "A sala esta fechada pelo Mestre." }
+                    continue
+                }
+                if (-not (Test-RoomPasscode $Request $Passcode)) {
+                    Send-JsonResponse $Response 401 @{ ok = $false; authRequired = $true; error = "Senha incorreta." }
+                    continue
+                }
+
+                if ($SenderCid) {
+                    $RoleOut = if ($Incoming.senderRole) { [string]$Incoming.senderRole } else { "player" }
+                    if (-not $IsHost -and $SessionState.roomConfig.blockRemoteGm -and $RoleOut -eq "gm") { $RoleOut = "player" }
+                    $ActiveClients[$SenderCid] = @{
+                        clientId    = $SenderCid
+                        deviceId    = $DeviceId
+                        ipHash      = (Get-HashedIdentifier (Get-ClientIp $Request))
+                        playerId    = $SenderId
+                        playerName  = if ($Incoming.senderName) { [string]$Incoming.senderName } else { "Jogador" }
+                        role        = $RoleOut
+                        color       = if ($Incoming.senderColor) { [string]$Incoming.senderColor } else { "#d8b467" }
+                        avatarEmoji = if ($Incoming.senderAvatar) { [string]$Incoming.senderAvatar } else { "🛡️" }
+                        isHost      = $IsHost
+                        connectedAt = if ($ActiveClients.ContainsKey($SenderCid)) { $ActiveClients[$SenderCid].connectedAt } else { [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+                        lastSeen    = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+                    }
+                }
+
                 if ($Incoming.delta) {
                     $d = $Incoming.delta
                     if ($d.type -eq "DICE_ROLL" -and $d.roll) {
@@ -148,16 +604,16 @@ try {
                     if ($null -ne $Incoming.activeMods) { $SessionState.activeMods = $Incoming.activeMods }
                 }
                 $SessionState.updatedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-                $RespJson = @{ ok = $true; updatedAt = $SessionState.updatedAt } | ConvertTo-Json
-                $Bytes = [System.Text.Encoding]::UTF8.GetBytes($RespJson)
-                $Response.ContentType = "application/json; charset=utf-8"
-                $Response.StatusCode = 200
-                $Response.OutputStream.Write($Bytes, 0, $Bytes.Length)
-                $Response.Close()
+                Save-PersistedSession
+                Send-JsonResponse $Response 200 @{ ok = $true; updatedAt = $SessionState.updatedAt }
                 continue
             }
 
             if ($Request.HttpMethod -eq "POST" -and $PathName -eq "/api/save") {
+                if (-not $IsHost) {
+                    Send-JsonResponse $Response 403 @{ ok = $false; error = "Apenas o computador Host pode gravar arquivos permanentes no disco." }
+                    continue
+                }
                 $Reader = New-Object System.IO.StreamReader($Request.InputStream, [System.Text.Encoding]::UTF8)
                 $Body = $Reader.ReadToEnd()
                 $Reader.Close()
@@ -203,16 +659,19 @@ try {
                     [System.IO.File]::WriteAllText($DadosPath, $JsContent, $Utf8NoBom)
                 }
 
-                $RespBytes = [System.Text.Encoding]::UTF8.GetBytes('{"ok":true,"message":"Salvo com sucesso!"}')
-                $Response.ContentType = "application/json; charset=utf-8"
-                $Response.StatusCode = 200
-                $Response.OutputStream.Write($RespBytes, 0, $RespBytes.Length)
-                $Response.Close()
+                Send-JsonResponse $Response 200 @{ ok = $true; message = "Salvo com sucesso!" }
                 continue
             }
 
             $ReqFile = if ($PathName -eq "/") { "/index.html" } else { $PathName }
             $FullPath = Get-SafePublicPath $ReqFile
+
+            if ($FullPath -ieq $SessionStateFile) {
+                $Response.StatusCode = 403
+                $ErrBytes = [System.Text.Encoding]::UTF8.GetBytes("Acesso restrito")
+                $Response.OutputStream.Write($ErrBytes, 0, $ErrBytes.Length)
+                continue
+            }
 
             if (Test-Path $FullPath -PathType Leaf) {
                 $Ext = [System.IO.Path]::GetExtension($FullPath).ToLower()
