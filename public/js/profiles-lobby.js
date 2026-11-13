@@ -318,6 +318,15 @@ function ensureSafeInitialProfileForClient() {
             if (firstPlayer) activePlayerId = firstPlayer.id;
         }
         renderPlayerIdentitySelector();
+        if (typeof CompendioNetAdapter !== 'undefined' && typeof CompendioNetAdapter.sendPresenceUpdate === 'function') {
+            CompendioNetAdapter.sendPresenceUpdate();
+        }
+        if (typeof refreshCompendiumViewAfterSync === 'function') {
+            refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true });
+        } else if (typeof activeModule !== 'undefined') {
+            if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
+            else if (activeModule === 'character' && typeof renderCharacterModule === 'function') renderCharacterModule();
+        }
         if (!window._promptedRemoteProfileOnce) {
             window._promptedRemoteProfileOnce = true;
             setTimeout(() => {

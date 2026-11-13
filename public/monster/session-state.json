@@ -1,0 +1,2426 @@
+{
+  "sessionId": "local-session",
+  "roomConfig": {
+    "isOpen": true,
+    "isLocked": false,
+    "roomName": "Mesa de Campanha",
+    "roomCode": "MESA-9378",
+    "passcode": "",
+    "maxPlayers": 8,
+    "blockRemoteGm": true,
+    "allowSelfProfileCreate": true,
+    "bannedEntries": [],
+    "createdAt": 1794586453462
+  },
+  "players": [
+    {
+      "id": "gm-master",
+      "name": "Mestre (GM)",
+      "role": "gm",
+      "color": "#d8b467",
+      "avatarEmoji": "👑",
+      "hasPin": false,
+      "pin": ""
+    },
+    {
+      "id": "player-mwf4njbd-9gn",
+      "name": "Dkziin",
+      "role": "player",
+      "color": "#000000",
+      "avatarEmoji": "🐺",
+      "hasPin": false,
+      "pin": ""
+    }
+  ],
+  "characters": [
+    {
+      "id": "char-kael-varhen",
+      "name": "Kael Varhen",
+      "ownerId": "player-1",
+      "ownerName": "Jogador 1 (Kael)",
+      "race": "Aasimar (Nobre da Casa Varhen)",
+      "classLevel": "Fighter (Eldritch Knight) 13",
+      "ac": 20,
+      "hpCurrent": 71,
+      "hpMax": 165,
+      "hpTemp": 0,
+      "speed": "30ft (9m)",
+      "initiativeBonus": 4,
+      "passivePerceptionBonus": 5,
+      "hitDieType": 10,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 20,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 10,
+        "cha": 8
+      },
+      "inventory": "• Greatsword +2 (Weapon Mastery: Graze, +12 atk, 2d6+7 slashing)\n• Longsword +1 (Sap, +11 atk, 1d8+6)\n• Javelin (+10 atk, 1d6+5)\n• Plate Armor (CA 20)\n• Magias Preparadas: Shield, Absorb Elements, Misty Step, Counterspell, Fireball, Spirit Shroud, Haste",
+      "notes": "Ficha padrão importada de public/import-tests/kael-varhen-ek-13-v2.pdf.\nHabilidades: Second Wind, Action Surge, War Bond, Eldritch Strike, Arcane Charge, Indomitable (2x), Three Extra Attacks.",
+      "tokenImg": "./npc/kael/bucket-head.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-sw",
+          "name": "Retomar o Fôlego (Second Wind)",
+          "current": 2,
+          "max": 2,
+          "recharge": "short"
+        },
+        {
+          "id": "res-as",
+          "name": "Surto de Ação (Action Surge)",
+          "current": 1,
+          "max": 1,
+          "recharge": "short"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 4,
+          "max": 4
+        },
+        "2": {
+          "current": 3,
+          "max": 3
+        },
+        "3": {
+          "current": 2,
+          "max": 2
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-kiriton",
+      "name": "Kiriton",
+      "ownerId": "player-2",
+      "ownerName": "Jogador 2 (Kiriton)",
+      "race": "Elf, High (Farmer)",
+      "classLevel": "Mago 1",
+      "ac": 13,
+      "hpCurrent": 9,
+      "hpMax": 9,
+      "hpTemp": 0,
+      "speed": "30ft (9m)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 2,
+      "hitDieType": 8,
+      "hitDieCurrent": 1,
+      "hitDieMax": 1,
+      "stats": {
+        "str": 8,
+        "dex": 15,
+        "con": 13,
+        "int": 17,
+        "wis": 12,
+        "cha": 10
+      },
+      "inventory": "• Cajado Arcano (Foco)\n• Adaga (+4 atk, 1d4+2 perfurante)\n• Grimório & Componentes\n• Truques & Magias de 1º Círculo (D&D 2024 PT-BR)",
+      "notes": "Ficha padrão importada de public/import-tests/kiriton.pdf (D&D 2024 PT-BR).\nTalento de Origem: Tough / Iniciado em Magia.\nTraços de Alto Elfo: Visão no Escuro 18m, Ancestralidade Feérica, Transe, Passo Nebuloso.",
+      "tokenImg": "./npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [],
+      "spellSlots": {
+        "1": {
+          "current": 4,
+          "max": 4
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-auxiz",
+      "name": "Auxiz",
+      "ownerId": "player-3",
+      "ownerName": "Jogador 3 (Auxiz)",
+      "race": "Tiefling Cthonic (Merchant)",
+      "classLevel": "Rogue 1",
+      "ac": 13,
+      "hpCurrent": 9,
+      "hpMax": 9,
+      "hpTemp": 0,
+      "speed": "30ft (9m)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 2,
+      "hitDieType": 8,
+      "hitDieCurrent": 1,
+      "hitDieMax": 1,
+      "stats": {
+        "str": 8,
+        "dex": 15,
+        "con": 10,
+        "int": 10,
+        "wis": 14,
+        "cha": 16
+      },
+      "inventory": "• Shortsword (+4 atk, 1d6+2 piercing, Vex)\n• Dagger x2 (+4 atk, 1d4+2 piercing, Nick)\n• Shortbow (+4 atk, 1d6+2 piercing, Vex, 20 flechas)\n• Leather Armor (CA 13)\n• Thieves' Tools, Merchant's Scale",
+      "notes": "Ficha padrão importada de public/import-tests/character-sheet.pdf.\nHabilidades: Expertise, Sneak Attack (1d6), Thieves' Cant, Weapon Mastery, Cthonic Legacy.",
+      "tokenImg": "./npc/zaltherion/zaltherion-act-2-profile.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-la-loba",
+      "name": "La Loba (Tanya)",
+      "ownerId": "player-4",
+      "ownerName": "Jogador 4 (La Loba)",
+      "race": "ArchDemon",
+      "classLevel": "Barbarian (Precognition) 22",
+      "ac": 30,
+      "hpCurrent": 320,
+      "hpMax": 320,
+      "hpTemp": 0,
+      "speed": "45ft (13,5m)",
+      "initiativeBonus": 5,
+      "passivePerceptionBonus": 8,
+      "hitDieType": 12,
+      "hitDieCurrent": 22,
+      "hitDieMax": 22,
+      "stats": {
+        "str": 20,
+        "dex": 26,
+        "con": 24,
+        "int": 18,
+        "wis": 16,
+        "cha": 20
+      },
+      "inventory": "• Claws of the Abyss\n• Unarmored Defense (CA 30)\n• Relíquias Abissais Sintonizadas",
+      "notes": "Ficha padrão importada de public/import-tests/La Loba.pdf.\nHabilidades: Rage, Unarmored Defense, Reckless Attack, Danger Sense, Extra Attack, Brutal Critical, Relentless Rage, Primal Champion, Precognition Foresight.",
+      "tokenImg": "./npc/aetheron/aetheron.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-rage",
+          "name": "Fúria (Rage)",
+          "current": 4,
+          "max": 4,
+          "recharge": "long"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-astel-varhen",
+      "name": "Astel Vhalzar Varhen",
+      "ownerId": "player-1",
+      "ownerName": "Jogador 1 (Astel)",
+      "race": "Humano (Casa Varhen)",
+      "classLevel": "Cleric (Hadar) · ND 30",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m, voo 9m, natação 9m",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 10,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Saving Throws: Str +19, Con +18, Int +18, Wis +15, Cha +14\n• Skills: Athletics +19, Arcana +18, Perception +15\n• Resistências: Necrotic, Radiant",
+      "notes": "Ficha padrão sincronizada de public/import-tests/astel.html e public/npc/astel/astel.html.\nTraços: Instinto, Multiataque.",
+      "tokenImg": "./npc/kael/bucket-head.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-cd",
+          "name": "Canalizar Divindade",
+          "current": 2,
+          "max": 2,
+          "recharge": "short"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 4,
+          "max": 4
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-connor-smith",
+      "name": "Connor Smith",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Humano",
+      "classLevel": "Level 10 Battle Smith (Artificer)",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m (30 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 10,
+      "hitDieCurrent": 10,
+      "hitDieMax": 10,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Steel Defender & Armas Rúnicas de Artífice (Battle Smith)",
+      "notes": "Ficha padrão sincronizada de public/npc/connor/connor.html.",
+      "tokenImg": "./npc/connor/connor-smith.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-aetheron",
+      "name": "Aetheron",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Construct (Humanoid)",
+      "classLevel": "Battle Smith",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m (30 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 10,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Núcleo Arcano & Armadura de Constructo (CA 20)",
+      "notes": "Ficha padrão sincronizada de public/npc/aetheron/aetheron.html.",
+      "tokenImg": "./npc/aetheron/aetheron.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-lyra-bloodseeker",
+      "name": "Lyra Bloodseeker",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Human Lycanthrope",
+      "classLevel": "Beast Barbarian / Champion",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m (30 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 12,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Garras Bestiais Licantrópicas & Fúria Sanguinária",
+      "notes": "Ficha padrão sincronizada de public/npc/lyra/lyra.html.",
+      "tokenImg": "./monster/data/werewolf/token.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-rage",
+          "name": "Fúria (Rage)",
+          "current": 4,
+          "max": 4,
+          "recharge": "long"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-mustang",
+      "name": "Mustang",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Inverted Centaur",
+      "classLevel": "HORSE (Deer) Totem Barbarian",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "12m (40 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 12,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Totem Espiritual & Investida Implacável",
+      "notes": "Ficha padrão sincronizada de public/npc/mustang/mustang.html.",
+      "tokenImg": "./npc/mustang/mustang.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-rage",
+          "name": "Fúria (Rage)",
+          "current": 4,
+          "max": 4,
+          "recharge": "long"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-willick",
+      "name": "Willick Wolfgang Blackthorn III",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Owlin",
+      "classLevel": "Abjurer (Wizard)",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m, voo 9m",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 6,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Grimório de Abjuração Blackthorn & Proteção Arcana",
+      "notes": "Ficha padrão sincronizada de public/npc/willick/willick.html.",
+      "tokenImg": "./npc/willick/willick-wolfgang-amadeus-frederick-von-bernard-blackthorn-III.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [],
+      "spellSlots": {
+        "1": {
+          "current": 4,
+          "max": 4
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-zaltherion",
+      "name": "Zaltherion Vindicator",
+      "ownerId": "gm-master",
+      "ownerName": "Mestre (GM)",
+      "race": "Tiefling",
+      "classLevel": "Devotion Paladin",
+      "ac": 20,
+      "hpCurrent": 140,
+      "hpMax": 140,
+      "hpTemp": 0,
+      "speed": "9m (30 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 3,
+      "hitDieType": 10,
+      "hitDieCurrent": 13,
+      "hitDieMax": 13,
+      "stats": {
+        "str": 21,
+        "dex": 10,
+        "con": 20,
+        "int": 18,
+        "wis": 8,
+        "cha": 10
+      },
+      "inventory": "• Arma Sagrada (Sacred Weapon) & Armadura de Devoção",
+      "notes": "Ficha padrão sincronizada de public/npc/zaltherion/zaltherion.html.",
+      "tokenImg": "./npc/zaltherion/zaltherion-act-2-profile.png",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-cd",
+          "name": "Canalizar Divindade",
+          "current": 2,
+          "max": 2,
+          "recharge": "short"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 4,
+          "max": 4
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-mwf4qhlf-58",
+      "name": "Novo Aventureiro",
+      "ownerId": "player-mwf4njbd-9gn",
+      "ownerName": "Dkziin",
+      "race": "Humano",
+      "classLevel": "Guerreiro 1",
+      "ac": 16,
+      "hpCurrent": 12,
+      "hpMax": 12,
+      "hpTemp": 0,
+      "speed": "9m (30 ft)",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 0,
+      "hitDieType": 10,
+      "hitDieCurrent": 1,
+      "hitDieMax": 1,
+      "stats": {
+        "str": 15,
+        "dex": 13,
+        "con": 14,
+        "int": 10,
+        "wis": 12,
+        "cha": 8
+      },
+      "inventory": "",
+      "notes": "",
+      "tokenImg": "",
+      "inspiration": false,
+      "exhaustion": 0,
+      "deathSaves": {
+        "successes": 0,
+        "failures": 0
+      },
+      "customResources": [
+        {
+          "id": "res-sw",
+          "name": "Retomar o Fôlego (Second Wind)",
+          "current": 2,
+          "max": 2,
+          "recharge": "short"
+        },
+        {
+          "id": "res-as",
+          "name": "Surto de Ação (Action Surge)",
+          "current": 1,
+          "max": 1,
+          "recharge": "short"
+        }
+      ],
+      "spellSlots": {
+        "1": {
+          "current": 0,
+          "max": 0
+        },
+        "2": {
+          "current": 0,
+          "max": 0
+        },
+        "3": {
+          "current": 0,
+          "max": 0
+        },
+        "4": {
+          "current": 0,
+          "max": 0
+        },
+        "5": {
+          "current": 0,
+          "max": 0
+        },
+        "6": {
+          "current": 0,
+          "max": 0
+        },
+        "7": {
+          "current": 0,
+          "max": 0
+        },
+        "8": {
+          "current": 0,
+          "max": 0
+        },
+        "9": {
+          "current": 0,
+          "max": 0
+        }
+      },
+      "linkedItems": []
+    },
+    {
+      "id": "char-mwf4thqi-159",
+      "name": "Yankee",
+      "ownerId": "player-mwf4njbd-9gn",
+      "ownerName": "Dkziin",
+      "race": "Tiefiling (Cthonic) (Mercante)",
+      "classLevel": "Ladino (Adaga Espiritual) 3",
+      "alignment": "Neutro",
+      "ac": 12,
+      "hpCurrent": 18,
+      "hpMax": 18,
+      "hpTemp": 0,
+      "speed": "30ft",
+      "initiativeBonus": 0,
+      "passivePerceptionBonus": 0,
+      "hitDieType": 8,
+      "hitDieCurrent": 3,
+      "hitDieMax": 3,
+      "stats": {
+        "str": 8,
+        "dex": 15,
+        "con": 10,
+        "int": 10,
+        "wis": 14,
+        "cha": 16
+      },
+      "str": 8,
+      "dex": 15,
+      "con": 10,
+      "int": 10,
+      "wis": 14,
+      "cha": 16,
+      "level": 3,
+      "attacks": "• Perfurante · Acuidade/ leve /arremeso(60-120) · 1d4 · Adaga\n• Perfurante · Acuidade/ leve /arremeso(60-120) · 1d4 · Adaga",
+      "features": "RAÇA:\r\nToque Gelido: 1d10 Necrotico\r\n\r\nExperteza: 2x (Prestidigitação e Enganação)\r\n\r\nAtaque sorateiro: 1d6\r\n\r\nLVL2 \r\nAção Ardilosa\r\n\r\nLVL3\r\nLamina Psiquica\r\n\r\nPoder Psionico (4 x d6) \r\n\r\nMira Firme (vantagem se nao se mover)\nAção Ardilosa: Seu pensamento rápido e agilidade permitem que você\r\nse mova e aja rapidamente. No seu turno, você pode\r\nexecutar uma das seguintes ações como uma Ação\r\nBônus: Correr, Desengajar ou Esconder.",
+      "inventory": "⚔️ ARMAS & ATAQUES:\n• Perfurante · Acuidade/ leve /arremeso(60-120) · 1d4 · Adaga\n• Perfurante · Acuidade/ leve /arremeso(60-120) · 1d4 · Adaga\n\n🎒 EQUIPAMENTOS:\n1X Leather Armor\r\n2X Daggers;\r\n1X Short Sword;\r\n1X Shortbow;\r\n20X Arrows; \r\n1X Quiver; \r\n1X Thieves' Tools;\r\n1X Burglar's Pack;\r\n1x Navigator's Tool;\r\n2x Pouches;\r\n1XTraveler's Clothes.\r\n3 pcs de ouro \r\n25 pcs prata \r\n2 ligthscrosbow 50 pelos 2\n\n✨ MAGIAS (5):\n• Toque Gelido\n• Toque\n• Vida Falsa\n• Ação\n• Traumaturgia",
+      "notes": "Alinhamento: Neutro\n\n🔥 CARACTERÍSTICAS & TALENTOS:\nRAÇA:\r\nToque Gelido: 1d10 Necrotico\r\n\r\nExperteza: 2x (Prestidigitação e Enganação)\r\n\r\nAtaque sorateiro: 1d6\r\n\r\nLVL2 \r\nAção Ardilosa\r\n\r\nLVL3\r\nLamina Psiquica\r\n\r\nPoder Psionico (4 x d6) \r\n\r\nMira Firme (vantagem se nao se mover)\n\nAção Ardilosa: Seu pensamento rápido e agilidade permitem que você\r\nse mova e aja rapidamente. No seu turno, você pode\r\nexecutar uma das seguintes ações como uma Ação\r\nBônus: Correr, Desengajar ou Esconder.",
+      "tokenImg": ""
+    }
+  ],
+  "tabletop": {
+    "sessionId": "local-session",
+    "networkMode": "lan-sse",
+    "mapPath": "./map/2c4d7b5de5cc5dbc5c5c9ba5e2744e96/2c4d7b5de5cc5dbc5c5c9ba5e2744e96.jpg",
+    "gridSize": 56,
+    "zoom": 100,
+    "snapToGrid": false,
+    "tokens": [
+      {
+        "id": "tok-mwf4p172-55",
+        "refId": "char-kael-varhen",
+        "name": "Kael Varhen",
+        "type": "pc",
+        "category": "character",
+        "itemKey": "char-kael-varhen",
+        "groupKey": "",
+        "ownerId": "player-1",
+        "x": 283,
+        "y": 451,
+        "hpCurrent": 71,
+        "hpMax": 165,
+        "ac": 20,
+        "imgSrc": "./npc/kael/bucket-head.png"
+      },
+      {
+        "id": "tok-mwf52r6f-4",
+        "refId": "char-mwf4thqi-159",
+        "name": "Yankee",
+        "type": "pc",
+        "category": "character",
+        "itemKey": "char-mwf4thqi-159",
+        "groupKey": "",
+        "ownerId": "player-mwf4njbd-9gn",
+        "x": 202,
+        "y": 276,
+        "hpCurrent": 18,
+        "hpMax": 18,
+        "ac": 12,
+        "imgSrc": ""
+      }
+    ],
+    "aoeTemplates": [],
+    "fogRegions": [],
+    "fogEnabled": true
+  },
+  "knowledge": {
+    "npcs:kael": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:astel": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:connor": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:aetheron": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:lyra": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:mustang": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:willick": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:zaltherion": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "npcs:butcher": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:template-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:haunted-regras": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:letalidade": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:escalonamento": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:dicas": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:ganchos": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:sidequest1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:shadow-dragon-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {
+        "player-1": "sighted"
+      }
+    },
+    "monsters:stone-golem-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:brazen-gorgon-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:froghemoth": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:shield-guardian-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:flesh-golem-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:night-hag-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {
+        "player-1": "sighted"
+      }
+    },
+    "monsters:helmed-horror-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:juvenile-shadow-dragon-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:shadow-demon-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:mimic-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:shambling-mound": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:aarakocra-aeromancer": {
+      "globalLevel": "studied",
+      "playerLevels": {}
+    },
+    "monsters:helmed-horror": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:mimic": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:animated-armor": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:loup-garou": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werewyvern": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werebear": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wereboar": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werejaguar": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:weretiger": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werevulture": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:alpha-werewolf": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werewolf": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:werebat": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wererat": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wereraven": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:young-wereraven": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:dire-wolf": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:cultist-hierophant-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:aberrant-cultist-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:death-cultist-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:fiend-cultist-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:irmao-osvaldo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:mage-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:campeao-de-osybus": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:blackguard": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:adepto-do-ritual": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:cult-fanatic": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:cultist": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:arauto-da-aniquilacao": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:tarrasque": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:tarrasque-html": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "monsters:death-knight-boss": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:greater-emissary": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:nightwalker": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:osybus-behemoth": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:death-tyrant-boss": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:sibriex": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:vampire-boss": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:strahd-von-zarovich": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:vampire-lord": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:high-priest-osybus": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:cultist-hierophant-boss": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "character:char-kiriton": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "character:char-auxiz": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "maps:varhen_village": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:varhen_mansion_lower": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:varhen_mansion_upper": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d_terreo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d_superior": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d_sotao": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d_masmorra": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:layout_json": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:mapa_deathhouse_superior": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:sunblade": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:blood-spear": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:blood-spear-cos": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:staff-skull": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:la-espada": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:mithral-armor": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:moon-sickle": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:fdd": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:rmd": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:luckstone": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:prologo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:ato1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:ato2": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:ato3": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:epilogo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:visao-geral": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:ganchos": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:evento1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:evento2": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:evento3": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:sidequest1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:desfecho": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:template-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:letalidade": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:escalonamento": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:dicas": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D2": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D3": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D4": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D5": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D6": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D7": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D8": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D9": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D10": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D11": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D12": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D13": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D14": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D15": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D16": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D17": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D18": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D19": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D20": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D21": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D22": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D22b": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D23": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D24": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D25": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D26": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D27": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D28": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D29": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D30": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D31": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D32": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D33": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D34": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D35": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D36": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D37": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:D38": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:haunted-regras": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:zona1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:zona2": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:zona3": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:rod-seven-parts": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:holy-symbol": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:amulet-health": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:calice-ichor": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:chave-osso": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:diario-galias": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:estilhaco-veu": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:cavalinho-thorn": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:rose-thorn-ghosts": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:rose-thorn-specter": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:brigetta-ghost": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:brigetta-2024": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:gustav-elizabeth-ghost": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:gustav-durst": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:elizabeth-durst": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:ireena": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:ismark": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:sarusanda-allester": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:sarusanda-knight": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:aldo-vesperin": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:aldo-commoner": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:death-knight": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:skull-lord": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:death-knight-aspirant-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:devourer": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:haunting-revenant-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:boneclaw": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:osybus-boneclaw": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:relentless-juggernaut": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:relentless-jugg-base": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:vampire-nightbringer-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:graveyard-revenant-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:ghast-gravecaller-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:revenant-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:vampire-spawn-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wraith-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:banshee-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:flameskull-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:mummy-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wight-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:ghast-elite": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:vampire-spawn": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:wraith": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:ghost": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:ghast": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:poltergeist-rose-thorn": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:ghoul": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:specter": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:shadow": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:skeleton": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:tabela-xp": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "curio:condicoes-e-exaustao": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "curio:acoes-e-maestrias": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "curio:testes-cds-e-ambiente": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "curio:precos-pocoes-e-servicos": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "character:char-kael-varhen": {
+      "globalLevel": "studied",
+      "playerLevels": {}
+    },
+    "npcs:aarakocra-aeromancer": {
+      "globalLevel": "studied",
+      "playerLevels": {}
+    },
+    "character:char-connor-smith": {
+      "globalLevel": "sighted",
+      "playerLevels": {}
+    },
+    "monsters:aldo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:aldo-vesperin": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:brigetta": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:brigetta-(ghost)": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:campeão-de-osybus": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:elizabeth": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:gustav": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:gustav-&-elizabeth-durst-(ghost)": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:herald": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:irmão-osvaldo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:relentless-jugg": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:rose-&-thorn-(specter)": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:rose-thorn": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:sarusanda": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:sarusanda-allester": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "monsters:strahd": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "npcs:rose_thorn_ghosts": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "items:cavalinho": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d-masmorra": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:varhen_mansion_lowerfloor": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:varhen_mansion_upperfloor": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:varhen-village": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:layout": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "curio:lore-barovia-e-varhen": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d1": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d2": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d3": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d4": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d5": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d6": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d7": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d8": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d9": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d10": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d11": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d12": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d13": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d14": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d15": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d16": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d17": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d18": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d19": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d20": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d21": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d22": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d22b": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d23": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d24": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d25": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d26": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d27": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d28": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d29": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d30": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d31": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d32": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d33": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d34": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d35": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d36": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d37": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "session:d38": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d-sotao": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d-superior": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    },
+    "maps:d-terreo": {
+      "globalLevel": "hidden",
+      "playerLevels": {}
+    }
+  },
+  "compendioData": {
+    "monsters": {
+      "aarakocra-aeromancer": {
+        "title": "Aarakocra Aeromancer",
+        "tipo": "json",
+        "path": "./monster/data/aarakocra-aeromancer/aarakocra-aeromancer.json",
+        "inlineContent": "{\n  \"name\": \"Aarakocra Aeromancer\",\n  \"source\": \"XMM\",\n  \"page\": 10,\n  \"referenceSources\": [\n    \"FRAiF\",\n    \"RWG\"\n  ],\n  \"size\": [\n    \"M\"\n  ],\n  \"type\": \"elemental\",\n  \"alignment\": [\n    \"N\"\n  ],\n  \"ac\": [\n    16\n  ],\n  \"hp\": {\n    \"average\": 66,\n    \"formula\": \"12d8 + 12\"\n  },\n  \"speed\": {\n    \"walk\": 20,\n    \"fly\": 50\n  },\n  \"str\": 10,\n  \"dex\": 16,\n  \"con\": 12,\n  \"int\": 13,\n  \"wis\": 17,\n  \"cha\": 12,\n  \"save\": {\n    \"dex\": \"+5\",\n    \"wis\": \"+5\"\n  },\n  \"skill\": {\n    \"arcana\": \"+3\",\n    \"nature\": \"+5\",\n    \"perception\": \"+7\"\n  },\n  \"passive\": 17,\n  \"languages\": [\n    \"Aarakocra\",\n    \"Primordial (Auran)\"\n  ],\n  \"cr\": \"4\",\n  \"spellcasting\": [\n    {\n      \"name\": \"Spellcasting\",\n      \"type\": \"spellcasting\",\n      \"headerEntries\": [\n        \"The aarakocra casts one of the following spells, requiring no Material components and using Wisdom as the spellcasting ability (spell save {@dc 13}):\"\n      ],\n      \"will\": [\n        \"{@spell Elementalism|XPHB}\",\n        \"{@spell Gust of Wind|XPHB}\",\n        \"{@spell Mage Hand|XPHB}\",\n        \"{@spell Message|XPHB}\"\n      ],\n      \"daily\": {\n        \"1\": [\n          \"{@spell Lightning Bolt|XPHB}\"\n        ]\n      },\n      \"ability\": \"wis\",\n      \"displayAs\": \"action\"\n    },\n    {\n      \"name\": \"Feather Fall (1/Day)\",\n      \"type\": \"spellcasting\",\n      \"headerEntries\": [\n        \"The aarakocra casts {@spell Feather Fall|XPHB} in response to that spell's trigger, using the same spellcasting ability as Spellcasting.\"\n      ],\n      \"daily\": {\n        \"1\": [\n          \"{@spell Feather Fall|XPHB}\"\n        ]\n      },\n      \"ability\": \"wis\",\n      \"displayAs\": \"reaction\",\n      \"hidden\": [\n        \"daily\"\n      ]\n    }\n  ],\n  \"action\": [\n    {\n      \"name\": \"Multiattack\",\n      \"entries\": [\n        \"The aarakocra makes two Wind Staff attacks, and it can use Spellcasting to cast {@spell Gust of Wind|XPHB}.\"\n      ]\n    },\n    {\n      \"name\": \"Wind Staff\",\n      \"entries\": [\n        \"{@atkr m,r} {@hit 5}, reach 5 ft. or range 120 ft. {@h}7 ({@damage 1d8 + 3}) Bludgeoning damage plus 11 ({@damage 2d10}) Lightning damage.\"\n      ]\n    }\n  ],\n  \"environment\": [\n    \"mountain\",\n    \"planar, air\"\n  ],\n  \"treasure\": [\n    \"implements\",\n    \"individual\"\n  ],\n  \"actionTags\": [\n    \"Multiattack\"\n  ],\n  \"languageTags\": [\n    \"AU\",\n    \"OTH\",\n    \"P\"\n  ],\n  \"damageTags\": [\n    \"B\",\n    \"L\"\n  ],\n  \"damageTagsSpell\": [\n    \"L\"\n  ],\n  \"spellcastingTags\": [\n    \"O\"\n  ],\n  \"miscTags\": [\n    \"MA\",\n    \"RA\"\n  ],\n  \"savingThrowForcedSpell\": [\n    \"dexterity\",\n    \"strength\"\n  ],\n  \"hasToken\": true,\n  \"hasFluff\": true,\n  \"hasFluffImages\": true\n}"
+      }
+    },
+    "npcs": {
+      "aarakocra-aeromancer": {
+        "title": "Aarakocra Aeromancer",
+        "tipo": "json",
+        "path": "./npc/aarakocra-aeromancer/aarakocra-aeromancer.json",
+        "inlineContent": "{\n  \"name\": \"Aarakocra Aeromancer\",\n  \"source\": \"XMM\",\n  \"page\": 10,\n  \"referenceSources\": [\n    \"FRAiF\",\n    \"RWG\"\n  ],\n  \"size\": [\n    \"M\"\n  ],\n  \"type\": \"elemental\",\n  \"alignment\": [\n    \"N\"\n  ],\n  \"ac\": [\n    16\n  ],\n  \"hp\": {\n    \"average\": 66,\n    \"formula\": \"12d8 + 12\"\n  },\n  \"speed\": {\n    \"walk\": 20,\n    \"fly\": 50\n  },\n  \"str\": 10,\n  \"dex\": 16,\n  \"con\": 12,\n  \"int\": 13,\n  \"wis\": 17,\n  \"cha\": 12,\n  \"save\": {\n    \"dex\": \"+5\",\n    \"wis\": \"+5\"\n  },\n  \"skill\": {\n    \"arcana\": \"+3\",\n    \"nature\": \"+5\",\n    \"perception\": \"+7\"\n  },\n  \"passive\": 17,\n  \"languages\": [\n    \"Aarakocra\",\n    \"Primordial (Auran)\"\n  ],\n  \"cr\": \"4\",\n  \"spellcasting\": [\n    {\n      \"name\": \"Spellcasting\",\n      \"type\": \"spellcasting\",\n      \"headerEntries\": [\n        \"The aarakocra casts one of the following spells, requiring no Material components and using Wisdom as the spellcasting ability (spell save {@dc 13}):\"\n      ],\n      \"will\": [\n        \"{@spell Elementalism|XPHB}\",\n        \"{@spell Gust of Wind|XPHB}\",\n        \"{@spell Mage Hand|XPHB}\",\n        \"{@spell Message|XPHB}\"\n      ],\n      \"daily\": {\n        \"1\": [\n          \"{@spell Lightning Bolt|XPHB}\"\n        ]\n      },\n      \"ability\": \"wis\",\n      \"displayAs\": \"action\"\n    },\n    {\n      \"name\": \"Feather Fall (1/Day)\",\n      \"type\": \"spellcasting\",\n      \"headerEntries\": [\n        \"The aarakocra casts {@spell Feather Fall|XPHB} in response to that spell's trigger, using the same spellcasting ability as Spellcasting.\"\n      ],\n      \"daily\": {\n        \"1\": [\n          \"{@spell Feather Fall|XPHB}\"\n        ]\n      },\n      \"ability\": \"wis\",\n      \"displayAs\": \"reaction\",\n      \"hidden\": [\n        \"daily\"\n      ]\n    }\n  ],\n  \"action\": [\n    {\n      \"name\": \"Multiattack\",\n      \"entries\": [\n        \"The aarakocra makes two Wind Staff attacks, and it can use Spellcasting to cast {@spell Gust of Wind|XPHB}.\"\n      ]\n    },\n    {\n      \"name\": \"Wind Staff\",\n      \"entries\": [\n        \"{@atkr m,r} {@hit 5}, reach 5 ft. or range 120 ft. {@h}7 ({@damage 1d8 + 3}) Bludgeoning damage plus 11 ({@damage 2d10}) Lightning damage.\"\n      ]\n    }\n  ],\n  \"environment\": [\n    \"mountain\",\n    \"planar, air\"\n  ],\n  \"treasure\": [\n    \"implements\",\n    \"individual\"\n  ],\n  \"actionTags\": [\n    \"Multiattack\"\n  ],\n  \"languageTags\": [\n    \"AU\",\n    \"OTH\",\n    \"P\"\n  ],\n  \"damageTags\": [\n    \"B\",\n    \"L\"\n  ],\n  \"damageTagsSpell\": [\n    \"L\"\n  ],\n  \"spellcastingTags\": [\n    \"O\"\n  ],\n  \"miscTags\": [\n    \"MA\",\n    \"RA\"\n  ],\n  \"savingThrowForcedSpell\": [\n    \"dexterity\",\n    \"strength\"\n  ],\n  \"hasToken\": true,\n  \"hasFluff\": true,\n  \"hasFluffImages\": true\n}"
+      }
+    },
+    "maps": {
+      "layout": {
+        "title": "Layout",
+        "tipo": "json",
+        "path": "./data/layout.json",
+        "inlineContent": "{\"gridCell_ft\": 5, \"rooms\": [{\"id\": \"D1\", \"name\": \"Vestíbulo\", \"level\": 1, \"x\": 18, \"y\": 24, \"w\": 8, \"h\": 6, \"connects\": [\"D2\", \"D11\", \"D12\"]}, {\"id\": \"D2\", \"name\": \"Grande Salão\", \"level\": 1, \"x\": 14, \"y\": 16, \"w\": 16, \"h\": 8, \"connects\": [\"D1\", \"D3\", \"D6\", \"D10\", \"D13\"]}, {\"id\": \"D3\", \"name\": \"Sala de Jantar\", \"level\": 1, \"x\": 30, \"y\": 16, \"w\": 10, \"h\": 8, \"connects\": [\"D2\", \"D4\"]}, {\"id\": \"D4\", \"name\": \"Cozinha\", \"level\": 1, \"x\": 30, \"y\": 8, \"w\": 10, \"h\": 8, \"connects\": [\"D3\", \"D5\", \"D10\"]}, {\"id\": \"D5\", \"name\": \"Despensa / Alçapão\", \"level\": 1, \"x\": 30, \"y\": 4, \"w\": 6, \"h\": 4, \"connects\": [\"D4\", \"D23\"]}, {\"id\": \"D6\", \"name\": \"Sala de Visitas\", \"level\": 1, \"x\": 4, \"y\": 16, \"w\": 10, \"h\": 8, \"connects\": [\"D2\", \"D7\"]}, {\"id\": \"D7\", \"name\": \"Escritório de Gustav\", \"level\": 1, \"x\": 4, \"y\": 8, \"w\": 10, \"h\": 8, \"connects\": [\"D6\", \"D8\"]}, {\"id\": \"D8\", \"name\": \"Biblioteca\", \"level\": 1, \"x\": 14, \"y\": 8, \"w\": 10, \"h\": 8, \"connects\": [\"D7\", \"D9\", \"D10\"]}, {\"id\": \"D9\", \"name\": \"Sala Secreta dos Cultistas\", \"level\": 1, \"x\": 16, \"y\": 4, \"w\": 6, \"h\": 4, \"connects\": [\"D8\"]}, {\"id\": \"D10\", \"name\": \"Galeria dos Retratos\", \"level\": 1, \"x\": 24, \"y\": 8, \"w\": 6, \"h\": 8, \"connects\": [\"D2\", \"D4\", \"D8\"]}, {\"id\": \"D11\", \"name\": \"Capela da Família\", \"level\": 1, \"x\": 10, \"y\": 24, \"w\": 8, \"h\": 6, \"connects\": [\"D1\"]}, {\"id\": \"D12\", \"name\": \"Varanda Coberta\", \"level\": 1, \"x\": 26, \"y\": 24, \"w\": 10, \"h\": 6, \"connects\": [\"D1\"]}, {\"id\": \"D13\", \"name\": \"Corredor Superior\", \"level\": 2, \"x\": 4, \"y\": 16, \"w\": 36, \"h\": 4, \"connects\": [\"D2\", \"D14\", \"D15\", \"D16\", \"D17\", \"D18\", \"D19\", \"D20\", \"D21\"]}, {\"id\": \"D14\", \"name\": \"Aposento Oculto de Sarusanda\", \"level\": 2, \"x\": 22, \"y\": 26, \"w\": 8, \"h\": 6, \"connects\": [\"D18\"]}, {\"id\": \"D15\", \"name\": \"Quarto Principal\", \"level\": 2, \"x\": 4, \"y\": 20, \"w\": 10, \"h\": 8, \"connects\": [\"D13\"]}, {\"id\": \"D16\", \"name\": \"Quarto das Crianças\", \"level\": 2, \"x\": 30, \"y\": 20, \"w\": 10, \"h\": 8, \"connects\": [\"D13\"]}, {\"id\": \"D17\", \"name\": \"Quarto de Walter\", \"level\": 2, \"x\": 14, \"y\": 20, \"w\": 8, \"h\": 8, \"connects\": [\"D13\"]}, {\"id\": \"D18\", \"name\": \"Banheiro\", \"level\": 2, \"x\": 22, \"y\": 20, \"w\": 8, \"h\": 6, \"connects\": [\"D13\", \"D14\"]}, {\"id\": \"D19\", \"name\": \"Quarto das Criadas\", \"level\": 2, \"x\": 4, \"y\": 8, \"w\": 10, \"h\": 8, \"connects\": [\"D13\"]}, {\"id\": \"D20\", \"name\": \"Quarto de Hóspedes\", \"level\": 2, \"x\": 30, \"y\": 8, \"w\": 10, \"h\": 8, \"connects\": [\"D13\"]}, {\"id\": \"D21\", \"name\": \"Salão de Música\", \"level\": 2, \"x\": 14, \"y\": 8, \"w\": 16, \"h\": 8, \"connects\": [\"D13\", \"D22\"]}, {\"id\": \"D22\", \"name\": \"Sótão Principal\", \"level\": 3, \"x\": 8, \"y\": 10, \"w\": 28, \"h\": 16, \"connects\": [\"D21\", \"D22b\"]}, {\"id\": \"D22b\", \"name\": \"Quartinho Selado\", \"level\": 3, \"x\": 36, \"y\": 14, \"w\": 6, \"h\": 8, \"connects\": [\"D22\"]}, {\"id\": \"D23\", \"name\": \"Escadaria dos Degraus Úmidos\", \"level\": 0, \"x\": 6, \"y\": 32, \"w\": 6, \"h\": 6, \"connects\": [\"D5\", \"D24\"]}, {\"id\": \"D24\", \"name\": \"Corredor Ossário\", \"level\": 0, \"x\": 12, \"y\": 33, \"w\": 14, \"h\": 4, \"connects\": [\"D23\", \"D25\", \"D26\"]}, {\"id\": \"D25\", \"name\": \"Alojamento dos Cultistas\", \"level\": 0, \"x\": 12, \"y\": 25, \"w\": 12, \"h\": 8, \"connects\": [\"D24\", \"D27\", \"D31\"]}, {\"id\": \"D26\", \"name\": \"Cripta das Ossadas Familiares\", \"level\": 0, \"x\": 26, \"y\": 29, \"w\": 10, \"h\": 8, \"connects\": [\"D24\", \"D28\", \"D29\"]}, {\"id\": \"D27\", \"name\": \"Cela do Prisioneiro\", \"level\": 0, \"x\": 4, \"y\": 24, \"w\": 8, \"h\": 8, \"connects\": [\"D25\"]}, {\"id\": \"D28\", \"name\": \"Oficina do Ritual\", \"level\": 0, \"x\": 24, \"y\": 21, \"w\": 10, \"h\": 8, \"connects\": [\"D26\", \"D32\", \"D34\"]}, {\"id\": \"D29\", \"name\": \"Poço de Sangue\", \"level\": 0, \"x\": 36, \"y\": 24, \"w\": 10, \"h\": 8, \"connects\": [\"D26\", \"D30\", \"D34\"]}, {\"id\": \"D30\", \"name\": \"Fenda de Penumbra\", \"level\": 0, \"x\": 36, \"y\": 32, \"w\": 10, \"h\": 6, \"connects\": [\"D29\"]}, {\"id\": \"D31\", \"name\": \"Arsenal do Culto\", \"level\": 0, \"x\": 12, \"y\": 17, \"w\": 10, \"h\": 8, \"connects\": [\"D25\", \"D33\"]}, {\"id\": \"D32\", \"name\": \"Laboratório de Embalsamamento\", \"level\": 0, \"x\": 24, \"y\": 13, \"w\": 10, \"h\": 8, \"connects\": [\"D28\", \"D33\"]}, {\"id\": \"D33\", \"name\": \"Biblioteca Ritual\", \"level\": 0, \"x\": 6, \"y\": 9, \"w\": 12, \"h\": 8, \"connects\": [\"D31\", \"D32\"]}, {\"id\": \"D34\", \"name\": \"Corredor da Névoa Venenosa\", \"level\": 0, \"x\": 34, \"y\": 12, \"w\": 4, \"h\": 12, \"connects\": [\"D28\", \"D29\", \"D35\"]}, {\"id\": \"D35\", \"name\": \"Posto dos Guardiões\", \"level\": 0, \"x\": 38, \"y\": 12, \"w\": 10, \"h\": 6, \"connects\": [\"D34\", \"D36\"]}, {\"id\": \"D36\", \"name\": \"Câmara do Gongo\", \"level\": 0, \"x\": 38, \"y\": 18, \"w\": 10, \"h\": 6, \"connects\": [\"D35\", \"D37\"]}, {\"id\": \"D37\", \"name\": \"Corredor de Osybus\", \"level\": 0, \"x\": 34, \"y\": 6, \"w\": 14, \"h\": 5, \"connects\": [\"D36\", \"D38\"]}, {\"id\": \"D38\", \"name\": \"Altar do Ritual\", \"level\": 0, \"x\": 20, \"y\": 2, \"w\": 14, \"h\": 10, \"connects\": [\"D37\"]}]}"
+      },
+      "d-masmorra": {
+        "title": "D Masmorra",
+        "tipo": "svg",
+        "path": "./data/d-masmorra.svg",
+        "inlineContent": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 784 590' width='100%'><rect width='100%' height='100%' fill='#111'/><text x='10' y='20' fill='#eee' font-size='16' font-family='sans-serif'>Masmorra · D23–D38</text><line x1='0' y1='30' x2='0' y2='590' stroke='#222' stroke-width='0.5'/><line x1='14' y1='30' x2='14' y2='590' stroke='#222' stroke-width='0.5'/><line x1='28' y1='30' x2='28' y2='590' stroke='#222' stroke-width='0.5'/><line x1='42' y1='30' x2='42' y2='590' stroke='#222' stroke-width='0.5'/><line x1='56' y1='30' x2='56' y2='590' stroke='#222' stroke-width='0.5'/><line x1='70' y1='30' x2='70' y2='590' stroke='#222' stroke-width='0.5'/><line x1='84' y1='30' x2='84' y2='590' stroke='#222' stroke-width='0.5'/><line x1='98' y1='30' x2='98' y2='590' stroke='#222' stroke-width='0.5'/><line x1='112' y1='30' x2='112' y2='590' stroke='#222' stroke-width='0.5'/><line x1='126' y1='30' x2='126' y2='590' stroke='#222' stroke-width='0.5'/><line x1='140' y1='30' x2='140' y2='590' stroke='#222' stroke-width='0.5'/><line x1='154' y1='30' x2='154' y2='590' stroke='#222' stroke-width='0.5'/><line x1='168' y1='30' x2='168' y2='590' stroke='#222' stroke-width='0.5'/><line x1='182' y1='30' x2='182' y2='590' stroke='#222' stroke-width='0.5'/><line x1='196' y1='30' x2='196' y2='590' stroke='#222' stroke-width='0.5'/><line x1='210' y1='30' x2='210' y2='590' stroke='#222' stroke-width='0.5'/><line x1='224' y1='30' x2='224' y2='590' stroke='#222' stroke-width='0.5'/><line x1='238' y1='30' x2='238' y2='590' stroke='#222' stroke-width='0.5'/><line x1='252' y1='30' x2='252' y2='590' stroke='#222' stroke-width='0.5'/><line x1='266' y1='30' x2='266' y2='590' stroke='#222' stroke-width='0.5'/><line x1='280' y1='30' x2='280' y2='590' stroke='#222' stroke-width='0.5'/><line x1='294' y1='30' x2='294' y2='590' stroke='#222' stroke-width='0.5'/><line x1='308' y1='30' x2='308' y2='590' stroke='#222' stroke-width='0.5'/><line x1='322' y1='30' x2='322' y2='590' stroke='#222' stroke-width='0.5'/><line x1='336' y1='30' x2='336' y2='590' stroke='#222' stroke-width='0.5'/><line x1='350' y1='30' x2='350' y2='590' stroke='#222' stroke-width='0.5'/><line x1='364' y1='30' x2='364' y2='590' stroke='#222' stroke-width='0.5'/><line x1='378' y1='30' x2='378' y2='590' stroke='#222' stroke-width='0.5'/><line x1='392' y1='30' x2='392' y2='590' stroke='#222' stroke-width='0.5'/><line x1='406' y1='30' x2='406' y2='590' stroke='#222' stroke-width='0.5'/><line x1='420' y1='30' x2='420' y2='590' stroke='#222' stroke-width='0.5'/><line x1='434' y1='30' x2='434' y2='590' stroke='#222' stroke-width='0.5'/><line x1='448' y1='30' x2='448' y2='590' stroke='#222' stroke-width='0.5'/><line x1='462' y1='30' x2='462' y2='590' stroke='#222' stroke-width='0.5'/><line x1='476' y1='30' x2='476' y2='590' stroke='#222' stroke-width='0.5'/><line x1='490' y1='30' x2='490' y2='590' stroke='#222' stroke-width='0.5'/><line x1='504' y1='30' x2='504' y2='590' stroke='#222' stroke-width='0.5'/><line x1='518' y1='30' x2='518' y2='590' stroke='#222' stroke-width='0.5'/><line x1='532' y1='30' x2='532' y2='590' stroke='#222' stroke-width='0.5'/><line x1='546' y1='30' x2='546' y2='590' stroke='#222' stroke-width='0.5'/><line x1='560' y1='30' x2='560' y2='590' stroke='#222' stroke-width='0.5'/><line x1='574' y1='30' x2='574' y2='590' stroke='#222' stroke-width='0.5'/><line x1='588' y1='30' x2='588' y2='590' stroke='#222' stroke-width='0.5'/><line x1='602' y1='30' x2='602' y2='590' stroke='#222' stroke-width='0.5'/><line x1='616' y1='30' x2='616' y2='590' stroke='#222' stroke-width='0.5'/><line x1='630' y1='30' x2='630' y2='590' stroke='#222' stroke-width='0.5'/><line x1='644' y1='30' x2='644' y2='590' stroke='#222' stroke-width='0.5'/><line x1='658' y1='30' x2='658' y2='590' stroke='#222' stroke-width='0.5'/><line x1='672' y1='30' x2='672' y2='590' stroke='#222' stroke-width='0.5'/><line x1='686' y1='30' x2='686' y2='590' stroke='#222' stroke-width='0.5'/><line x1='700' y1='30' x2='700' y2='590' stroke='#222' stroke-width='0.5'/><line x1='714' y1='30' x2='714' y2='590' stroke='#222' stroke-width='0.5'/><line x1='728' y1='30' x2='728' y2='590' stroke='#222' stroke-width='0.5'/><line x1='742' y1='30' x2='742' y2='590' stroke='#222' stroke-width='0.5'/><line x1='756' y1='30' x2='756' y2='590' stroke='#222' stroke-width='0.5'/><line x1='770' y1='30' x2='770' y2='590' stroke='#222' stroke-width='0.5'/><line x1='784' y1='30' x2='784' y2='590' stroke='#222' stroke-width='0.5'/><line x1='0' y1='30' x2='784' y2='30' stroke='#222' stroke-width='0.5'/><line x1='0' y1='44' x2='784' y2='44' stroke='#222' stroke-width='0.5'/><line x1='0' y1='58' x2='784' y2='58' stroke='#222' stroke-width='0.5'/><line x1='0' y1='72' x2='784' y2='72' stroke='#222' stroke-width='0.5'/><line x1='0' y1='86' x2='784' y2='86' stroke='#222' stroke-width='0.5'/><line x1='0' y1='100' x2='784' y2='100' stroke='#222' stroke-width='0.5'/><line x1='0' y1='114' x2='784' y2='114' stroke='#222' stroke-width='0.5'/><line x1='0' y1='128' x2='784' y2='128' stroke='#222' stroke-width='0.5'/><line x1='0' y1='142' x2='784' y2='142' stroke='#222' stroke-width='0.5'/><line x1='0' y1='156' x2='784' y2='156' stroke='#222' stroke-width='0.5'/><line x1='0' y1='170' x2='784' y2='170' stroke='#222' stroke-width='0.5'/><line x1='0' y1='184' x2='784' y2='184' stroke='#222' stroke-width='0.5'/><line x1='0' y1='198' x2='784' y2='198' stroke='#222' stroke-width='0.5'/><line x1='0' y1='212' x2='784' y2='212' stroke='#222' stroke-width='0.5'/><line x1='0' y1='226' x2='784' y2='226' stroke='#222' stroke-width='0.5'/><line x1='0' y1='240' x2='784' y2='240' stroke='#222' stroke-width='0.5'/><line x1='0' y1='254' x2='784' y2='254' stroke='#222' stroke-width='0.5'/><line x1='0' y1='268' x2='784' y2='268' stroke='#222' stroke-width='0.5'/><line x1='0' y1='282' x2='784' y2='282' stroke='#222' stroke-width='0.5'/><line x1='0' y1='296' x2='784' y2='296' stroke='#222' stroke-width='0.5'/><line x1='0' y1='310' x2='784' y2='310' stroke='#222' stroke-width='0.5'/><line x1='0' y1='324' x2='784' y2='324' stroke='#222' stroke-width='0.5'/><line x1='0' y1='338' x2='784' y2='338' stroke='#222' stroke-width='0.5'/><line x1='0' y1='352' x2='784' y2='352' stroke='#222' stroke-width='0.5'/><line x1='0' y1='366' x2='784' y2='366' stroke='#222' stroke-width='0.5'/><line x1='0' y1='380' x2='784' y2='380' stroke='#222' stroke-width='0.5'/><line x1='0' y1='394' x2='784' y2='394' stroke='#222' stroke-width='0.5'/><line x1='0' y1='408' x2='784' y2='408' stroke='#222' stroke-width='0.5'/><line x1='0' y1='422' x2='784' y2='422' stroke='#222' stroke-width='0.5'/><line x1='0' y1='436' x2='784' y2='436' stroke='#222' stroke-width='0.5'/><line x1='0' y1='450' x2='784' y2='450' stroke='#222' stroke-width='0.5'/><line x1='0' y1='464' x2='784' y2='464' stroke='#222' stroke-width='0.5'/><line x1='0' y1='478' x2='784' y2='478' stroke='#222' stroke-width='0.5'/><line x1='0' y1='492' x2='784' y2='492' stroke='#222' stroke-width='0.5'/><line x1='0' y1='506' x2='784' y2='506' stroke='#222' stroke-width='0.5'/><line x1='0' y1='520' x2='784' y2='520' stroke='#222' stroke-width='0.5'/><line x1='0' y1='534' x2='784' y2='534' stroke='#222' stroke-width='0.5'/><line x1='0' y1='548' x2='784' y2='548' stroke='#222' stroke-width='0.5'/><line x1='0' y1='562' x2='784' y2='562' stroke='#222' stroke-width='0.5'/><line x1='0' y1='576' x2='784' y2='576' stroke='#222' stroke-width='0.5'/><line x1='0' y1='590' x2='784' y2='590' stroke='#222' stroke-width='0.5'/><rect x='84' y='478' width='84' height='84' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='126.0' y='520.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D23</text><text x='126.0' y='534.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Escadaria dos Degraus Úmidos</text><rect x='168' y='492' width='196' height='56' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='266.0' y='520.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D24</text><text x='266.0' y='534.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Corredor Ossário</text><rect x='168' y='380' width='168' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='252.0' y='436.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D25</text><text x='252.0' y='450.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Alojamento dos Cultistas</text><rect x='364' y='436' width='140' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='434.0' y='492.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D26</text><text x='434.0' y='506.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Cripta das Ossadas Familiares</text><rect x='56' y='366' width='112' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='112.0' y='422.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D27</text><text x='112.0' y='436.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Cela do Prisioneiro</text><rect x='336' y='324' width='140' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='406.0' y='380.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D28</text><text x='406.0' y='394.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Oficina do Ritual</text><rect x='504' y='366' width='140' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='574.0' y='422.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D29</text><text x='574.0' y='436.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Poço de Sangue</text><rect x='504' y='478' width='140' height='84' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='574.0' y='520.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D30</text><text x='574.0' y='534.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Fenda de Penumbra</text><rect x='168' y='268' width='140' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='238.0' y='324.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D31</text><text x='238.0' y='338.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Arsenal do Culto</text><rect x='336' y='212' width='140' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='406.0' y='268.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D32</text><text x='406.0' y='282.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Laboratório de Embalsamamento</text><rect x='84' y='156' width='168' height='112' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='168.0' y='212.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D33</text><text x='168.0' y='226.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Biblioteca Ritual</text><rect x='476' y='198' width='56' height='168' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='504.0' y='282.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D34</text><text x='504.0' y='296.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Corredor da Névoa Venenosa</text><rect x='532' y='198' width='140' height='84' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='602.0' y='240.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D35</text><text x='602.0' y='254.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Posto dos Guardiões</text><rect x='532' y='282' width='140' height='84' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='602.0' y='324.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D36</text><text x='602.0' y='338.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Câmara do Gongo</text><rect x='476' y='114' width='196' height='70' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='574.0' y='149.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D37</text><text x='574.0' y='163.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Corredor de Osybus</text><rect x='280' y='58' width='196' height='140' fill='#3a2f3f' stroke='#d8c9a0' stroke-width='2'/><text x='378.0' y='128.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D38</text><text x='378.0' y='142.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Altar do Ritual</text><rect x='165' y='514.0' width='6' height='12' fill='#e8b04a'/><rect x='246.0' y='489' width='12' height='6' fill='#e8b04a'/><rect x='361' y='514.0' width='6' height='12' fill='#e8b04a'/><rect x='165' y='423.0' width='6' height='12' fill='#e8b04a'/><rect x='232.0' y='377' width='12' height='6' fill='#e8b04a'/><rect x='414.0' y='433' width='12' height='6' fill='#e8b04a'/><rect x='501' y='451.0' width='6' height='12' fill='#e8b04a'/><rect x='400.0' y='321' width='12' height='6' fill='#e8b04a'/><rect x='473' y='339.0' width='6' height='12' fill='#e8b04a'/><rect x='568.0' y='475' width='12' height='6' fill='#e8b04a'/><rect x='512.0' y='363' width='12' height='6' fill='#e8b04a'/><rect x='204.0' y='265' width='12' height='6' fill='#e8b04a'/><line x1='406.0' y1='268.0' x2='168.0' y2='212.0' stroke='#e8b04a' stroke-dasharray='4 3'/><rect x='529' y='234.0' width='6' height='12' fill='#e8b04a'/><rect x='596.0' y='279' width='12' height='6' fill='#e8b04a'/><line x1='602.0' y1='324.0' x2='574.0' y2='149.0' stroke='#e8b04a' stroke-dasharray='4 3'/><rect x='473' y='143.0' width='6' height='12' fill='#e8b04a'/></svg>"
+      },
+      "d-sotao": {
+        "title": "D Sotao",
+        "tipo": "svg",
+        "path": "./data/d-sotao.svg",
+        "inlineContent": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 672 534' width='100%'><rect width='100%' height='100%' fill='#111'/><text x='10' y='20' fill='#eee' font-size='16' font-family='sans-serif'>Sótão · D22</text><line x1='0' y1='30' x2='0' y2='534' stroke='#222' stroke-width='0.5'/><line x1='14' y1='30' x2='14' y2='534' stroke='#222' stroke-width='0.5'/><line x1='28' y1='30' x2='28' y2='534' stroke='#222' stroke-width='0.5'/><line x1='42' y1='30' x2='42' y2='534' stroke='#222' stroke-width='0.5'/><line x1='56' y1='30' x2='56' y2='534' stroke='#222' stroke-width='0.5'/><line x1='70' y1='30' x2='70' y2='534' stroke='#222' stroke-width='0.5'/><line x1='84' y1='30' x2='84' y2='534' stroke='#222' stroke-width='0.5'/><line x1='98' y1='30' x2='98' y2='534' stroke='#222' stroke-width='0.5'/><line x1='112' y1='30' x2='112' y2='534' stroke='#222' stroke-width='0.5'/><line x1='126' y1='30' x2='126' y2='534' stroke='#222' stroke-width='0.5'/><line x1='140' y1='30' x2='140' y2='534' stroke='#222' stroke-width='0.5'/><line x1='154' y1='30' x2='154' y2='534' stroke='#222' stroke-width='0.5'/><line x1='168' y1='30' x2='168' y2='534' stroke='#222' stroke-width='0.5'/><line x1='182' y1='30' x2='182' y2='534' stroke='#222' stroke-width='0.5'/><line x1='196' y1='30' x2='196' y2='534' stroke='#222' stroke-width='0.5'/><line x1='210' y1='30' x2='210' y2='534' stroke='#222' stroke-width='0.5'/><line x1='224' y1='30' x2='224' y2='534' stroke='#222' stroke-width='0.5'/><line x1='238' y1='30' x2='238' y2='534' stroke='#222' stroke-width='0.5'/><line x1='252' y1='30' x2='252' y2='534' stroke='#222' stroke-width='0.5'/><line x1='266' y1='30' x2='266' y2='534' stroke='#222' stroke-width='0.5'/><line x1='280' y1='30' x2='280' y2='534' stroke='#222' stroke-width='0.5'/><line x1='294' y1='30' x2='294' y2='534' stroke='#222' stroke-width='0.5'/><line x1='308' y1='30' x2='308' y2='534' stroke='#222' stroke-width='0.5'/><line x1='322' y1='30' x2='322' y2='534' stroke='#222' stroke-width='0.5'/><line x1='336' y1='30' x2='336' y2='534' stroke='#222' stroke-width='0.5'/><line x1='350' y1='30' x2='350' y2='534' stroke='#222' stroke-width='0.5'/><line x1='364' y1='30' x2='364' y2='534' stroke='#222' stroke-width='0.5'/><line x1='378' y1='30' x2='378' y2='534' stroke='#222' stroke-width='0.5'/><line x1='392' y1='30' x2='392' y2='534' stroke='#222' stroke-width='0.5'/><line x1='406' y1='30' x2='406' y2='534' stroke='#222' stroke-width='0.5'/><line x1='420' y1='30' x2='420' y2='534' stroke='#222' stroke-width='0.5'/><line x1='434' y1='30' x2='434' y2='534' stroke='#222' stroke-width='0.5'/><line x1='448' y1='30' x2='448' y2='534' stroke='#222' stroke-width='0.5'/><line x1='462' y1='30' x2='462' y2='534' stroke='#222' stroke-width='0.5'/><line x1='476' y1='30' x2='476' y2='534' stroke='#222' stroke-width='0.5'/><line x1='490' y1='30' x2='490' y2='534' stroke='#222' stroke-width='0.5'/><line x1='504' y1='30' x2='504' y2='534' stroke='#222' stroke-width='0.5'/><line x1='518' y1='30' x2='518' y2='534' stroke='#222' stroke-width='0.5'/><line x1='532' y1='30' x2='532' y2='534' stroke='#222' stroke-width='0.5'/><line x1='546' y1='30' x2='546' y2='534' stroke='#222' stroke-width='0.5'/><line x1='560' y1='30' x2='560' y2='534' stroke='#222' stroke-width='0.5'/><line x1='574' y1='30' x2='574' y2='534' stroke='#222' stroke-width='0.5'/><line x1='588' y1='30' x2='588' y2='534' stroke='#222' stroke-width='0.5'/><line x1='602' y1='30' x2='602' y2='534' stroke='#222' stroke-width='0.5'/><line x1='616' y1='30' x2='616' y2='534' stroke='#222' stroke-width='0.5'/><line x1='630' y1='30' x2='630' y2='534' stroke='#222' stroke-width='0.5'/><line x1='644' y1='30' x2='644' y2='534' stroke='#222' stroke-width='0.5'/><line x1='658' y1='30' x2='658' y2='534' stroke='#222' stroke-width='0.5'/><line x1='672' y1='30' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><line x1='0' y1='30' x2='672' y2='30' stroke='#222' stroke-width='0.5'/><line x1='0' y1='44' x2='672' y2='44' stroke='#222' stroke-width='0.5'/><line x1='0' y1='58' x2='672' y2='58' stroke='#222' stroke-width='0.5'/><line x1='0' y1='72' x2='672' y2='72' stroke='#222' stroke-width='0.5'/><line x1='0' y1='86' x2='672' y2='86' stroke='#222' stroke-width='0.5'/><line x1='0' y1='100' x2='672' y2='100' stroke='#222' stroke-width='0.5'/><line x1='0' y1='114' x2='672' y2='114' stroke='#222' stroke-width='0.5'/><line x1='0' y1='128' x2='672' y2='128' stroke='#222' stroke-width='0.5'/><line x1='0' y1='142' x2='672' y2='142' stroke='#222' stroke-width='0.5'/><line x1='0' y1='156' x2='672' y2='156' stroke='#222' stroke-width='0.5'/><line x1='0' y1='170' x2='672' y2='170' stroke='#222' stroke-width='0.5'/><line x1='0' y1='184' x2='672' y2='184' stroke='#222' stroke-width='0.5'/><line x1='0' y1='198' x2='672' y2='198' stroke='#222' stroke-width='0.5'/><line x1='0' y1='212' x2='672' y2='212' stroke='#222' stroke-width='0.5'/><line x1='0' y1='226' x2='672' y2='226' stroke='#222' stroke-width='0.5'/><line x1='0' y1='240' x2='672' y2='240' stroke='#222' stroke-width='0.5'/><line x1='0' y1='254' x2='672' y2='254' stroke='#222' stroke-width='0.5'/><line x1='0' y1='268' x2='672' y2='268' stroke='#222' stroke-width='0.5'/><line x1='0' y1='282' x2='672' y2='282' stroke='#222' stroke-width='0.5'/><line x1='0' y1='296' x2='672' y2='296' stroke='#222' stroke-width='0.5'/><line x1='0' y1='310' x2='672' y2='310' stroke='#222' stroke-width='0.5'/><line x1='0' y1='324' x2='672' y2='324' stroke='#222' stroke-width='0.5'/><line x1='0' y1='338' x2='672' y2='338' stroke='#222' stroke-width='0.5'/><line x1='0' y1='352' x2='672' y2='352' stroke='#222' stroke-width='0.5'/><line x1='0' y1='366' x2='672' y2='366' stroke='#222' stroke-width='0.5'/><line x1='0' y1='380' x2='672' y2='380' stroke='#222' stroke-width='0.5'/><line x1='0' y1='394' x2='672' y2='394' stroke='#222' stroke-width='0.5'/><line x1='0' y1='408' x2='672' y2='408' stroke='#222' stroke-width='0.5'/><line x1='0' y1='422' x2='672' y2='422' stroke='#222' stroke-width='0.5'/><line x1='0' y1='436' x2='672' y2='436' stroke='#222' stroke-width='0.5'/><line x1='0' y1='450' x2='672' y2='450' stroke='#222' stroke-width='0.5'/><line x1='0' y1='464' x2='672' y2='464' stroke='#222' stroke-width='0.5'/><line x1='0' y1='478' x2='672' y2='478' stroke='#222' stroke-width='0.5'/><line x1='0' y1='492' x2='672' y2='492' stroke='#222' stroke-width='0.5'/><line x1='0' y1='506' x2='672' y2='506' stroke='#222' stroke-width='0.5'/><line x1='0' y1='520' x2='672' y2='520' stroke='#222' stroke-width='0.5'/><line x1='0' y1='534' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><rect x='112' y='170' width='392' height='224' fill='#2f3a2f' stroke='#d8c9a0' stroke-width='2'/><text x='308.0' y='282.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D22</text><text x='308.0' y='296.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Sótão Principal</text><rect x='504' y='226' width='84' height='112' fill='#2f3a2f' stroke='#d8c9a0' stroke-width='2'/><text x='546.0' y='282.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D22b</text><text x='546.0' y='296.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quartinho Selado</text><rect x='501' y='276.0' width='6' height='12' fill='#e8b04a'/></svg>"
+      },
+      "d-superior": {
+        "title": "D Superior",
+        "tipo": "svg",
+        "path": "./data/d-superior.svg",
+        "inlineContent": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 672 534' width='100%'><rect width='100%' height='100%' fill='#111'/><text x='10' y='20' fill='#eee' font-size='16' font-family='sans-serif'>Andar Superior · D13–D21</text><line x1='0' y1='30' x2='0' y2='534' stroke='#222' stroke-width='0.5'/><line x1='14' y1='30' x2='14' y2='534' stroke='#222' stroke-width='0.5'/><line x1='28' y1='30' x2='28' y2='534' stroke='#222' stroke-width='0.5'/><line x1='42' y1='30' x2='42' y2='534' stroke='#222' stroke-width='0.5'/><line x1='56' y1='30' x2='56' y2='534' stroke='#222' stroke-width='0.5'/><line x1='70' y1='30' x2='70' y2='534' stroke='#222' stroke-width='0.5'/><line x1='84' y1='30' x2='84' y2='534' stroke='#222' stroke-width='0.5'/><line x1='98' y1='30' x2='98' y2='534' stroke='#222' stroke-width='0.5'/><line x1='112' y1='30' x2='112' y2='534' stroke='#222' stroke-width='0.5'/><line x1='126' y1='30' x2='126' y2='534' stroke='#222' stroke-width='0.5'/><line x1='140' y1='30' x2='140' y2='534' stroke='#222' stroke-width='0.5'/><line x1='154' y1='30' x2='154' y2='534' stroke='#222' stroke-width='0.5'/><line x1='168' y1='30' x2='168' y2='534' stroke='#222' stroke-width='0.5'/><line x1='182' y1='30' x2='182' y2='534' stroke='#222' stroke-width='0.5'/><line x1='196' y1='30' x2='196' y2='534' stroke='#222' stroke-width='0.5'/><line x1='210' y1='30' x2='210' y2='534' stroke='#222' stroke-width='0.5'/><line x1='224' y1='30' x2='224' y2='534' stroke='#222' stroke-width='0.5'/><line x1='238' y1='30' x2='238' y2='534' stroke='#222' stroke-width='0.5'/><line x1='252' y1='30' x2='252' y2='534' stroke='#222' stroke-width='0.5'/><line x1='266' y1='30' x2='266' y2='534' stroke='#222' stroke-width='0.5'/><line x1='280' y1='30' x2='280' y2='534' stroke='#222' stroke-width='0.5'/><line x1='294' y1='30' x2='294' y2='534' stroke='#222' stroke-width='0.5'/><line x1='308' y1='30' x2='308' y2='534' stroke='#222' stroke-width='0.5'/><line x1='322' y1='30' x2='322' y2='534' stroke='#222' stroke-width='0.5'/><line x1='336' y1='30' x2='336' y2='534' stroke='#222' stroke-width='0.5'/><line x1='350' y1='30' x2='350' y2='534' stroke='#222' stroke-width='0.5'/><line x1='364' y1='30' x2='364' y2='534' stroke='#222' stroke-width='0.5'/><line x1='378' y1='30' x2='378' y2='534' stroke='#222' stroke-width='0.5'/><line x1='392' y1='30' x2='392' y2='534' stroke='#222' stroke-width='0.5'/><line x1='406' y1='30' x2='406' y2='534' stroke='#222' stroke-width='0.5'/><line x1='420' y1='30' x2='420' y2='534' stroke='#222' stroke-width='0.5'/><line x1='434' y1='30' x2='434' y2='534' stroke='#222' stroke-width='0.5'/><line x1='448' y1='30' x2='448' y2='534' stroke='#222' stroke-width='0.5'/><line x1='462' y1='30' x2='462' y2='534' stroke='#222' stroke-width='0.5'/><line x1='476' y1='30' x2='476' y2='534' stroke='#222' stroke-width='0.5'/><line x1='490' y1='30' x2='490' y2='534' stroke='#222' stroke-width='0.5'/><line x1='504' y1='30' x2='504' y2='534' stroke='#222' stroke-width='0.5'/><line x1='518' y1='30' x2='518' y2='534' stroke='#222' stroke-width='0.5'/><line x1='532' y1='30' x2='532' y2='534' stroke='#222' stroke-width='0.5'/><line x1='546' y1='30' x2='546' y2='534' stroke='#222' stroke-width='0.5'/><line x1='560' y1='30' x2='560' y2='534' stroke='#222' stroke-width='0.5'/><line x1='574' y1='30' x2='574' y2='534' stroke='#222' stroke-width='0.5'/><line x1='588' y1='30' x2='588' y2='534' stroke='#222' stroke-width='0.5'/><line x1='602' y1='30' x2='602' y2='534' stroke='#222' stroke-width='0.5'/><line x1='616' y1='30' x2='616' y2='534' stroke='#222' stroke-width='0.5'/><line x1='630' y1='30' x2='630' y2='534' stroke='#222' stroke-width='0.5'/><line x1='644' y1='30' x2='644' y2='534' stroke='#222' stroke-width='0.5'/><line x1='658' y1='30' x2='658' y2='534' stroke='#222' stroke-width='0.5'/><line x1='672' y1='30' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><line x1='0' y1='30' x2='672' y2='30' stroke='#222' stroke-width='0.5'/><line x1='0' y1='44' x2='672' y2='44' stroke='#222' stroke-width='0.5'/><line x1='0' y1='58' x2='672' y2='58' stroke='#222' stroke-width='0.5'/><line x1='0' y1='72' x2='672' y2='72' stroke='#222' stroke-width='0.5'/><line x1='0' y1='86' x2='672' y2='86' stroke='#222' stroke-width='0.5'/><line x1='0' y1='100' x2='672' y2='100' stroke='#222' stroke-width='0.5'/><line x1='0' y1='114' x2='672' y2='114' stroke='#222' stroke-width='0.5'/><line x1='0' y1='128' x2='672' y2='128' stroke='#222' stroke-width='0.5'/><line x1='0' y1='142' x2='672' y2='142' stroke='#222' stroke-width='0.5'/><line x1='0' y1='156' x2='672' y2='156' stroke='#222' stroke-width='0.5'/><line x1='0' y1='170' x2='672' y2='170' stroke='#222' stroke-width='0.5'/><line x1='0' y1='184' x2='672' y2='184' stroke='#222' stroke-width='0.5'/><line x1='0' y1='198' x2='672' y2='198' stroke='#222' stroke-width='0.5'/><line x1='0' y1='212' x2='672' y2='212' stroke='#222' stroke-width='0.5'/><line x1='0' y1='226' x2='672' y2='226' stroke='#222' stroke-width='0.5'/><line x1='0' y1='240' x2='672' y2='240' stroke='#222' stroke-width='0.5'/><line x1='0' y1='254' x2='672' y2='254' stroke='#222' stroke-width='0.5'/><line x1='0' y1='268' x2='672' y2='268' stroke='#222' stroke-width='0.5'/><line x1='0' y1='282' x2='672' y2='282' stroke='#222' stroke-width='0.5'/><line x1='0' y1='296' x2='672' y2='296' stroke='#222' stroke-width='0.5'/><line x1='0' y1='310' x2='672' y2='310' stroke='#222' stroke-width='0.5'/><line x1='0' y1='324' x2='672' y2='324' stroke='#222' stroke-width='0.5'/><line x1='0' y1='338' x2='672' y2='338' stroke='#222' stroke-width='0.5'/><line x1='0' y1='352' x2='672' y2='352' stroke='#222' stroke-width='0.5'/><line x1='0' y1='366' x2='672' y2='366' stroke='#222' stroke-width='0.5'/><line x1='0' y1='380' x2='672' y2='380' stroke='#222' stroke-width='0.5'/><line x1='0' y1='394' x2='672' y2='394' stroke='#222' stroke-width='0.5'/><line x1='0' y1='408' x2='672' y2='408' stroke='#222' stroke-width='0.5'/><line x1='0' y1='422' x2='672' y2='422' stroke='#222' stroke-width='0.5'/><line x1='0' y1='436' x2='672' y2='436' stroke='#222' stroke-width='0.5'/><line x1='0' y1='450' x2='672' y2='450' stroke='#222' stroke-width='0.5'/><line x1='0' y1='464' x2='672' y2='464' stroke='#222' stroke-width='0.5'/><line x1='0' y1='478' x2='672' y2='478' stroke='#222' stroke-width='0.5'/><line x1='0' y1='492' x2='672' y2='492' stroke='#222' stroke-width='0.5'/><line x1='0' y1='506' x2='672' y2='506' stroke='#222' stroke-width='0.5'/><line x1='0' y1='520' x2='672' y2='520' stroke='#222' stroke-width='0.5'/><line x1='0' y1='534' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><rect x='56' y='254' width='504' height='56' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='308.0' y='282.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D13</text><text x='308.0' y='296.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Corredor Superior</text><rect x='308' y='394' width='112' height='84' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='364.0' y='436.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D14</text><text x='364.0' y='450.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Aposento Oculto de Sarusanda</text><rect x='56' y='310' width='140' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='126.0' y='366.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D15</text><text x='126.0' y='380.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quarto Principal</text><rect x='420' y='310' width='140' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='490.0' y='366.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D16</text><text x='490.0' y='380.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quarto das Crianças</text><rect x='196' y='310' width='112' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='252.0' y='366.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D17</text><text x='252.0' y='380.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quarto de Walter</text><rect x='308' y='310' width='112' height='84' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='364.0' y='352.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D18</text><text x='364.0' y='366.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Banheiro</text><rect x='56' y='142' width='140' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='126.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D19</text><text x='126.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quarto das Criadas</text><rect x='420' y='142' width='140' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='490.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D20</text><text x='490.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Quarto de Hóspedes</text><rect x='196' y='142' width='224' height='112' fill='#3a4a4a' stroke='#d8c9a0' stroke-width='2'/><text x='308.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D21</text><text x='308.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Salão de Música</text><line x1='308.0' y1='282.0' x2='364.0' y2='436.0' stroke='#e8b04a' stroke-dasharray='4 3'/><rect x='120.0' y='307' width='12' height='6' fill='#e8b04a'/><rect x='484.0' y='307' width='12' height='6' fill='#e8b04a'/><rect x='246.0' y='307' width='12' height='6' fill='#e8b04a'/><rect x='358.0' y='307' width='12' height='6' fill='#e8b04a'/><rect x='120.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='484.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='302.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='358.0' y='391' width='12' height='6' fill='#e8b04a'/></svg>"
+      },
+      "d-terreo": {
+        "title": "D Terreo",
+        "tipo": "svg",
+        "path": "./data/d-terreo.svg",
+        "inlineContent": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 672 534' width='100%'><rect width='100%' height='100%' fill='#111'/><text x='10' y='20' fill='#eee' font-size='16' font-family='sans-serif'>Térreo · D1–D12</text><line x1='0' y1='30' x2='0' y2='534' stroke='#222' stroke-width='0.5'/><line x1='14' y1='30' x2='14' y2='534' stroke='#222' stroke-width='0.5'/><line x1='28' y1='30' x2='28' y2='534' stroke='#222' stroke-width='0.5'/><line x1='42' y1='30' x2='42' y2='534' stroke='#222' stroke-width='0.5'/><line x1='56' y1='30' x2='56' y2='534' stroke='#222' stroke-width='0.5'/><line x1='70' y1='30' x2='70' y2='534' stroke='#222' stroke-width='0.5'/><line x1='84' y1='30' x2='84' y2='534' stroke='#222' stroke-width='0.5'/><line x1='98' y1='30' x2='98' y2='534' stroke='#222' stroke-width='0.5'/><line x1='112' y1='30' x2='112' y2='534' stroke='#222' stroke-width='0.5'/><line x1='126' y1='30' x2='126' y2='534' stroke='#222' stroke-width='0.5'/><line x1='140' y1='30' x2='140' y2='534' stroke='#222' stroke-width='0.5'/><line x1='154' y1='30' x2='154' y2='534' stroke='#222' stroke-width='0.5'/><line x1='168' y1='30' x2='168' y2='534' stroke='#222' stroke-width='0.5'/><line x1='182' y1='30' x2='182' y2='534' stroke='#222' stroke-width='0.5'/><line x1='196' y1='30' x2='196' y2='534' stroke='#222' stroke-width='0.5'/><line x1='210' y1='30' x2='210' y2='534' stroke='#222' stroke-width='0.5'/><line x1='224' y1='30' x2='224' y2='534' stroke='#222' stroke-width='0.5'/><line x1='238' y1='30' x2='238' y2='534' stroke='#222' stroke-width='0.5'/><line x1='252' y1='30' x2='252' y2='534' stroke='#222' stroke-width='0.5'/><line x1='266' y1='30' x2='266' y2='534' stroke='#222' stroke-width='0.5'/><line x1='280' y1='30' x2='280' y2='534' stroke='#222' stroke-width='0.5'/><line x1='294' y1='30' x2='294' y2='534' stroke='#222' stroke-width='0.5'/><line x1='308' y1='30' x2='308' y2='534' stroke='#222' stroke-width='0.5'/><line x1='322' y1='30' x2='322' y2='534' stroke='#222' stroke-width='0.5'/><line x1='336' y1='30' x2='336' y2='534' stroke='#222' stroke-width='0.5'/><line x1='350' y1='30' x2='350' y2='534' stroke='#222' stroke-width='0.5'/><line x1='364' y1='30' x2='364' y2='534' stroke='#222' stroke-width='0.5'/><line x1='378' y1='30' x2='378' y2='534' stroke='#222' stroke-width='0.5'/><line x1='392' y1='30' x2='392' y2='534' stroke='#222' stroke-width='0.5'/><line x1='406' y1='30' x2='406' y2='534' stroke='#222' stroke-width='0.5'/><line x1='420' y1='30' x2='420' y2='534' stroke='#222' stroke-width='0.5'/><line x1='434' y1='30' x2='434' y2='534' stroke='#222' stroke-width='0.5'/><line x1='448' y1='30' x2='448' y2='534' stroke='#222' stroke-width='0.5'/><line x1='462' y1='30' x2='462' y2='534' stroke='#222' stroke-width='0.5'/><line x1='476' y1='30' x2='476' y2='534' stroke='#222' stroke-width='0.5'/><line x1='490' y1='30' x2='490' y2='534' stroke='#222' stroke-width='0.5'/><line x1='504' y1='30' x2='504' y2='534' stroke='#222' stroke-width='0.5'/><line x1='518' y1='30' x2='518' y2='534' stroke='#222' stroke-width='0.5'/><line x1='532' y1='30' x2='532' y2='534' stroke='#222' stroke-width='0.5'/><line x1='546' y1='30' x2='546' y2='534' stroke='#222' stroke-width='0.5'/><line x1='560' y1='30' x2='560' y2='534' stroke='#222' stroke-width='0.5'/><line x1='574' y1='30' x2='574' y2='534' stroke='#222' stroke-width='0.5'/><line x1='588' y1='30' x2='588' y2='534' stroke='#222' stroke-width='0.5'/><line x1='602' y1='30' x2='602' y2='534' stroke='#222' stroke-width='0.5'/><line x1='616' y1='30' x2='616' y2='534' stroke='#222' stroke-width='0.5'/><line x1='630' y1='30' x2='630' y2='534' stroke='#222' stroke-width='0.5'/><line x1='644' y1='30' x2='644' y2='534' stroke='#222' stroke-width='0.5'/><line x1='658' y1='30' x2='658' y2='534' stroke='#222' stroke-width='0.5'/><line x1='672' y1='30' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><line x1='0' y1='30' x2='672' y2='30' stroke='#222' stroke-width='0.5'/><line x1='0' y1='44' x2='672' y2='44' stroke='#222' stroke-width='0.5'/><line x1='0' y1='58' x2='672' y2='58' stroke='#222' stroke-width='0.5'/><line x1='0' y1='72' x2='672' y2='72' stroke='#222' stroke-width='0.5'/><line x1='0' y1='86' x2='672' y2='86' stroke='#222' stroke-width='0.5'/><line x1='0' y1='100' x2='672' y2='100' stroke='#222' stroke-width='0.5'/><line x1='0' y1='114' x2='672' y2='114' stroke='#222' stroke-width='0.5'/><line x1='0' y1='128' x2='672' y2='128' stroke='#222' stroke-width='0.5'/><line x1='0' y1='142' x2='672' y2='142' stroke='#222' stroke-width='0.5'/><line x1='0' y1='156' x2='672' y2='156' stroke='#222' stroke-width='0.5'/><line x1='0' y1='170' x2='672' y2='170' stroke='#222' stroke-width='0.5'/><line x1='0' y1='184' x2='672' y2='184' stroke='#222' stroke-width='0.5'/><line x1='0' y1='198' x2='672' y2='198' stroke='#222' stroke-width='0.5'/><line x1='0' y1='212' x2='672' y2='212' stroke='#222' stroke-width='0.5'/><line x1='0' y1='226' x2='672' y2='226' stroke='#222' stroke-width='0.5'/><line x1='0' y1='240' x2='672' y2='240' stroke='#222' stroke-width='0.5'/><line x1='0' y1='254' x2='672' y2='254' stroke='#222' stroke-width='0.5'/><line x1='0' y1='268' x2='672' y2='268' stroke='#222' stroke-width='0.5'/><line x1='0' y1='282' x2='672' y2='282' stroke='#222' stroke-width='0.5'/><line x1='0' y1='296' x2='672' y2='296' stroke='#222' stroke-width='0.5'/><line x1='0' y1='310' x2='672' y2='310' stroke='#222' stroke-width='0.5'/><line x1='0' y1='324' x2='672' y2='324' stroke='#222' stroke-width='0.5'/><line x1='0' y1='338' x2='672' y2='338' stroke='#222' stroke-width='0.5'/><line x1='0' y1='352' x2='672' y2='352' stroke='#222' stroke-width='0.5'/><line x1='0' y1='366' x2='672' y2='366' stroke='#222' stroke-width='0.5'/><line x1='0' y1='380' x2='672' y2='380' stroke='#222' stroke-width='0.5'/><line x1='0' y1='394' x2='672' y2='394' stroke='#222' stroke-width='0.5'/><line x1='0' y1='408' x2='672' y2='408' stroke='#222' stroke-width='0.5'/><line x1='0' y1='422' x2='672' y2='422' stroke='#222' stroke-width='0.5'/><line x1='0' y1='436' x2='672' y2='436' stroke='#222' stroke-width='0.5'/><line x1='0' y1='450' x2='672' y2='450' stroke='#222' stroke-width='0.5'/><line x1='0' y1='464' x2='672' y2='464' stroke='#222' stroke-width='0.5'/><line x1='0' y1='478' x2='672' y2='478' stroke='#222' stroke-width='0.5'/><line x1='0' y1='492' x2='672' y2='492' stroke='#222' stroke-width='0.5'/><line x1='0' y1='506' x2='672' y2='506' stroke='#222' stroke-width='0.5'/><line x1='0' y1='520' x2='672' y2='520' stroke='#222' stroke-width='0.5'/><line x1='0' y1='534' x2='672' y2='534' stroke='#222' stroke-width='0.5'/><rect x='252' y='366' width='112' height='84' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='308.0' y='408.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D1</text><text x='308.0' y='422.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Vestíbulo</text><rect x='196' y='254' width='224' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='308.0' y='310.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D2</text><text x='308.0' y='324.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Grande Salão</text><rect x='420' y='254' width='140' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='490.0' y='310.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D3</text><text x='490.0' y='324.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Sala de Jantar</text><rect x='420' y='142' width='140' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='490.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D4</text><text x='490.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Cozinha</text><rect x='420' y='86' width='84' height='56' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='462.0' y='114.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D5</text><text x='462.0' y='128.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Despensa / Alçapão</text><rect x='56' y='254' width='140' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='126.0' y='310.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D6</text><text x='126.0' y='324.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Sala de Visitas</text><rect x='56' y='142' width='140' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='126.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D7</text><text x='126.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Escritório de Gustav</text><rect x='196' y='142' width='140' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='266.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D8</text><text x='266.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Biblioteca</text><rect x='224' y='86' width='84' height='56' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='266.0' y='114.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D9</text><text x='266.0' y='128.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Sala Secreta dos Cultistas</text><rect x='336' y='142' width='84' height='112' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='378.0' y='198.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D10</text><text x='378.0' y='212.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Galeria dos Retratos</text><rect x='140' y='366' width='112' height='84' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='196.0' y='408.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D11</text><text x='196.0' y='422.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Capela da Família</text><rect x='364' y='366' width='140' height='84' fill='#4b3a2a' stroke='#d8c9a0' stroke-width='2'/><text x='434.0' y='408.0' fill='#fff' font-size='13' font-family='sans-serif' text-anchor='middle'>D12</text><text x='434.0' y='422.0' fill='#bbb' font-size='8' font-family='sans-serif' text-anchor='middle'>Varanda Coberta</text><rect x='302.0' y='363' width='12' height='6' fill='#e8b04a'/><rect x='249' y='402.0' width='6' height='12' fill='#e8b04a'/><rect x='361' y='402.0' width='6' height='12' fill='#e8b04a'/><rect x='417' y='304.0' width='6' height='12' fill='#e8b04a'/><rect x='193' y='304.0' width='6' height='12' fill='#e8b04a'/><rect x='484.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='456.0' y='139' width='12' height='6' fill='#e8b04a'/><rect x='120.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='193' y='192.0' width='6' height='12' fill='#e8b04a'/><rect x='260.0' y='139' width='12' height='6' fill='#e8b04a'/><rect x='372.0' y='251' width='12' height='6' fill='#e8b04a'/><rect x='417' y='192.0' width='6' height='12' fill='#e8b04a'/><rect x='333' y='192.0' width='6' height='12' fill='#e8b04a'/></svg>"
+      }
+    },
+    "items": {},
+    "curio": {},
+    "session": {}
+  },
+  "quests": [
+    {
+      "id": "quest-death-house",
+      "title": "A Casa da Morte (Família Durst)",
+      "giver": "Rose & Thorn Durst",
+      "location": "Mansão Durst (D1–D38)",
+      "status": "ACTIVE",
+      "summary": "Investigar os lamentos na mansão de quatro andares, descobrir o destino de Walter Durst no sótão e sobreviver ao altar subterrâneo.",
+      "objectives": "Encontrar a chave do sótão na biblioteca secreta (D9)\nAcalmar os espíritos de Rose e Thorn (D20)\nEnfrentar ou escapar do Lorghoth, o Decaidro, na Câmara do Altar (D35)\nFugir pelas Haunted Zones até a floresta de Baróvia",
+      "reward": "Avanço para o Nível 3 + Relíquias da Família Durst"
+    },
+    {
+      "id": "quest-casa-varhen",
+      "title": "O Sangue da Casa Varhen",
+      "giver": "Astel Vhalzar Varhen",
+      "location": "Vila e Mansão Varhen",
+      "status": "ACTIVE",
+      "summary": "Proteger a linhagem Varhen contra a maldição licantrópica de Verenkar e a invasão dos Sacerdotes de Osybus.",
+      "objectives": "Defender os portões da Vila Varhen\nImpedir o ritual do Arauto de Sangue\nConfrontar Verenkar na Mansão Varhen",
+      "reward": "Bênção Ancestral da Casa Varhen"
+    }
+  ],
+  "hitDice": [
+    {
+      "id": "hd-kael",
+      "name": "Kael Varhen",
+      "charClass": "Eldritch Knight 13",
+      "dieType": 10,
+      "max": 13,
+      "current": 13,
+      "conMod": 3,
+      "notes": "Second Wind, Action Surge, Indomitable"
+    },
+    {
+      "id": "hd-kiriton",
+      "name": "Kiriton",
+      "charClass": "Mago 1",
+      "dieType": 6,
+      "max": 1,
+      "current": 1,
+      "conMod": 2,
+      "notes": "Recuperação Arcana"
+    },
+    {
+      "id": "hd-auxiz",
+      "name": "Auxiz",
+      "charClass": "Ladino (Rogue) 1",
+      "dieType": 8,
+      "max": 1,
+      "current": 1,
+      "conMod": 1,
+      "notes": "Ataque Furtivo 1d6, Cthonic Tiefling"
+    },
+    {
+      "id": "hd-laloba",
+      "name": "La Loba (Tanya)",
+      "charClass": "Precognition Barbarian 22",
+      "dieType": 12,
+      "max": 22,
+      "current": 22,
+      "conMod": 9,
+      "notes": "Fúria Implacável, ArchDemon"
+    },
+    {
+      "id": "hd-astel",
+      "name": "Astel Vhalzar Varhen",
+      "charClass": "Hexblade / Paladino 20",
+      "dieType": 10,
+      "max": 20,
+      "current": 20,
+      "conMod": 2,
+      "notes": "Soberano de Sangue, Shadar-Kai"
+    },
+    {
+      "id": "hd-connor",
+      "name": "Connor Smith",
+      "charClass": "Caçador de Sangue / Bruxo 20",
+      "dieType": 10,
+      "max": 20,
+      "current": 20,
+      "conMod": 3,
+      "notes": "Rito Carmesim, Marca de Maldição"
+    }
+  ],
+  "combatCards": [],
+  "combatTurn": {
+    "activeCardId": null,
+    "round": 1
+  },
+  "rules": {
+    "presetId": "dnd2024",
+    "presetName": "D&D 2024 (5.5e Oficial)",
+    "critRule": "double-dice",
+    "exhaustionMode": "2024-penalty",
+    "exhaustionPenaltyPerLevel": -2,
+    "exhaustionMaxLevel": 6,
+    "longRestHpPercent": 100,
+    "longRestHitDicePercent": 100,
+    "shortRestAllowHitDice": true,
+    "gridMetersPerSquare": 1.5,
+    "gridFeetPerSquare": 5,
+    "diagonalRule": "equidistant",
+    "initiativeTieBreaker": "dex",
+    "baseConditions": [
+      "Agarrado",
+      "Amedrontado",
+      "Atordoado",
+      "Caído",
+      "Cego",
+      "Enfeitiçado",
+      "Envenenado",
+      "Impedido",
+      "Incapacitado",
+      "Inconsciente",
+      "Invisível",
+      "Paralisado",
+      "Petrificado",
+      "Surdo",
+      "Concentração",
+      " Sangrando"
+    ],
+    "extraConditions": []
+  },
+  "activeMods": [
+    {
+      "enabled": false,
+      "sourcePath": "./mods/mod-modo-fatal-elite.json",
+      "id": "mod-modo-fatal-elite",
+      "name": "🩸 Modo Fatal 5.5e & Template Elite (Baróvia / Osybus)",
+      "version": "1.0.0",
+      "author": "Compêndio RPG",
+      "description": "Adiciona as condições especiais da campanha (Sangramento, Maldição de Osybus, Brumas de Strahd, Em Fúria/Bloodied), Crítico Brutal (Dano Máximo + Rolagem) e botão para converter qualquer Monstro em Elite (+50% PV, +2 CA) na Runa.",
+      "rulesPatch": {
+        "critRule": "max-plus-roll",
+        "exhaustionMode": "2024-penalty",
+        "exhaustionPenaltyPerLevel": -2,
+        "exhaustionMaxLevel": 6,
+        "extraConditions": [
+          "Sangrando",
+          "Marca de Osybus",
+          "Assombrado (Brumas)",
+          "Frenesi Elite (+2 Dano)"
+        ]
+      },
+      "customResources": [
+        {
+          "name": "Pontos de Destino / Corrupção",
+          "max": 3,
+          "recharge": "long"
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "sourcePath": "./mods/mod-realismo-cruel.json",
+      "id": "mod-realismo-cruel",
+      "name": "⚔️ Realismo Cruel (Gritty Realism & Tática Clássica)",
+      "version": "1.0.0",
+      "author": "Compêndio RPG",
+      "description": "Regras de sobrevivência severa: Descanso Longo não cura PV automaticamente (apenas 50% dos Dados de Vida), movimento diagonal 5-10-5 (1.5m / 3m) e Exaustão acumula até 10 níveis (-1 por nível).",
+      "rulesPatch": {
+        "longRestHpPercent": 0,
+        "longRestHitDicePercent": 50,
+        "exhaustionMode": "2024-penalty",
+        "exhaustionPenaltyPerLevel": -1,
+        "exhaustionMaxLevel": 10,
+        "diagonalRule": "alternating",
+        "extraConditions": [
+          "Ferimento Grave",
+          "Fadiga de Viagem",
+          "Hemorragia"
+        ]
+      }
+    }
+  ],
+  "updatedAt": 1794587584612
+}

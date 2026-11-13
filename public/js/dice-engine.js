@@ -6,14 +6,83 @@
 
 const STORAGE_KEY_DICELOG = 'compendio_rpg_dicelog_v1';
 
+const DICE_TRAY_TYPES = [4, 6, 8, 10, 12, 20, 100];
+
+function createEmptyDiceTrayCounts() {
+    return { 4: 0, 6: 0, 8: 0, 10: 0, 12: 0, 20: 0, 100: 0 };
+}
+
+function parseDiceFormulaTokens(cleanFormula) {
+    const tokenRegex = /([+-]?)(?:(\d*)d(\d+)|(\d+))/gi;
+    const tokens = [];
+    let match;
+    while ((match = tokenRegex.exec(cleanFormula)) !== null) {
+        if (!match[0]) continue;
+        const sign = match[1] === '-' ? -1 : 1;
+        if (match[3] !== undefined) {
+            tokens.push({
+                type: 'die',
+                sign,
+                count: Math.max(1, parseInt(match[2] || '1', 10)),
+                faces: Math.max(1, parseInt(match[3], 10))
+            });
+        } else if (match[4] !== undefined) {
+            tokens.push({
+                type: 'const',
+                sign,
+                value: parseInt(match[4], 10) || 0
+            });
+        }
+    }
+    return tokens;
+}
+
+function rollStandardDieTerm(token, isCrit, rules, prefixStr) {
+    let count = token.count;
+    let maxBonus = 0;
+    if (isCrit && token.faces !== 20) {
+        if (rules.critRule === 'double-dice') {
+            count = token.count * 2;
+        } else if (rules.critRule === 'max-plus-roll') {
+            maxBonus = token.count * token.faces;
+        }
+    }
+
+    const rolls = [];
+    let sumRolls = 0;
+    for (let i = 0; i < count; i++) {
+        const r = Math.floor(Math.random() * token.faces) + 1;
+        rolls.push(r);
+        sumRolls += r;
+    }
+
+    const termTotal = sumRolls + maxBonus;
+    const baseText = `${prefixStr}${count}d${token.faces}[${rolls.join(',')}]`;
+    const partText = maxBonus > 0 ? `${baseText} + ${maxBonus}(Máx Crít)` : baseText;
+    return {
+        signedTotal: token.sign * termTotal,
+        rolls,
+        partText
+    };
+}
+
 window.diceLogData = [];
 window.diceTowerOpen = false;
+window.diceLogSectionCollapsed = false;
 window.diceRollMode = 'normal'; // 'normal' | 'adv' | 'dis'
 window.diceCritActive = false;
 window.diceSecretGm = false;
+window.diceTrayState = {
+    counts: createEmptyDiceTrayCounts(),
+    mod: 0,
+    pin: false
+};
 
 const CompendioDice = {
     init() {
+        if (!window.diceTrayState || !window.diceTrayState.counts) {
+            window.diceTrayState = { counts: createEmptyDiceTrayCounts(), mod: 0, pin: false };
+        }
         try {
             const saved = localStorage.getItem(STORAGE_KEY_DICELOG);
             if (saved) {
@@ -48,6 +117,81 @@ const CompendioDice = {
     toggleTower() {
         window.diceTowerOpen = !window.diceTowerOpen;
         this.renderWidget();
+    },
+
+    toggleLogCollapse() {
+        window.diceLogSectionCollapsed = !window.diceLogSectionCollapsed;
+        this.renderWidget();
+    },
+
+    addTrayDie(faces, delta = 1) {
+        const die = Number(faces);
+        if (!DICE_TRAY_TYPES.includes(die)) return;
+        const counts = window.diceTrayState.counts;
+        counts[die] = Math.max(0, (Number(counts[die]) || 0) + (Number(delta) || 0));
+        this.renderWidget();
+    },
+
+    stepTrayMod(delta) {
+        window.diceTrayState.mod = (Number(window.diceTrayState.mod) || 0) + (Number(delta) || 0);
+        this.renderWidget();
+    },
+
+    setTrayMod(rawVal, skipRender = false) {
+        const cleaned = String(rawVal ?? '').trim();
+        const parsed = cleaned === '' || cleaned === '-' || cleaned === '+' ? 0 : parseInt(cleaned, 10);
+        window.diceTrayState.mod = Number.isFinite(parsed) ? parsed : 0;
+        const previewEl = document.getElementById('dice-tray-preview');
+        if (previewEl) {
+            const formula = this.getTrayFormula(false);
+            previewEl.textContent = formula || '1d20 (padrão)';
+        }
+        if (!skipRender) this.renderWidget();
+    },
+
+    toggleTrayPin() {
+        window.diceTrayState.pin = !window.diceTrayState.pin;
+        this.renderWidget();
+    },
+
+    clearTray() {
+        window.diceTrayState.counts = createEmptyDiceTrayCounts();
+        window.diceTrayState.mod = 0;
+        this.renderWidget();
+    },
+
+    getTrayFormula(forRoll = false) {
+        const counts = window.diceTrayState?.counts || {};
+        const mod = Number(window.diceTrayState?.mod) || 0;
+        const dieTerms = DICE_TRAY_TYPES
+            .filter(d => (Number(counts[d]) || 0) > 0)
+            .map(d => `${Number(counts[d])}d${d}`);
+
+        const modStr = mod > 0 ? `+${mod}` : (mod < 0 ? `${mod}` : '');
+        if (dieTerms.length === 0) {
+            if (!forRoll) return modStr;
+            return modStr ? `1d20${modStr}` : '1d20';
+        }
+        return `${dieTerms.join('+')}${modStr}`;
+    },
+
+    rollTray() {
+        const previewFormula = this.getTrayFormula(false);
+        const expr = this.getTrayFormula(true);
+        const label = previewFormula ? `Bandeja (${previewFormula})` : 'Bandeja (1d20)';
+        if (!window.diceTrayState.pin) {
+            window.diceTrayState.counts = createEmptyDiceTrayCounts();
+            window.diceTrayState.mod = 0;
+        }
+        return this.rollExpression(expr, label);
+    },
+
+    rerollEntry(rollId) {
+        const entry = window.diceLogData.find(r => r && r.id === rollId);
+        if (!entry || !entry.formula) return null;
+        return this.rollExpression(entry.formula, entry.label || `Rolagem (${entry.formula})`, {
+            isDamage: Boolean(entry.isDamage)
+        });
     },
 
     rollQuick(expr, label = 'Rolagem', opts = {}) {
@@ -101,80 +245,83 @@ const CompendioDice = {
         }
 
         const cleanFormula = hookPayload.expr.replace(/\s+/g, '');
-        const tokenRegex = /([+-]?)(?:(\d*)d(\d+)|(\d+))/gi;
-        let match;
-        let total = 0;
-        const breakdownParts = [];
-        let isNat20 = false;
-        let isNat1 = false;
-        let hasAnyMatch = false;
+        const tokens = parseDiceFormulaTokens(cleanFormula);
 
-        while ((match = tokenRegex.exec(cleanFormula)) !== null) {
-            if (!match[0]) continue;
-            hasAnyMatch = true;
-            const sign = match[1] === '-' ? -1 : 1;
-            const signStr = sign < 0 ? '-' : (breakdownParts.length > 0 ? '+' : '');
-
-            if (match[3] !== undefined) {
-                // Termo de dado: NdX
-                const baseCount = Math.max(1, parseInt(match[2] || '1', 10));
-                const faces = Math.max(1, parseInt(match[3], 10));
-
-                if (faces === 20 && baseCount === 1 && (hookPayload.mode === 'adv' || hookPayload.mode === 'dis')) {
-                    const r1 = Math.floor(Math.random() * 20) + 1;
-                    const r2 = Math.floor(Math.random() * 20) + 1;
-                    const chosen = hookPayload.mode === 'adv' ? Math.max(r1, r2) : Math.min(r1, r2);
-                    if (chosen === 20) isNat20 = true;
-                    if (chosen === 1) isNat1 = true;
-                    total += sign * chosen;
-                    const tag = hookPayload.mode === 'adv' ? 'Vant' : 'Desv';
-                    breakdownParts.push(`${signStr}2d20(${tag}: ${r1}, ${r2} ➔ ${chosen})`);
-                } else {
-                    let count = baseCount;
-                    let maxBonus = 0;
-                    if (hookPayload.isCrit && faces !== 20) {
-                        if (rules.critRule === 'double-dice') {
-                            count = baseCount * 2;
-                        } else if (rules.critRule === 'max-plus-roll') {
-                            maxBonus = baseCount * faces;
-                        }
-                    }
-
-                    const rolls = [];
-                    let sumRolls = 0;
-                    for (let i = 0; i < count; i++) {
-                        const r = Math.floor(Math.random() * faces) + 1;
-                        rolls.push(r);
-                        sumRolls += r;
-                    }
-                    if (faces === 20 && count === 1) {
-                        if (rolls[0] === 20) isNat20 = true;
-                        if (rolls[0] === 1) isNat1 = true;
-                    }
-
-                    const termTotal = sumRolls + maxBonus;
-                    total += sign * termTotal;
-                    if (maxBonus > 0) {
-                        breakdownParts.push(`${signStr}${count}d${faces}[${rolls.join(',')}] + ${maxBonus}(Máx Crít)`);
-                    } else {
-                        breakdownParts.push(`${signStr}${count}d${faces}[${rolls.join(',')}]`);
-                    }
-                }
-            } else if (match[4] !== undefined) {
-                const modVal = parseInt(match[4], 10) || 0;
-                total += sign * modVal;
-                breakdownParts.push(`${signStr}${modVal}`);
-            }
-        }
-
-        if (!hasAnyMatch) {
+        if (tokens.length === 0) {
             if (typeof showToast === 'function') showToast('⚠️ Fórmula de dados inválida: ' + rawExpr);
             return null;
         }
 
+        let total = 0;
+        const breakdownParts = [];
+        let isNat20 = false;
+        let isNat1 = false;
+
+        const dieTokens = tokens.filter(t => t.type === 'die');
+        const constTokens = tokens.filter(t => t.type === 'const');
+        const hasSingleD20 = dieTokens.some(t => t.faces === 20 && t.count === 1);
+        const isAdvOrDis = hookPayload.mode === 'adv' || hookPayload.mode === 'dis';
+
+        if (isAdvOrDis && !hasSingleD20 && dieTokens.length > 0) {
+            const rollPoolAttempt = () => {
+                let sum = 0;
+                const parts = [];
+                for (const token of dieTokens) {
+                    const signStr = token.sign < 0 ? '-' : (parts.length > 0 ? '+' : '');
+                    const res = rollStandardDieTerm(token, hookPayload.isCrit, rules, signStr);
+                    sum += res.signedTotal;
+                    parts.push(res.partText);
+                }
+                return { sum, text: `${parts.join(' ')} = ${sum}` };
+            };
+
+            const attemptA = rollPoolAttempt();
+            const attemptB = rollPoolAttempt();
+            const useA = hookPayload.mode === 'adv'
+                ? (attemptA.sum >= attemptB.sum)
+                : (attemptA.sum <= attemptB.sum);
+            const chosenDiceSum = useA ? attemptA.sum : attemptB.sum;
+            const tag = hookPayload.mode === 'adv' ? 'Vant' : 'Desv';
+
+            total += chosenDiceSum;
+            breakdownParts.push(`${tag}: [${attemptA.text}] vs [${attemptB.text}] ➔ ${chosenDiceSum}`);
+
+            for (const token of constTokens) {
+                total += token.sign * token.value;
+                breakdownParts.push(`${token.sign < 0 ? '-' : '+'}${token.value}`);
+            }
+        } else {
+            for (const token of tokens) {
+                const signStr = token.sign < 0 ? '-' : (breakdownParts.length > 0 ? '+' : '');
+                if (token.type === 'die') {
+                    if (token.faces === 20 && token.count === 1 && isAdvOrDis) {
+                        const r1 = Math.floor(Math.random() * 20) + 1;
+                        const r2 = Math.floor(Math.random() * 20) + 1;
+                        const chosen = hookPayload.mode === 'adv' ? Math.max(r1, r2) : Math.min(r1, r2);
+                        if (chosen === 20) isNat20 = true;
+                        if (chosen === 1) isNat1 = true;
+                        total += token.sign * chosen;
+                        const tag = hookPayload.mode === 'adv' ? 'Vant' : 'Desv';
+                        breakdownParts.push(`${signStr}2d20(${tag}: ${r1}, ${r2} ➔ ${chosen})`);
+                    } else {
+                        const res = rollStandardDieTerm(token, hookPayload.isCrit, rules, signStr);
+                        if (token.faces === 20 && res.rolls.length === 1) {
+                            if (res.rolls[0] === 20) isNat20 = true;
+                            if (res.rolls[0] === 1) isNat1 = true;
+                        }
+                        total += res.signedTotal;
+                        breakdownParts.push(res.partText);
+                    }
+                } else {
+                    total += token.sign * token.value;
+                    breakdownParts.push(`${signStr}${token.value}`);
+                }
+            }
+        }
+
         if (hookPayload.exhaustionMod !== 0) {
             total += hookPayload.exhaustionMod;
-            breakdownParts.push(`${hookPayload.exhaustionMod}(Exaustão)`);
+            breakdownParts.push(`${hookPayload.exhaustionMod > 0 ? '+' : ''}${hookPayload.exhaustionMod}(Exaustão)`);
         }
 
         if (hookPayload.isCrit && rules.critRule === 'double-total' && !/d20/i.test(cleanFormula)) {
@@ -279,6 +426,7 @@ const CompendioDice = {
         const activePl = (typeof getActivePlayer === 'function') ? getActivePlayer() : { role: 'gm' };
         const isGm = activePl && activePl.role === 'gm';
 
+        const prevCustomFormula = document.getElementById('custom-dice-formula-input')?.value || '';
         const visibleLogs = window.diceLogData.slice().reverse().slice(0, 30);
         const logsHtml = visibleLogs.map(r => {
             if (r.isSecret && !isGm && r.playerId !== activePl?.id) {
@@ -317,6 +465,7 @@ const CompendioDice = {
                         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:3px;">
                             <span class="dice-total-badge">${r.total}</span>
                             <div style="display:flex; gap:2px;">
+                                <button type="button" class="card-mini-btn" style="font-size:9.5px; padding:1px 4px; color:#d7dbe8;" onclick="CompendioDice.rerollEntry('${escapeHtmlText(r.id)}')" title="Rolar novamente esta expressão">🔁</button>
                                 <button type="button" class="card-mini-btn" style="font-size:9.5px; padding:1px 4px; color:#ff9999;" onclick="CompendioDice.applyRollToTarget(${r.total}, false)" title="Aplicar este valor como DANO no Token selecionado ou Card atual">-Dano</button>
                                 <button type="button" class="card-mini-btn" style="font-size:9.5px; padding:1px 4px; color:#8df596;" onclick="CompendioDice.applyRollToTarget(${r.total}, true)" title="Aplicar este valor como CURA no Token selecionado ou Card atual">+Cura</button>
                             </div>
@@ -324,53 +473,125 @@ const CompendioDice = {
                     </div>
                 </div>
             `;
-        }).join('') || `<div style="color:#828699; font-size:11.5px; text-align:center; padding:14px;">Nenhuma rolagem ainda. Clique nos dados acima ou nos bônus das fichas!</div>`;
+        }).join('') || `<div style="color:#828699; font-size:11.5px; text-align:center; padding:14px;">Nenhuma rolagem ainda. Monte sua bandeja ou clique nos bônus das fichas!</div>`;
 
         const lastRoll = visibleLogs[0];
         const lastBadge = lastRoll
-            ? ((lastRoll.isSecret && !isGm) ? '🔒' : `${lastRoll.total}`)
+            ? ((lastRoll.isSecret && !isGm && lastRoll.playerId !== activePl?.id) ? '🔒' : `${lastRoll.total}`)
             : 'd20';
 
+        const trayCounts = window.diceTrayState?.counts || {};
+        const trayMod = Number(window.diceTrayState?.mod) || 0;
+        const trayModDisplay = trayMod > 0 ? `+${trayMod}` : String(trayMod);
+        const rawTrayFormula = this.getTrayFormula(false);
+        const previewText = rawTrayFormula || '1d20 (clique nos dados)';
+
+        let spotlightHtml = '';
+        if (lastRoll) {
+            if (lastRoll.isSecret && !isGm && lastRoll.playerId !== activePl?.id) {
+                spotlightHtml = `
+                    <div class="dice-last-spotlight">
+                        <span style="font-size:11px; color:#b8b2a6; font-style:italic;">🔒 Última rolagem oculta pelo Mestre</span>
+                        <span class="dice-total-badge">🔒</span>
+                    </div>
+                `;
+            } else {
+                spotlightHtml = `
+                    <div class="dice-last-spotlight">
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:10.5px; font-weight:700; color:#f2cf83; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                Último: ${escapeHtmlText(lastRoll.label)}
+                            </div>
+                            <div style="font-size:10.5px; color:#c2c6d6; font-family:Consolas, monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtmlText(lastRoll.breakdown)}">
+                                ${escapeHtmlText(lastRoll.breakdown)}
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                            <span class="dice-total-badge">${lastRoll.total}</span>
+                            <button type="button" class="card-mini-btn" style="font-size:10px; padding:2px 5px;" onclick="CompendioDice.rerollEntry('${escapeHtmlText(lastRoll.id)}')" title="Rolar novamente">🔁</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         container.innerHTML = `
-            <div class="dice-tower-panel ${window.diceTowerOpen ? 'open' : ''}">
-                <div class="dice-tower-header">
+            <div class="dice-tower-panel ${window.diceTowerOpen ? 'open' : ''}" style="display:${window.diceTowerOpen ? 'flex' : 'none'};">
+                <div class="dice-tower-header" onclick="CompendioDice.toggleTower()" title="Clique para minimizar o painel de dados">
                     <span>🎲 Rolador & Log de Dados</span>
                     <div style="display:flex; gap:4px;">
-                        <button type="button" class="card-mini-btn" onclick="CompendioDice.clearLog()" title="Limpar histórico de rolagens">🗑️</button>
-                        <button type="button" class="card-mini-btn" onclick="CompendioDice.toggleTower()" title="Recolher">▼</button>
+                        <button type="button" class="card-mini-btn" onclick="event.stopPropagation(); CompendioDice.clearLog()" title="Limpar histórico de rolagens">🗑️</button>
+                        <button type="button" class="card-mini-btn" onclick="event.stopPropagation(); CompendioDice.toggleTower()" title="Minimizar">▼</button>
                     </div>
                 </div>
 
                 <!-- Modos de Rolagem (Normal / Vantagem / Desvantagem / Crítico / Oculto GM) -->
                 <div class="dice-modes-bar">
                     <button type="button" class="vis-pill ${window.diceRollMode === 'normal' ? 'active-studied' : ''}" onclick="CompendioDice.setMode('normal')">Normal</button>
-                    <button type="button" class="vis-pill ${window.diceRollMode === 'adv' ? 'active-studied' : ''}" onclick="CompendioDice.setMode('adv')" title="Rola 2d20 e escolhe o maior">🟢 Vantagem</button>
-                    <button type="button" class="vis-pill ${window.diceRollMode === 'dis' ? 'active-hidden' : ''}" onclick="CompendioDice.setMode('dis')" title="Rola 2d20 e escolhe o menor">🔴 Desvant.</button>
-                    <button type="button" class="vis-pill ${window.diceCritActive ? 'active-sighted' : ''}" onclick="CompendioDice.toggleCrit()" title="Aplica a regra de Dano Crítico ativa no próximo dado de dano">💥 Crítico</button>
+                    <button type="button" class="vis-pill ${window.diceRollMode === 'adv' ? 'active-studied' : ''}" onclick="CompendioDice.setMode('adv')" title="Rola com Vantagem (2× e escolhe o maior resultado)">🟢 Vantagem</button>
+                    <button type="button" class="vis-pill ${window.diceRollMode === 'dis' ? 'active-hidden' : ''}" onclick="CompendioDice.setMode('dis')" title="Rola com Desvantagem (2× e escolhe o menor resultado)">🔴 Desvant.</button>
+                    <button type="button" class="vis-pill ${window.diceCritActive ? 'active-sighted' : ''}" onclick="CompendioDice.toggleCrit()" title="Aplica a regra de Dano Crítico ativa na próxima rolagem">💥 Crítico</button>
                     ${isGm ? `<button type="button" class="vis-pill ${window.diceSecretGm ? 'active-hidden' : ''}" onclick="CompendioDice.toggleSecretGm()" title="Oculta o resultado desta rolagem para os jogadores">🔒 GM</button>` : ''}
                 </div>
 
-                <!-- Dados Rápidos -->
+                <!-- Bandeja de Dados Clicáveis (Esquerdo: +1 dado | Direito: -1 dado) -->
                 <div class="dice-quick-grid">
-                    ${[4, 6, 8, 10, 12, 20, 100].map(d => `
-                        <button type="button" class="calc-btn dice-die-btn" onclick="CompendioDice.rollQuick('1d${d}', 'Dado d${d}')">d${d}</button>
-                    `).join('')}
+                    ${DICE_TRAY_TYPES.map(d => {
+                        const qty = Number(trayCounts[d]) || 0;
+                        return `
+                            <button type="button"
+                                class="calc-btn dice-die-btn ${qty > 0 ? 'has-qty' : ''}"
+                                onclick="CompendioDice.addTrayDie(${d}, 1)"
+                                oncontextmenu="event.preventDefault(); CompendioDice.addTrayDie(${d}, -1)"
+                                title="Clique para +1d${d} • Clique direito para remover 1">
+                                d${d}${qty > 0 ? `<span class="dice-qty-pill">${qty}×</span>` : ''}
+                            </button>
+                        `;
+                    }).join('')}
                 </div>
 
-                <!-- Fórmula Customizada -->
-                <div style="display:flex; gap:4px; padding:0 8px 6px 8px;">
-                    <input type="text" id="custom-dice-formula-input" class="form-control" style="flex:1; padding:4px 7px; font-size:11.5px;" placeholder="Ex: 2d6+4 ou 1d20+8" onkeydown="if(event.key==='Enter'){CompendioDice.rollFromCustomInput();}">
+                <!-- Modificador Numérico + Ações da Bandeja -->
+                <div class="dice-tray-controls">
+                    <div class="dice-mod-row">
+                        <span class="dice-mod-label">Modificador:</span>
+                        <div class="dice-mod-stepper">
+                            <button type="button" class="dice-mod-btn" onclick="CompendioDice.stepTrayMod(-5)" title="Subtrair 5">-5</button>
+                            <button type="button" class="dice-mod-btn" onclick="CompendioDice.stepTrayMod(-1)" title="Subtrair 1">-</button>
+                            <input type="text" inputmode="numeric" id="dice-tray-mod-input" class="dice-mod-input" value="${escapeHtmlText(trayModDisplay)}" oninput="CompendioDice.setTrayMod(this.value, true)" onchange="CompendioDice.setTrayMod(this.value, false)" onkeydown="if(event.key==='Enter'){CompendioDice.rollTray();}" title="Valor do modificador (+5, -2, etc.)">
+                            <button type="button" class="dice-mod-btn" onclick="CompendioDice.stepTrayMod(1)" title="Somar 1">+</button>
+                            <button type="button" class="dice-mod-btn" onclick="CompendioDice.stepTrayMod(5)" title="Somar 5">+5</button>
+                        </div>
+                    </div>
+                    <div class="dice-tray-actions">
+                        <span id="dice-tray-preview" class="dice-preview-chip" title="Fórmula montada na bandeja">${escapeHtmlText(previewText)}</span>
+                        <button type="button" class="card-mini-btn dice-tray-icon-btn ${window.diceTrayState?.pin ? 'active' : ''}" onclick="CompendioDice.toggleTrayPin()" title="Fixar bandeja (mantém dados selecionados após rolar)">📌</button>
+                        <button type="button" class="card-mini-btn" onclick="CompendioDice.clearTray()" title="Limpar bandeja">🧹</button>
+                        <button type="button" class="btn-summon-card dice-tray-roll-btn" onclick="CompendioDice.rollTray()">🎲 Rolar</button>
+                    </div>
+                </div>
+
+                <!-- Fórmula Customizada Livre -->
+                <div class="dice-custom-row">
+                    <input type="text" id="custom-dice-formula-input" class="form-control" value="${escapeHtmlText(prevCustomFormula)}" style="flex:1; padding:4px 7px; font-size:11.5px;" placeholder="Fórmula livre (ex: 2d6+1d8+5)" onkeydown="if(event.key==='Enter'){CompendioDice.rollFromCustomInput();}">
                     <button type="button" class="btn-summon-card" style="padding:4px 10px; font-size:11.5px;" onclick="CompendioDice.rollFromCustomInput()">Rolar</button>
                 </div>
 
+                ${spotlightHtml}
+
+                <!-- Barra Retrátil do Histórico -->
+                <div class="dice-log-collapse-bar" onclick="CompendioDice.toggleLogCollapse()" title="Mostrar ou minimizar histórico de rolagens">
+                    <span>📜 Histórico (${visibleLogs.length})</span>
+                    <span>${window.diceLogSectionCollapsed ? '▶ Mostrar' : '▼ Ocultar'}</span>
+                </div>
+
                 <!-- Histórico / Feed de Rolagens -->
-                <div class="dice-log-scroll">
+                <div class="dice-log-scroll ${window.diceLogSectionCollapsed ? 'collapsed' : ''}" style="display:${window.diceLogSectionCollapsed ? 'none' : 'flex'};">
                     ${logsHtml}
                 </div>
             </div>
 
-            <button type="button" class="rune-stone-trigger dice-tower-trigger" onclick="CompendioDice.toggleTower()" title="Abrir/Fechar Bandeja e Histórico de Dados">
-                <span>🎲 Dados</span>
+            <button type="button" class="rune-stone-trigger dice-tower-trigger" aria-expanded="${window.diceTowerOpen ? 'true' : 'false'}" onclick="CompendioDice.toggleTower()" title="Abrir/Minimizar Bandeja e Histórico de Dados">
+                <span>🎲 Dados ${window.diceTowerOpen ? '▼' : '▲'}</span>
                 <span class="rune-count-badge">${escapeHtmlText(String(lastBadge))}</span>
             </button>
         `;

@@ -1,0 +1,26 @@
+{
+    "id": "mod-modo-fatal-elite",
+    "name": "🩸 Modo Fatal 5.5e & Template Elite (Baróvia / Osybus)",
+    "version": "1.0.0",
+    "author": "Compêndio RPG",
+    "description": "Adiciona as condições especiais da campanha (Sangramento, Maldição de Osybus, Brumas de Strahd, Em Fúria/Bloodied), Crítico Brutal (Dano Máximo + Rolagem) e botão para converter qualquer Monstro em Elite (+50% PV, +2 CA) na Runa.",
+    "rulesPatch": {
+        "critRule": "max-plus-roll",
+        "exhaustionMode": "2024-penalty",
+        "exhaustionPenaltyPerLevel": -2,
+        "exhaustionMaxLevel": 6,
+        "extraConditions": [
+            "Sangrando",
+            "Marca de Osybus",
+            "Assombrado (Brumas)",
+            "Frenesi Elite (+2 Dano)"
+        ]
+    },
+    "customResources": [
+        {
+            "name": "Pontos de Destino / Corrupção",
+            "max": 3,
+            "recharge": "long"
+        }
+    ]
+}

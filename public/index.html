@@ -55,12 +55,15 @@
                     <span class="module-dir-chevron" id="chevron-dir-compendium">▼</span>
                 </button>
                 <div class="module-dir-content open" id="sidebar-compendium-dir">
-                    <div class="sidebar-cta">
+                    <div class="sidebar-cta" style="flex-wrap:wrap;">
                         <button class="btn-new-page" type="button" onclick="openStudioModal()">
                             <span>＋</span> Nova Página
                         </button>
                         <button class="btn-new-page btn-unified-code" type="button" onclick="openUnifiedCodeModal()" title="Importar ou Exportar Monstros, Mapas, Quests e Sessão em um único código">
                             <span>⚡</span> Código Único
+                        </button>
+                        <button class="btn-new-page" type="button" style="flex-basis:100%; background:linear-gradient(135deg,#2a3142,#1e2433); border-color:#4b556e;" onclick="openFolderImportModal()" title="Carregar pastas existentes no servidor (public/) ou importar uma pasta do seu PC em lote">
+                            <span>📂</span> Importar Pastas / Lote
                         </button>
                     </div>
 
@@ -105,9 +108,12 @@
                 <input type="file" id="import-backup-input" accept=".json" style="display:none" onchange="importBackup(event)">
             </div>
             <div style="display:flex; gap:4px; width:100%;">
-                <button class="btn-mini" style="flex:1;" type="button" onclick="resetToDefaultDirectoryData()" title="Restaurar todos os dados padrão existentes no diretório public/">
-                    🔄 Restaurar Padrão
+                <button class="btn-mini" style="flex:1;" type="button" onclick="resetToDefaultDirectoryData()" title="Importar itens ou Restaurar todos os dados padrão existentes no diretório public/">
+                    🔄 Importar ou Restaurar
                 </button>
+                <!-- <button class="btn-mini" style="flex:1;" type="button" onclick="resetToDefaultDirectoryData()" title="Restaurar todos os dados padrão existentes no diretório public/">
+                    🔄 Restaurar Padrão
+                </button> -->
                 <button class="btn-mini danger" style="flex:1;" type="button" onclick="nukeAllFoldersAndDocs()" title="Apagar todas as pastas, documentos, fichas e listas de uma só vez">
                     💀 Expurgar
                 </button>
@@ -222,6 +228,14 @@
                             <div class="form-group full" id="st-new-group-wrap" style="display:none;">
                                 <label>Nome da Nova Pasta / Grupo</label>
                                 <input type="text" id="st-new-group-title" class="form-control" placeholder="Ex: Metamorfos, Consumíveis, Ato 1...">
+                            </div>
+                            <div class="form-group full">
+                                <label>Visibilidade Inicial para Jogadores</label>
+                                <select id="st-visibility" class="form-control">
+                                    <option value="sighted">👁️ Visto (Nome/Aparência visível, ficha oculta)</option>
+                                    <option value="studied">📖 Estudado (Ficha completa liberada aos jogadores)</option>
+                                    <option value="hidden">🔒 Oculto (Segredo do Mestre até revelar)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -563,6 +577,11 @@
     <!-- MODAL DE PORTÃO DA SALA (SENHA / KICK / BAN / FECHADA / LOTADA) -->
     <div class="modal-backdrop" id="room-gate-backdrop" style="z-index:10050;">
         <div class="studio-modal" id="room-gate-modal-content" style="max-width:520px; height:auto; max-height:80vh;"></div>
+    </div>
+
+    <!-- MODAL DE IMPORTAÇÃO DE PASTAS DO SERVIDOR / LOTE DO PC -->
+    <div class="modal-backdrop" id="folder-scan-backdrop" onclick="if(event.target===this) closeFolderImportModal()">
+        <div class="studio-modal" id="folder-scan-modal-content" style="max-width:860px; height:auto; max-height:88vh;"></div>
     </div>
 
     <!-- TORRE DE DADOS FLUTUANTE & LOG COMPARTILHADO -->
@@ -985,11 +1004,29 @@
                         } else if (msg.type === 'KNOWLEDGE_SYNC' && msg.knowledge) {
                             entityKnowledge = msg.knowledge;
                             localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
-                            if (activeModule === 'compendium' && activeItemContext) {
+                            if (typeof refreshCompendiumViewAfterSync === 'function') {
+                                refreshCompendiumViewAfterSync({ knowledgeChanged: true });
+                            } else if (activeModule === 'compendium' && activeItemContext) {
                                 loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
                             } else if (activeModule === 'tabletop') {
                                 renderTabletopModule();
                             }
+                        } else if (msg.type === 'COMPENDIUM_SYNC' && msg.compendioData) {
+                            compendioData = msg.compendioData;
+                            if (msg.knowledge) entityKnowledge = msg.knowledge;
+                            if (Array.isArray(msg.quests)) questsData = msg.quests;
+                            if (Array.isArray(msg.hitDice)) hitDiceData = msg.hitDice;
+                            if (typeof refreshCompendiumViewAfterSync === 'function') {
+                                refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true, questsChanged: true, hitDiceChanged: true });
+                            }
+                        } else if (msg.type === 'QUESTS_SYNC' && Array.isArray(msg.quests)) {
+                            questsData = msg.quests;
+                            localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(questsData));
+                            if (activeModule === 'compendium' && currentCategory === 'quests') renderQuestsScreen();
+                        } else if (msg.type === 'HITDICE_SYNC' && Array.isArray(msg.hitDice)) {
+                            hitDiceData = msg.hitDice;
+                            localStorage.setItem(STORAGE_KEY_HITDICE, JSON.stringify(hitDiceData));
+                            if (activeModule === 'compendium' && currentCategory === 'hitdice') renderHitDiceScreen();
                         } else if (msg.type === 'STUDY_REQUEST') {
                             const activeP = getActivePlayer();
                             if (activeP && activeP.role === 'gm') {
@@ -1027,16 +1064,45 @@
                 }
                 this.syncServerSession();
             },
-            sendStudyRequest(entityKey, entityTitle) {
-                const p = getActivePlayer();
+            broadcastCompendium() {
                 if (this.channel) {
                     this.channel.postMessage({
-                        type: 'STUDY_REQUEST',
-                        playerId: activePlayerId,
-                        playerName: p ? p.name : 'Jogador',
-                        entityKey,
-                        entityTitle
+                        type: 'COMPENDIUM_SYNC',
+                        senderId: activePlayerId,
+                        compendioData,
+                        knowledge: entityKnowledge,
+                        quests: questsData,
+                        hitDice: hitDiceData
                     });
+                }
+                this.syncServerSession();
+            },
+            broadcastQuests() {
+                if (this.channel) {
+                    this.channel.postMessage({ type: 'QUESTS_SYNC', senderId: activePlayerId, quests: questsData });
+                }
+                this.syncServerSession();
+            },
+            broadcastHitDice() {
+                if (this.channel) {
+                    this.channel.postMessage({ type: 'HITDICE_SYNC', senderId: activePlayerId, hitDice: hitDiceData });
+                }
+                this.syncServerSession();
+            },
+            sendStudyRequest(entityKey, entityTitle) {
+                const p = getActivePlayer();
+                const reqPayload = {
+                    type: 'STUDY_REQUEST',
+                    playerId: activePlayerId,
+                    playerName: p ? p.name : 'Jogador',
+                    entityKey,
+                    entityTitle
+                };
+                if (this.channel) {
+                    this.channel.postMessage(reqPayload);
+                }
+                if (typeof this.postSessionPayload === 'function') {
+                    this.postSessionPayload({ delta: reqPayload });
                 }
                 showToast(`🔍 Pedido de "Estudar" (${entityTitle}) enviado ao Mestre!`);
             },
@@ -1186,6 +1252,7 @@
                 if (savedData) {
                     const parsed = JSON.parse(savedData);
                     if (parsed.__replacedAll) {
+                        window._compendioReplacedAll = true;
                         for (const k of Object.keys(compendioData)) delete compendioData[k];
                     }
                     for (const [cat, entries] of Object.entries(parsed)) {
@@ -1214,10 +1281,15 @@
 
         function saveLocalPersistence(replacedAll = false) {
             try {
-                const payload = Object.assign({}, compendioData);
-                if (replacedAll) payload.__replacedAll = true;
-                localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(payload));
-                localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(virtualFiles));
+                if (replacedAll) window._compendioReplacedAll = true;
+                const isRemoteConnected = (window.isHostClient === false && typeof serverWritable !== 'undefined' && serverWritable);
+                if (!isRemoteConnected) {
+                    const payload = Object.assign({}, compendioData);
+                    if (replacedAll || window._compendioReplacedAll) payload.__replacedAll = true;
+                    localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(payload));
+                    localStorage.setItem(STORAGE_KEY_FILES, JSON.stringify(virtualFiles));
+                    localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
+                }
                 localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(combatCards));
                 localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(questsData));
                 localStorage.setItem(STORAGE_KEY_HITDICE, JSON.stringify(hitDiceData));
@@ -1225,7 +1297,6 @@
                 localStorage.setItem(STORAGE_KEY_ACTIVE_PLAYER, activePlayerId);
                 localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(charactersData));
                 localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
-                localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(entityKnowledge));
             } catch (e) {
                 console.warn('Cache local cheio ou indisponível:', e);
             }
@@ -1284,8 +1355,25 @@
             });
         }
 
+        function purgeKnowledgeForNode(cat, nodeObj) {
+            if (!cat || !nodeObj || typeof nodeObj !== 'object') return;
+            for (const [k, v] of Object.entries(nodeObj)) {
+                if (!v) continue;
+                if (v.children && typeof v.children === 'object') {
+                    purgeKnowledgeForNode(cat, v.children);
+                } else {
+                    delete entityKnowledge[`${cat}:${k}`];
+                }
+            }
+        }
+
         function resetToDefaultDirectoryData() {
+            if (typeof serverWritable !== 'undefined' && serverWritable && typeof openFolderImportModal === 'function') {
+                openFolderImportModal('server');
+                return;
+            }
             if (!confirm('Restaurar todos os dados padrão existentes no diretório (Monstros, NPCs, Mapas, Itens, Sessões e Personagens)?')) return;
+            window._compendioReplacedAll = false;
             [
                 STORAGE_KEY_DATA,
                 STORAGE_KEY_FILES,
@@ -1309,12 +1397,15 @@
                 compendioData[cat] = {};
             }
             virtualFiles = {};
+            entityKnowledge = {};
             combatCards = [];
             questsData = [];
             hitDiceData = [];
             activeItemContext = null;
+            window._compendioReplacedAll = true;
             saveLocalPersistence(true);
             await persistToDiskIfAvailable([], allPaths);
+            CompendioNetAdapter.broadcastCompendium();
             renderCombatHand();
             navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
             showToast('💀 Todas as pastas e memórias foram expurgadas!');
@@ -1343,6 +1434,7 @@
                 if (!confirm('Deseja limpar todas as Quests?')) return;
                 questsData = [];
                 saveLocalPersistence();
+                CompendioNetAdapter.broadcastQuests();
                 renderQuestsScreen();
                 return;
             }
@@ -1350,16 +1442,20 @@
                 if (!confirm('Deseja limpar todos os Dados de Vida do grupo?')) return;
                 hitDiceData = [];
                 saveLocalPersistence();
+                CompendioNetAdapter.broadcastHitDice();
                 renderHitDiceScreen();
                 return;
             }
             if (!confirm(`Tem certeza que deseja excluir TODAS as pastas e documentos da categoria "${currentCategory}"?`)) return;
             const removedPaths = collectPathsFromNode({ children: compendioData[currentCategory] });
             purgeVirtualPaths(removedPaths);
+            purgeKnowledgeForNode(currentCategory, compendioData[currentCategory]);
             compendioData[currentCategory] = {};
             activeItemContext = null;
+            window._compendioReplacedAll = true;
             saveLocalPersistence(true);
             await persistToDiskIfAvailable([], removedPaths);
+            CompendioNetAdapter.broadcastCompendium();
             navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
             showToast('🗑️ Categoria limpa com sucesso!');
         }
@@ -1367,12 +1463,27 @@
         async function deleteSingleListEntry(key, collection, title, event) {
             event.stopPropagation();
             if (!confirm(`Excluir "${title || key}" (incluindo arquivos e subpastas vinculados)?`)) return;
-            const removedPaths = collectPathsFromNode(collection[key]);
+            const targetNode = collection[key];
+            const removedPaths = collectPathsFromNode(targetNode);
             purgeVirtualPaths(removedPaths);
+            if (targetNode && targetNode.children) {
+                purgeKnowledgeForNode(currentCategory, targetNode.children);
+            } else {
+                delete entityKnowledge[`${currentCategory}:${key}`];
+            }
             delete collection[key];
+            if (activeItemContext && activeItemContext.key === key) {
+                activeItemContext = null;
+            }
+            window._compendioReplacedAll = true;
             saveLocalPersistence(true);
             await persistToDiskIfAvailable([], removedPaths);
-            navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
+            CompendioNetAdapter.broadcastCompendium();
+            if (typeof refreshCompendiumViewAfterSync === 'function') {
+                refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true });
+            } else {
+                navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
+            }
             showToast(`🗑️ "${title || key}" removido!`);
         }
 
@@ -1383,11 +1494,13 @@
             return `${category}:${itemKey}`;
         }
 
-        function getEntityKnowledgeRecord(category, itemKey) {
+        function getEntityKnowledgeRecord(category, itemKey, createIfMissing = true) {
             const k = getEntityKnowledgeKey(category, itemKey);
             if (!entityKnowledge[k]) {
                 const defaultGlobal = (category === 'session') ? 'hidden' : 'sighted';
-                entityKnowledge[k] = { globalLevel: defaultGlobal, playerLevels: {} };
+                const fallback = { globalLevel: defaultGlobal, playerLevels: {} };
+                if (!createIfMissing) return fallback;
+                entityKnowledge[k] = fallback;
             }
             return entityKnowledge[k];
         }
@@ -1395,7 +1508,7 @@
         function getEffectiveKnowledgeLevel(category, itemKey, playerId = activePlayerId) {
             const p = playersData.find(x => x.id === playerId) || getActivePlayer();
             if (p && p.role === 'gm') return 'gm';
-            const rec = getEntityKnowledgeRecord(category, itemKey);
+            const rec = getEntityKnowledgeRecord(category, itemKey, false);
             const rank = { hidden: 0, sighted: 1, studied: 2 };
             const gLvl = rec.globalLevel || 'sighted';
             const pLvl = (rec.playerLevels && rec.playerLevels[playerId]) || 'hidden';
@@ -1409,8 +1522,12 @@
             rec.globalLevel = level;
             saveLocalPersistence();
             CompendioNetAdapter.broadcastKnowledge();
-            if (activeModule === 'compendium' && activeItemContext) {
-                loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
+            if (activeModule === 'compendium') {
+                if (typeof refreshCompendiumViewAfterSync === 'function') {
+                    refreshCompendiumViewAfterSync({ knowledgeChanged: true, preserveKey: activeItemContext?.key || '__PRESERVE_NONE__' });
+                } else if (activeItemContext) {
+                    loadItem(activeItemContext.key, null, activeItemContext.collection, activeItemContext.groupKey);
+                }
             } else if (activeModule === 'tabletop') {
                 renderTabletopModule();
             }
@@ -1447,7 +1564,21 @@
             return '🔴 À Beira da Morte';
         }
 
-        function renderList(items, listTitle, collection, autoLoad = true, parentView = null, groupKey = '') {
+        function countVisibleEntriesInNode(cat, nodeObj) {
+            if (!nodeObj || typeof nodeObj !== 'object') return 0;
+            let count = 0;
+            for (const [k, v] of Object.entries(nodeObj)) {
+                if (!v) continue;
+                if (v.children && typeof v.children === 'object') {
+                    count += countVisibleEntriesInNode(cat, v.children);
+                } else if (getEffectiveKnowledgeLevel(cat, k) !== 'hidden') {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function renderList(items, listTitle, collection, autoLoad = true, parentView = null, groupKey = '', preserveItemKey = null) {
             const listContainer = document.getElementById('dynamic-item-list');
             const displayArea = document.getElementById('dynamic-display-area');
             const backButton = document.getElementById('session-back');
@@ -1463,10 +1594,15 @@
 
             let firstItemKey = null;
             let firstElement = null;
+            const renderedLeafElements = new Map();
 
             for (const [key, data] of Object.entries(items)) {
                 if (!data) continue;
-                if (!data.children && !isGm) {
+                let visibleFolderCount = 0;
+                if (data.children) {
+                    visibleFolderCount = isGm ? Object.keys(data.children).length : countVisibleEntriesInNode(currentCategory, data.children);
+                    if (!isGm && visibleFolderCount === 0) continue;
+                } else if (!isGm) {
                     const effLvl = getEffectiveKnowledgeLevel(currentCategory, key);
                     if (effLvl === 'hidden') continue;
                 }
@@ -1487,16 +1623,27 @@
                 if (data.children) {
                     const badge = document.createElement('span');
                     badge.className = 'list-item-folder-badge';
-                    badge.textContent = `📁 ${Object.keys(data.children).length}`;
+                    badge.textContent = `📁 ${visibleFolderCount}`;
                     rightWrap.appendChild(badge);
-                } else if (isGm) {
-                    const rec = getEntityKnowledgeRecord(currentCategory, key);
-                    const visIcon = rec.globalLevel === 'hidden' ? '🔒' : (rec.globalLevel === 'studied' ? '📖' : '👁️');
-                    const visBadge = document.createElement('span');
-                    visBadge.className = 'list-item-folder-badge';
-                    visBadge.title = `Visibilidade p/ Jogadores: ${rec.globalLevel}`;
-                    visBadge.textContent = visIcon;
-                    rightWrap.appendChild(visBadge);
+                } else {
+                    renderedLeafElements.set(key, li);
+                    if (isGm) {
+                        const rec = getEntityKnowledgeRecord(currentCategory, key, false);
+                        const visIcon = rec.globalLevel === 'hidden' ? '🔒' : (rec.globalLevel === 'studied' ? '📖' : '👁️');
+                        const visBadge = document.createElement('span');
+                        visBadge.className = 'list-item-folder-badge';
+                        visBadge.style.cursor = 'pointer';
+                        visBadge.title = `Visibilidade p/ Jogadores: ${rec.globalLevel} (clique para alternar)`;
+                        visBadge.textContent = visIcon;
+                        visBadge.onclick = (e) => {
+                            e.stopPropagation();
+                            const order = ['hidden', 'sighted', 'studied'];
+                            const cur = rec.globalLevel || (currentCategory === 'session' ? 'hidden' : 'sighted');
+                            const nextLvl = order[(order.indexOf(cur) + 1) % order.length];
+                            setGlobalEntityKnowledge(currentCategory, key, nextLvl);
+                        };
+                        rightWrap.appendChild(visBadge);
+                    }
                 }
 
                 if (isGm) {
@@ -1522,6 +1669,18 @@
                 if (!firstElement) firstElement = li;
             }
 
+            const desiredPreserve = (preserveItemKey === '__PRESERVE_OR_FIRST__' || preserveItemKey === '__PRESERVE__')
+                ? ((activeItemContext && activeItemContext.category === currentCategory) ? activeItemContext.key : null)
+                : preserveItemKey;
+
+            if (desiredPreserve === '__SKIP_LOAD__') {
+                return;
+            }
+            if (desiredPreserve && desiredPreserve !== '__PRESERVE_NONE__' && renderedLeafElements.has(desiredPreserve)) {
+                loadItem(desiredPreserve, renderedLeafElements.get(desiredPreserve), collection, groupKey);
+                return;
+            }
+
             if (firstItemKey) {
                 const firstItem = items[firstItemKey];
                 if (firstItem.children && autoLoad) {
@@ -1536,10 +1695,11 @@
                         </div>`;
                 }
             } else {
+                activeItemContext = null;
                 displayArea.innerHTML = `
                     <div class="info-container">
                         <h2 class="info-title">Nenhum Registro Visível nesta Categoria</h2>
-                        <p class="info-text">${isGm ? 'Clique em "＋ Nova Página" ou "⚡ Código Único" no menu lateral para adicionar conteúdo.' : 'O Mestre ainda não revelou registros nesta seção para o seu personagem.'}</p>
+                        <p class="info-text">${isGm ? 'Clique em "＋ Nova Página", "⚡ Código Único" ou "📂 Importar Pastas / Lote" no menu lateral para adicionar conteúdo.' : 'O Mestre ainda não revelou registros nesta seção para o seu personagem.'}</p>
                     </div>`;
             }
         }
@@ -2202,12 +2362,15 @@
             spawnCompendiumEntityToken(cat, groupKey, itemKey, title);
         }
 
-        function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle = '') {
+        async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle = '') {
             if (cat === 'maps') {
                 const root = compendioData.maps || {};
                 const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
-                if (entry?.path) {
-                    tabletopState.mapPath = entry.path;
+                if (entry?.path || entry?.inlineContent) {
+                    const mapSrc = (entry.path && !/^data:/i.test(entry.path) && entry.inlineContent && isRawSvgMarkup(entry.inlineContent))
+                        ? entry.path
+                        : resolveRenderableImageSrc(entry.path || '', entry.inlineContent || '');
+                    tabletopState.mapPath = mapSrc || entry.path;
                     saveLocalPersistence();
                     CompendioNetAdapter.broadcastTabletop();
                     switchMainModule('tabletop');
@@ -2224,8 +2387,19 @@
             let ac = 14;
             let imgSrc = '';
             let sizeSquares = 1;
-            if (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedJson) {
-                const j = activeItemContext.loadedJson;
+            let loadedJson = (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedJson)
+                ? activeItemContext.loadedJson
+                : null;
+
+            if (!loadedJson && entry && isJsonPath(entry.path, entry.tipo)) {
+                try {
+                    const rawText = entry.inlineContent || (entry.path ? await (await fetchWithRetry(entry.path)).text() : '');
+                    if (rawText) loadedJson = parseJsonWithFallback(rawText, entry.path || itemKey);
+                } catch (e) {}
+            }
+
+            if (loadedJson) {
+                const j = loadedJson;
                 hp = Number(j.hp?.average) || Number(j.hp) || 30;
                 ac = Array.isArray(j.ac) ? (j.ac[0]?.ac || j.ac[0] || 14) : (Number(j.ac) || 14);
                 const rawSz = Array.isArray(j.size) ? j.size[0] : (j.size || 'M');
@@ -2578,6 +2752,8 @@
         }
 
         function jumpToCatalogEntity(category, groupKey, itemKey) {
+            activeModule = 'compendium';
+            if (typeof updateMainModuleButtonsUI === 'function') updateMainModuleButtonsUI();
             const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${category}"]`);
             document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
             if (navEl) navEl.classList.add('active');
@@ -2587,17 +2763,17 @@
             if (groupKey && rootItems[groupKey] && rootItems[groupKey].children) {
                 const parentView = { items: rootItems, listTitle: category, collection: rootItems, parentView: null, groupKey: '' };
                 const subItems = rootItems[groupKey].children;
-                renderList(subItems, rootItems[groupKey].title || groupKey, subItems, false, parentView, groupKey);
+                renderList(subItems, rootItems[groupKey].title || groupKey, subItems, false, parentView, groupKey, '__SKIP_LOAD__');
                 const li = document.querySelector(`#dynamic-item-list .list-item[data-key="${itemKey}"]`);
                 loadItem(itemKey, li, subItems, groupKey);
             } else if (rootItems[itemKey]) {
-                renderList(rootItems, category, rootItems, false, null, '');
+                renderList(rootItems, category, rootItems, false, null, '', '__SKIP_LOAD__');
                 const li = document.querySelector(`#dynamic-item-list .list-item[data-key="${itemKey}"]`);
                 loadItem(itemKey, li, rootItems, '');
             } else {
                 for (const [k, v] of Object.entries(rootItems)) {
                     if (v && v.children && v.children[itemKey]) {
-                        renderList(v.children, v.title || k, v.children, false, null, k);
+                        renderList(v.children, v.title || k, v.children, false, null, k, '__SKIP_LOAD__');
                         const li = document.querySelector(`#dynamic-item-list .list-item[data-key="${itemKey}"]`);
                         loadItem(itemKey, li, v.children, k);
                         return;
@@ -2754,6 +2930,7 @@
                 dropRef
             });
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastQuests();
             renderQuestsScreen();
         }
 
@@ -2764,12 +2941,14 @@
             const current = q.status || 'Disponível';
             q.status = order[(order.indexOf(current) + 1) % order.length];
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastQuests();
             renderQuestsScreen();
         }
 
         function deleteQuest(id) {
             questsData = questsData.filter(x => x.id !== id);
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastQuests();
             renderQuestsScreen();
         }
 
@@ -2847,6 +3026,7 @@
             const con = parseInt(document.getElementById('hd-new-con').value) || 0;
             hitDiceData.push({ id: Date.now() + Math.floor(Math.random()*1000), name, die, current: max, max, con, lastRoll: '-' });
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastHitDice();
             renderHitDiceScreen();
         }
 
@@ -2858,6 +3038,7 @@
             const total = Math.max(1, r + h.con);
             h.lastRoll = `1d${h.die} (${r}) + ${h.con} = +${total} PV`;
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastHitDice();
             renderHitDiceScreen();
         }
 
@@ -2866,6 +3047,7 @@
             if (!h) return;
             h.current = Math.min(h.max, Math.max(0, h.current + delta));
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastHitDice();
             renderHitDiceScreen();
         }
 
@@ -2876,6 +3058,7 @@
                 h.lastRoll = `Descanso Longo (+${rec} DV)`;
             });
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastHitDice();
             renderHitDiceScreen();
             showToast('⛺ Descanso Longo aplicado ao grupo!');
         }
@@ -2883,6 +3066,7 @@
         function deleteHitDieMember(id) {
             hitDiceData = hitDiceData.filter(x => x.id !== id);
             saveLocalPersistence();
+            CompendioNetAdapter.broadcastHitDice();
             renderHitDiceScreen();
         }
 
@@ -3268,7 +3452,7 @@
         function renderKnowledgeControlBarHtml(category, itemKey, itemTitle) {
             const activePl = getActivePlayer();
             const isGm = activePl && activePl.role === 'gm';
-            const rec = getEntityKnowledgeRecord(category, itemKey);
+            const rec = getEntityKnowledgeRecord(category, itemKey, false);
 
             if (!isGm) return '';
 
@@ -3303,9 +3487,6 @@
 
         function setGlobalEntityKnowledge(category, itemKey, level) {
             setEntityGlobalKnowledge(category, itemKey, level);
-            if (currentListView) {
-                renderList(currentListView.items, currentListView.listTitle, currentListView.collection, false, currentListView.parentView, currentListView.groupKey);
-            }
         }
 
         function togglePlayerEntityStudied(category, itemKey, playerId) {
@@ -3420,10 +3601,21 @@
         }
 
         async function loadItem(itemKey, element, collection = compendioData[currentCategory], groupKey = '') {
+            const loadSeq = (window._compendiumLoadSeq = (window._compendiumLoadSeq || 0) + 1);
             if (element) {
                 const parentList = element.closest('.item-list');
                 if (parentList) parentList.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
                 element.classList.add('active');
+            } else {
+                const safeEscKey = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+                    ? CSS.escape(itemKey)
+                    : String(itemKey).replace(/"/g, '\\"');
+                const matchedLi = document.querySelector(`#dynamic-item-list .list-item[data-key="${safeEscKey}"]`);
+                if (matchedLi) {
+                    const parentList = matchedLi.closest('.item-list');
+                    if (parentList) parentList.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+                    matchedLi.classList.add('active');
+                }
             }
 
             const displayArea = document.getElementById('dynamic-display-area');
@@ -3472,10 +3664,12 @@
                     if (isJsonPath(effectivePath, itemData.tipo)) {
                         try {
                             const rawText = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                            if (loadSeq !== window._compendiumLoadSeq) return;
                             previewJson = parseJsonWithFallback(rawText, effectivePath);
                             activeItemContext.loadedJson = previewJson;
                         } catch (e) {}
                     }
+                    if (loadSeq !== window._compendiumLoadSeq) return;
                     displayArea.innerHTML = `
                         <div class="display-foreground">
                             ${renderEntryToolbar(false)}
@@ -3516,6 +3710,7 @@
                 // 3. Se for JSON (5etools, Criador Visual ou Layout de Mapa como layout.json)
                 else if (isJsonPath(effectivePath, itemData.tipo)) {
                     const rawText = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                    if (loadSeq !== window._compendiumLoadSeq) return;
                     const rawJson = parseJsonWithFallback(rawText, effectivePath);
                     activeItemContext.loadedJson = rawJson;
 
@@ -3588,6 +3783,7 @@
                 // 4. Se for Bloco de Texto (.txt, .md)
                 else if (isTextPath(effectivePath, itemData.tipo)) {
                     const rawText = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                    if (loadSeq !== window._compendiumLoadSeq) return;
                     activeItemContext.loadedText = rawText;
 
                     const innerPath = extractStandaloneFilePath(rawText);
@@ -3614,6 +3810,7 @@
                 else {
                     const isMonsterOrNpc = (currentCategory === 'monsters' || currentCategory === 'npcs');
                     const rawHtml = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                    if (loadSeq !== window._compendiumLoadSeq) return;
                     activeItemContext.loadedHtml = rawHtml;
 
                     // Verifica se o arquivo/conteúdo carregado é na verdade apenas o caminho de uma imagem/SVG (ex: "./map/d_terreo.svg") ou um <svg> puro
@@ -3654,6 +3851,7 @@
                     }
                 }
 
+                if (loadSeq !== window._compendiumLoadSeq) return;
                 displayArea.innerHTML = htmlFinal;
 
                 if (window.innerWidth <= 768) {
@@ -3661,6 +3859,7 @@
                 }
 
             } catch (error) {
+                if (loadSeq !== window._compendiumLoadSeq) return;
                 displayArea.innerHTML = `
                     <div class="display-foreground">
                         ${renderEntryToolbar(false)}
@@ -4427,9 +4626,11 @@
                 if (replaceAll) {
                     for (const k of Object.keys(compendioData)) compendioData[k] = {};
                     virtualFiles = {};
+                    entityKnowledge = {};
                     questsData = [];
                     hitDiceData = [];
                     combatCards = [];
+                    window._compendioReplacedAll = true;
                 }
 
                 if (parsed.compendioData) {
@@ -4493,8 +4694,9 @@
                 if (Array.isArray(parsed.hitDice)) hitDiceData = replaceAll ? parsed.hitDice : hitDiceData.concat(parsed.hitDice);
                 if (Array.isArray(parsed.combatCards)) combatCards = replaceAll ? parsed.combatCards : combatCards.concat(parsed.combatCards);
 
-                saveLocalPersistence(replaceAll);
+                saveLocalPersistence(replaceAll || Boolean(window._compendioReplacedAll));
                 await persistToDiskIfAvailable(filesToWrite);
+                CompendioNetAdapter.broadcastCompendium();
                 closeUnifiedCodeModal();
                 renderCombatHand();
                 navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
@@ -4562,10 +4764,23 @@
 
             const catSelect = document.getElementById('st-category');
             const validCats = ['monsters', 'npcs', 'items', 'maps', 'curio', 'session'];
-            catSelect.value = validCats.includes(currentCategory) ? currentCategory : 'monsters';
-            const modosPermitidos = { monsters: ['5etools','monster'], npcs: ['5etools','monster'], items: ['5etools','item'], maps: ['article'], curio: ['article'], session: ['article'] }[currentCategory];
+            const targetCat = (isEdit && activeItemContext?.category && validCats.includes(activeItemContext.category))
+                ? activeItemContext.category
+                : (validCats.includes(currentCategory) ? currentCategory : 'monsters');
+            catSelect.value = targetCat;
+            const modosPermitidos = { monsters: ['5etools','monster'], npcs: ['5etools','monster'], items: ['5etools','item'], maps: ['article'], curio: ['article'], session: ['article'] }[targetCat];
             document.querySelectorAll('.mode-card').forEach(el => { el.style.display = (!modosPermitidos || modosPermitidos.includes(el.dataset.mode)) ? '' : 'none'; });
             updateGroupSelector(currentListView && currentListView.groupKey ? currentListView.groupKey : '');
+
+            const visSelect = document.getElementById('st-visibility');
+            if (visSelect) {
+                if (editingExistingKey) {
+                    const rec = getEntityKnowledgeRecord(targetCat, editingExistingKey, false);
+                    visSelect.value = rec.globalLevel || (targetCat === 'session' ? 'hidden' : 'sighted');
+                } else {
+                    visSelect.value = (targetCat === 'session') ? 'hidden' : 'sighted';
+                }
+            }
 
             if (!isEdit) {
                 document.getElementById('json-lore-input').value = '';
@@ -5816,7 +6031,7 @@
         }
 
         async function persistToDiskIfAvailable(filesToWrite = [], deletePaths = []) {
-            saveLocalPersistence();
+            saveLocalPersistence(Boolean(window._compendioReplacedAll));
             if (!serverWritable || window.isHostClient === false) return false;
 
             try {
@@ -5826,7 +6041,8 @@
                     body: JSON.stringify({
                         files: filesToWrite,
                         deletePaths: deletePaths,
-                        compendioData
+                        compendioData,
+                        knowledge: entityKnowledge
                     })
                 });
                 const data = await res.json();
@@ -5872,6 +6088,7 @@
             const baseFolder = folderPrefixMap[category] || category;
 
             let title = '';
+            let savedSlug = editingExistingKey || '';
             let entryObj = {};
             const filesToWrite = [];
 
@@ -5901,6 +6118,7 @@
                     }
 
                     const slug = editingExistingKey || slugify(title);
+                    savedSlug = slug;
                     const dirPath = `./${baseFolder}/${slug}`;
 
                     if (studioImages.token) {
@@ -5935,6 +6153,7 @@
                     const sub = document.getElementById('va-subtype').value;
                     title = document.getElementById('va-title').value.trim() || 'Nova Página';
                     const slug = editingExistingKey || slugify(title);
+                    savedSlug = slug;
                     const dirPath = `./${baseFolder}/${slug}`;
 
                     if (sub === 'map') {
@@ -6034,11 +6253,22 @@
                     }
                 }
 
+                const visEl = document.getElementById('st-visibility');
+                if (savedSlug && visEl) {
+                    const rec = getEntityKnowledgeRecord(category, savedSlug);
+                    rec.globalLevel = visEl.value;
+                }
+
                 const savedOnDisk = await persistToDiskIfAvailable(filesToWrite);
+                CompendioNetAdapter.broadcastCompendium();
                 closeStudioModal();
 
-                const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${category}"]`);
-                navigateCategory(category, navEl);
+                if (savedSlug && typeof jumpToCatalogEntity === 'function') {
+                    jumpToCatalogEntity(category, groupKey || '', savedSlug);
+                } else {
+                    const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${category}"]`);
+                    navigateCategory(category, navEl);
+                }
 
                 showToast(savedOnDisk
                     ? `✅ "${title}" salvo diretamente nos arquivos do projeto!`
@@ -6093,15 +6323,24 @@
 
         async function deleteActiveEntry() {
             if (!activeItemContext) return;
-            const { key, itemData, collection } = activeItemContext;
+            const { key, itemData, collection, category } = activeItemContext;
+            const targetCat = category || currentCategory;
             if (!confirm(`Tem certeza que deseja remover "${itemData.title || key}" do Compêndio?`)) return;
 
             const removedPaths = collectPathsFromNode(itemData);
             purgeVirtualPaths(removedPaths);
+            delete entityKnowledge[`${targetCat}:${key}`];
             delete collection[key];
+            activeItemContext = null;
+            window._compendioReplacedAll = true;
             const savedOnDisk = await persistToDiskIfAvailable([], removedPaths);
-            const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
-            navigateCategory(currentCategory, navEl);
+            CompendioNetAdapter.broadcastCompendium();
+            if (typeof refreshCompendiumViewAfterSync === 'function') {
+                refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true });
+            } else {
+                const navEl = document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`);
+                navigateCategory(currentCategory, navEl);
+            }
             showToast(savedOnDisk ? '🗑️ Página e referências removidas do projeto!' : '🗑️ Página removida!');
         }
 
@@ -6144,7 +6383,9 @@
                     if (parsed.knowledge && typeof parsed.knowledge === 'object') Object.assign(entityKnowledge, parsed.knowledge);
 
                     renderPlayerIdentitySelector();
+                    window._compendioReplacedAll = true;
                     await persistToDiskIfAvailable([]);
+                    CompendioNetAdapter.broadcastCompendium();
                     renderCombatHand();
                     navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
                     showToast('✅ Backup restaurado com sucesso!');
@@ -6162,6 +6403,7 @@
     <script src="js/dice-engine.js"></script>
     <script src="js/combat-sync.js"></script>
     <script src="js/character-vtt.js"></script>
+    <script src="js/compendium-import-sync.js"></script>
     <script src="js/net-realtime.js"></script>
 </body>
 </html>

@@ -1465,16 +1465,19 @@
     color: #fff;
 }
 .dice-tower-panel {
-    width: 340px;
+    width: 360px;
     max-width: calc(100vw - 32px);
     background: var(--bg-panel);
     border: 2px outset var(--border-bevel-light);
     border-radius: 6px;
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.8);
     margin-bottom: 8px;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
+}
+.dice-tower-panel.open {
+    display: flex;
 }
 .dice-tower-header {
     background: var(--stone-header);
@@ -1485,6 +1488,8 @@
     align-items: center;
     font-size: 12px;
     color: var(--accent-gold);
+    cursor: pointer;
+    user-select: none;
 }
 .dice-modes-bar {
     display: flex;
@@ -1502,6 +1507,138 @@
     background: #202229;
     border-bottom: 1px solid #32343f;
 }
+.dice-quick-grid .dice-die-btn {
+    position: relative;
+    padding: 7px 2px;
+    font-weight: 700;
+    transition: border-color 0.12s, background 0.12s, transform 0.08s;
+}
+button.dice-die-btn.has-qty {
+    background: #2f2818;
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    box-shadow: inset 0 0 8px rgba(212, 168, 67, 0.22);
+}
+.dice-qty-pill {
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    background: var(--accent-gold);
+    color: #141519;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 9px;
+    border: 1px solid #141519;
+    pointer-events: none;
+}
+.dice-tray-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 6px 8px;
+    background: #1a1c22;
+    border-bottom: 1px solid #32343f;
+}
+.dice-mod-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+.dice-mod-label {
+    font-size: 11px;
+    color: var(--text-muted, #9aa0b4);
+    white-space: nowrap;
+}
+.dice-mod-stepper {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.dice-mod-btn {
+    min-width: 26px;
+    height: 24px;
+    padding: 0 5px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #252834;
+    color: #e6e8f0;
+    border: 1px solid #3e4356;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.dice-mod-btn:hover {
+    background: #303445;
+    border-color: var(--accent-gold);
+}
+.dice-mod-input {
+    width: 48px;
+    height: 24px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    background: #121318;
+    border: 1px solid #3e4356;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+.dice-tray-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.dice-preview-chip {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: #121318;
+    border: 1px solid #2e3240;
+    border-radius: 3px;
+    padding: 4px 7px;
+    font-family: monospace;
+    font-size: 11.5px;
+    color: #e5c97b;
+}
+.dice-tray-roll-btn {
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.dice-tray-icon-btn.active {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: #2f2818;
+}
+.dice-last-spotlight {
+    padding: 6px 8px;
+    background: #171920;
+    border-bottom: 1px solid #2b2e3a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+.dice-log-collapse-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: #181a21;
+    border-bottom: 1px solid #282a36;
+    font-size: 11px;
+    color: #a6adc4;
+    cursor: pointer;
+    user-select: none;
+}
+.dice-log-collapse-bar:hover {
+    color: var(--accent-gold);
+}
 .dice-custom-row {
     display: flex;
     gap: 4px;
@@ -1510,13 +1647,16 @@
     border-bottom: 1px solid #32343f;
 }
 .dice-log-scroll {
-    max-height: 240px;
+    max-height: 210px;
     overflow-y: auto;
     padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 6px;
     background: #141519;
+}
+.dice-log-scroll.collapsed {
+    display: none;
 }
 .dice-log-item {
     background: #22242b;

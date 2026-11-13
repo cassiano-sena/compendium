@@ -1,0 +1,20 @@
+{
+    "id": "mod-realismo-cruel",
+    "name": "⚔️ Realismo Cruel (Gritty Realism & Tática Clássica)",
+    "version": "1.0.0",
+    "author": "Compêndio RPG",
+    "description": "Regras de sobrevivência severa: Descanso Longo não cura PV automaticamente (apenas 50% dos Dados de Vida), movimento diagonal 5-10-5 (1.5m / 3m) e Exaustão acumula até 10 níveis (-1 por nível).",
+    "rulesPatch": {
+        "longRestHpPercent": 0,
+        "longRestHitDicePercent": 50,
+        "exhaustionMode": "2024-penalty",
+        "exhaustionPenaltyPerLevel": -1,
+        "exhaustionMaxLevel": 10,
+        "diagonalRule": "alternating",
+        "extraConditions": [
+            "Ferimento Grave",
+            "Fadiga de Viagem",
+            "Hemorragia"
+        ]
+    }
+}

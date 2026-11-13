@@ -108,12 +108,16 @@ let sessionState = {
     characters: [],
     tabletop: null,
     knowledge: {},
+    compendioData: null,
+    quests: [],
+    hitDice: [],
     combatCards: [],
     combatTurn: { activeCardId: null, round: 1 },
     diceLog: [],
     rules: null,
     activeMods: [],
     lastPing: null,
+    lastStudyRequest: null,
     roomConfig: {
         isOpen: true,
         isLocked: false,
@@ -129,28 +133,49 @@ let sessionState = {
     updatedAt: Date.now()
 };
 
+function loadDefaultDadosCompendium() {
+    try {
+        const dadosPath = path.join(PUBLIC_DIR, 'dados.js');
+        if (!fs.existsSync(dadosPath)) return null;
+        const raw = fs.readFileSync(dadosPath, 'utf8');
+        const firstBrace = raw.indexOf('{');
+        const lastBrace = raw.lastIndexOf('}');
+        if (firstBrace < 0 || lastBrace <= firstBrace) return null;
+        const parsed = JSON.parse(raw.slice(firstBrace, lastBrace + 1));
+        if (parsed && typeof parsed === 'object') return parsed;
+    } catch (e) {}
+    return null;
+}
+
 function loadPersistedSession() {
     try {
-        if (!fs.existsSync(SESSION_STATE_FILE)) return;
-        const raw = fs.readFileSync(SESSION_STATE_FILE, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
-            if (parsed.roomConfig && typeof parsed.roomConfig === 'object') {
-                Object.assign(sessionState.roomConfig, parsed.roomConfig);
-                if (!Array.isArray(sessionState.roomConfig.bannedEntries)) {
-                    sessionState.roomConfig.bannedEntries = [];
+        if (fs.existsSync(SESSION_STATE_FILE)) {
+            const raw = fs.readFileSync(SESSION_STATE_FILE, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                if (parsed.roomConfig && typeof parsed.roomConfig === 'object') {
+                    Object.assign(sessionState.roomConfig, parsed.roomConfig);
+                    if (!Array.isArray(sessionState.roomConfig.bannedEntries)) {
+                        sessionState.roomConfig.bannedEntries = [];
+                    }
                 }
+                if (Array.isArray(parsed.players)) sessionState.players = parsed.players;
+                if (Array.isArray(parsed.characters)) sessionState.characters = parsed.characters;
+                if (parsed.tabletop && typeof parsed.tabletop === 'object') sessionState.tabletop = parsed.tabletop;
+                if (parsed.knowledge && typeof parsed.knowledge === 'object') sessionState.knowledge = parsed.knowledge;
+                if (parsed.compendioData && typeof parsed.compendioData === 'object') sessionState.compendioData = parsed.compendioData;
+                if (Array.isArray(parsed.quests)) sessionState.quests = parsed.quests;
+                if (Array.isArray(parsed.hitDice)) sessionState.hitDice = parsed.hitDice;
+                if (Array.isArray(parsed.combatCards)) sessionState.combatCards = parsed.combatCards;
+                if (parsed.combatTurn && typeof parsed.combatTurn === 'object') sessionState.combatTurn = parsed.combatTurn;
+                if (parsed.rules && typeof parsed.rules === 'object') sessionState.rules = parsed.rules;
+                if (Array.isArray(parsed.activeMods)) sessionState.activeMods = parsed.activeMods;
             }
-            if (Array.isArray(parsed.players)) sessionState.players = parsed.players;
-            if (Array.isArray(parsed.characters)) sessionState.characters = parsed.characters;
-            if (parsed.tabletop && typeof parsed.tabletop === 'object') sessionState.tabletop = parsed.tabletop;
-            if (parsed.knowledge && typeof parsed.knowledge === 'object') sessionState.knowledge = parsed.knowledge;
-            if (Array.isArray(parsed.combatCards)) sessionState.combatCards = parsed.combatCards;
-            if (parsed.combatTurn && typeof parsed.combatTurn === 'object') sessionState.combatTurn = parsed.combatTurn;
-            if (parsed.rules && typeof parsed.rules === 'object') sessionState.rules = parsed.rules;
-            if (Array.isArray(parsed.activeMods)) sessionState.activeMods = parsed.activeMods;
         }
     } catch (e) {}
+    if (!sessionState.compendioData) {
+        sessionState.compendioData = loadDefaultDadosCompendium();
+    }
 }
 
 let persistSessionTimer = null;
@@ -165,6 +190,9 @@ function schedulePersistSession() {
                 characters: sessionState.characters,
                 tabletop: sessionState.tabletop,
                 knowledge: sessionState.knowledge,
+                compendioData: sessionState.compendioData,
+                quests: sessionState.quests,
+                hitDice: sessionState.hitDice,
                 combatCards: sessionState.combatCards,
                 combatTurn: sessionState.combatTurn,
                 rules: sessionState.rules,
@@ -177,6 +205,54 @@ function schedulePersistSession() {
 }
 
 loadPersistedSession();
+
+function isEntryVisibleToAnyRemotePlayer(cat, itemKey, knowledge) {
+    const k = `${cat}:${itemKey}`;
+    const rec = knowledge && typeof knowledge === 'object' ? knowledge[k] : null;
+    if (!rec) return cat !== 'session';
+    if (rec.globalLevel === 'sighted' || rec.globalLevel === 'studied') return true;
+    if (rec.playerLevels && typeof rec.playerLevels === 'object') {
+        for (const lvl of Object.values(rec.playerLevels)) {
+            if (lvl === 'sighted' || lvl === 'studied') return true;
+        }
+    }
+    return false;
+}
+
+function sanitizeCatalogNodeForRemote(cat, nodeObj, knowledge) {
+    if (!nodeObj || typeof nodeObj !== 'object') return {};
+    const out = {};
+    for (const [key, val] of Object.entries(nodeObj)) {
+        if (!val) continue;
+        if (typeof val === 'object' && val.children && typeof val.children === 'object') {
+            const sub = sanitizeCatalogNodeForRemote(cat, val.children, knowledge);
+            if (Object.keys(sub).length > 0) {
+                out[key] = Object.assign({}, val, { children: sub });
+            }
+        } else if (isEntryVisibleToAnyRemotePlayer(cat, key, knowledge)) {
+            if (typeof val === 'object') {
+                const clone = Object.assign({}, val);
+                if (typeof clone.inlineContent === 'string' && clone.inlineContent.length > 260000 && clone.path) {
+                    delete clone.inlineContent;
+                }
+                out[key] = clone;
+            } else {
+                out[key] = val;
+            }
+        }
+    }
+    return out;
+}
+
+function sanitizeCompendioForRemotePlayers(compendio, knowledge) {
+    if (!compendio || typeof compendio !== 'object') return null;
+    const out = {};
+    for (const [cat, entries] of Object.entries(compendio)) {
+        if (!entries || typeof entries !== 'object') continue;
+        out[cat] = sanitizeCatalogNodeForRemote(cat, entries, knowledge);
+    }
+    return out;
+}
 
 function sanitizeRoomForClient(isHost = false) {
     const rc = sessionState.roomConfig;
@@ -207,6 +283,9 @@ function sanitizeRoomForClient(isHost = false) {
 }
 
 function sanitizeSessionForClient(isHost = false) {
+    const compData = isHost
+        ? sessionState.compendioData
+        : sanitizeCompendioForRemotePlayers(sessionState.compendioData, sessionState.knowledge);
     return {
         sessionId: sessionState.sessionId,
         players: isHost
@@ -223,12 +302,16 @@ function sanitizeSessionForClient(isHost = false) {
         characters: sessionState.characters,
         tabletop: sessionState.tabletop,
         knowledge: sessionState.knowledge,
+        compendioData: compData,
+        quests: sessionState.quests,
+        hitDice: sessionState.hitDice,
         combatCards: sessionState.combatCards,
         combatTurn: sessionState.combatTurn,
         diceLog: sessionState.diceLog,
         rules: sessionState.rules,
         activeMods: sessionState.activeMods,
         lastPing: sessionState.lastPing,
+        lastStudyRequest: sessionState.lastStudyRequest,
         roomConfig: sanitizeRoomForClient(isHost),
         updatedAt: sessionState.updatedAt
     };
@@ -304,6 +387,23 @@ function broadcastSseEvent(eventType, dataObj, excludeSenderClientId = null) {
     }
 }
 
+function broadcastSessionSync(excludeSenderClientId = null, senderId = 'server') {
+    for (const [cid, client] of sseClients.entries()) {
+        if (excludeSenderClientId && cid === excludeSenderClientId) continue;
+        try {
+            const payload = `event: sync\ndata: ${JSON.stringify({
+                senderId,
+                senderClientId: excludeSenderClientId || null,
+                session: sanitizeSessionForClient(Boolean(client.isHost)),
+                updatedAt: sessionState.updatedAt
+            })}\n\n`;
+            client.res.write(payload);
+        } catch (err) {
+            sseClients.delete(cid);
+        }
+    }
+}
+
 function closeClientWithEvent(client, eventType, dataObj) {
     try {
         client.res.write(`event: ${eventType}\ndata: ${JSON.stringify(dataObj)}\n\n`);
@@ -321,6 +421,233 @@ setInterval(() => {
         }
     }
 }, 20000).unref();
+
+const COMPENDIUM_DIR_MAP = {
+    monster: 'monsters',
+    npc: 'npcs',
+    item: 'items',
+    map: 'maps',
+    curio: 'curio',
+    session: 'session'
+};
+
+function naturalCompareNames(a, b) {
+    return String(a || '').localeCompare(String(b || ''), undefined, { numeric: true, sensitivity: 'base' });
+}
+
+function prettifyCatalogTitle(rawName) {
+    return String(rawName || '')
+        .replace(/\.[^.]+$/, '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, c => c.toUpperCase()) || 'Sem Título';
+}
+
+function slugKeyFromName(name, isDir = false) {
+    const clean = isDir ? String(name || '') : String(name || '').replace(/\.[^.]+$/, '');
+    return clean
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-') || ('item-' + Date.now());
+}
+
+function extractTitleAndInlineFromFile(fullPath, relWebPath) {
+    const ext = path.extname(fullPath).toLowerCase();
+    const baseName = path.basename(fullPath, ext);
+    let title = prettifyCatalogTitle(baseName);
+    let inlineContent = null;
+    try {
+        const stat = fs.statSync(fullPath);
+        if (ext === '.json') {
+            if (stat.size <= 2 * 1024 * 1024) {
+                const raw = fs.readFileSync(fullPath, 'utf8');
+                try {
+                    const parsed = JSON.parse(raw.replace(/^\uFEFF/, '').trim());
+                    const itemObj = Array.isArray(parsed) ? parsed[0]
+                        : (parsed?.monster?.[0] || parsed?.item?.[0] || parsed?.npc?.[0] || parsed);
+                    if (itemObj && typeof itemObj === 'object' && (itemObj.name || itemObj.title)) {
+                        title = String(itemObj.name || itemObj.title).trim();
+                    }
+                } catch (e) {}
+                if (raw.length <= 260000) inlineContent = raw;
+            }
+            return { title, tipo: 'json', path: relWebPath, ...(inlineContent ? { inlineContent } : {}) };
+        }
+        if (ext === '.html' || ext === '.htm') {
+            if (stat.size <= 2 * 1024 * 1024) {
+                const raw = fs.readFileSync(fullPath, 'utf8');
+                const h1Match = raw.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || raw.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+                if (h1Match) {
+                    const stripped = h1Match[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                    if (stripped && stripped.length <= 100) title = stripped;
+                }
+                if (raw.length <= 260000) inlineContent = raw;
+            }
+            return { title, tipo: 'html', path: relWebPath, ...(inlineContent ? { inlineContent } : {}) };
+        }
+        if (ext === '.txt' || ext === '.md' || ext === '.svg') {
+            if (stat.size <= 260000) {
+                inlineContent = fs.readFileSync(fullPath, 'utf8');
+            }
+            return { title, tipo: ext.slice(1), path: relWebPath, ...(inlineContent ? { inlineContent } : {}) };
+        }
+    } catch (e) {}
+    return { title, tipo: ext.slice(1) || 'file', path: relWebPath };
+}
+
+function isDocExt(ext) {
+    return ['.json', '.html', '.htm', '.txt', '.md'].includes(ext);
+}
+
+function isImgExt(ext) {
+    return ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.avif'].includes(ext);
+}
+
+function flattenNestedLeaves(targetObj, nodeObj) {
+    for (const [k, v] of Object.entries(nodeObj || {})) {
+        if (!v) continue;
+        if (v.children && typeof v.children === 'object') {
+            flattenNestedLeaves(targetObj, v.children);
+        } else if (!targetObj[k]) {
+            targetObj[k] = v;
+        }
+    }
+}
+
+function walkCompendiumFolder(cat, dirAbsPath, dirWebRelPath, isCategoryRoot = false) {
+    if (!fs.existsSync(dirAbsPath)) return {};
+    const entries = fs.readdirSync(dirAbsPath, { withFileTypes: true })
+        .filter(e => !e.name.startsWith('.'))
+        .sort((a, b) => naturalCompareNames(a.name, b.name));
+
+    const subdirs = entries.filter(e => e.isDirectory());
+    const files = entries.filter(e => e.isFile());
+    const docFiles = files.filter(f => isDocExt(path.extname(f.name).toLowerCase()));
+    const imgFiles = files.filter(f => isImgExt(path.extname(f.name).toLowerCase()));
+
+    // Colapsa pasta de entidade única (ex: monster/data/tarrasque/tarrasque.json + tarrasque.png)
+    if (!isCategoryRoot && subdirs.length === 0) {
+        if (cat === 'monsters' || cat === 'npcs' || cat === 'items') {
+            const distinctDocSlugs = new Set(docFiles.map(f => slugKeyFromName(f.name)));
+            if (distinctDocSlugs.size === 1 || (docFiles.length === 0 && imgFiles.length >= 1)) {
+                const chosen =
+                    docFiles.find(f => path.extname(f.name).toLowerCase() === '.json') ||
+                    docFiles.find(f => ['.html', '.htm'].includes(path.extname(f.name).toLowerCase())) ||
+                    docFiles[0] ||
+                    imgFiles.find(f => !/-art\./i.test(f.name)) ||
+                    imgFiles[0];
+                if (chosen) {
+                    const key = slugKeyFromName(path.basename(dirAbsPath), true);
+                    const full = path.join(dirAbsPath, chosen.name);
+                    const rel = `${dirWebRelPath}/${chosen.name}`;
+                    return { __singleEntity: true, key, entry: extractTitleAndInlineFromFile(full, rel) };
+                }
+            }
+        } else if (cat === 'maps' && (docFiles.length + imgFiles.length) === 1) {
+            const chosen = docFiles[0] || imgFiles[0];
+            if (chosen) {
+                const key = slugKeyFromName(path.basename(dirAbsPath), true);
+                const full = path.join(dirAbsPath, chosen.name);
+                const rel = `${dirWebRelPath}/${chosen.name}`;
+                return { __singleEntity: true, key, entry: extractTitleAndInlineFromFile(full, rel) };
+            }
+        }
+    }
+
+    const collection = {};
+    for (const sd of subdirs) {
+        const subAbs = path.join(dirAbsPath, sd.name);
+        const subWeb = `${dirWebRelPath}/${sd.name}`;
+        const res = walkCompendiumFolder(cat, subAbs, subWeb, false);
+        if (res && res.__singleEntity) {
+            collection[res.key] = res.entry;
+        } else if (res && Object.keys(res).length > 0) {
+            if (isCategoryRoot) {
+                const fKey = slugKeyFromName(sd.name, true);
+                collection[fKey] = {
+                    title: prettifyCatalogTitle(sd.name),
+                    children: res
+                };
+            } else {
+                // UI suporta 1 nível de pasta; achata subníveis extras preservando entradas
+                flattenNestedLeaves(collection, res);
+            }
+        }
+    }
+
+    const leafCandidates = (cat === 'maps')
+        ? [...docFiles, ...imgFiles]
+        : (cat === 'curio' || cat === 'session' ? docFiles : (docFiles.length ? docFiles : imgFiles));
+
+    for (const lf of leafCandidates) {
+        const ext = path.extname(lf.name).toLowerCase();
+        const k = slugKeyFromName(lf.name);
+        if (ext !== '.json' && leafCandidates.some(other => slugKeyFromName(other.name) === k && path.extname(other.name).toLowerCase() === '.json')) {
+            continue;
+        }
+        const full = path.join(dirAbsPath, lf.name);
+        const rel = `${dirWebRelPath}/${lf.name}`;
+        if (!collection[k]) {
+            collection[k] = extractTitleAndInlineFromFile(full, rel);
+        }
+    }
+    return collection;
+}
+
+function countLeafEntries(nodeObj) {
+    if (!nodeObj || typeof nodeObj !== 'object') return 0;
+    let total = 0;
+    for (const v of Object.values(nodeObj)) {
+        if (!v) continue;
+        if (v.children && typeof v.children === 'object') total += countLeafEntries(v.children);
+        else total++;
+    }
+    return total;
+}
+
+function scanCompendiumDirectories() {
+    const scanned = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
+    const counts = { monsters: 0, npcs: 0, maps: 0, items: 0, curio: 0, session: 0 };
+    for (const [folderName, catKey] of Object.entries(COMPENDIUM_DIR_MAP)) {
+        const absDir = path.join(PUBLIC_DIR, folderName);
+        if (fs.existsSync(absDir)) {
+            scanned[catKey] = walkCompendiumFolder(catKey, absDir, `./${folderName}`, true);
+            counts[catKey] = countLeafEntries(scanned[catKey]);
+        }
+    }
+    return { scanned, counts };
+}
+
+function mergeCatalogCollections(targetCatObj, scannedCatObj) {
+    const result = Object.assign({}, targetCatObj || {});
+    for (const [k, v] of Object.entries(scannedCatObj || {})) {
+        if (v && v.children && result[k] && result[k].children) {
+            result[k] = {
+                title: result[k].title || v.title,
+                children: mergeCatalogCollections(result[k].children, v.children)
+            };
+        } else if (!result[k]) {
+            result[k] = v;
+        }
+    }
+    return result;
+}
+
+function applyScannedVisibility(catKey, nodeObj, knowledge, visLevel) {
+    if (!nodeObj || typeof nodeObj !== 'object' || !visLevel) return;
+    for (const [k, v] of Object.entries(nodeObj)) {
+        if (!v) continue;
+        if (v.children && typeof v.children === 'object') {
+            applyScannedVisibility(catKey, v.children, knowledge, visLevel);
+        } else {
+            const knowKey = `${catKey}:${k}`;
+            if (!knowledge[knowKey]) {
+                knowledge[knowKey] = { globalLevel: visLevel, playerLevels: {} };
+            }
+        }
+    }
+}
 
 const server = http.createServer((req, res) => {
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -609,6 +936,73 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // API: Escanear dinamicamente pastas existentes em public/ (monster, npc, item, map, curio, session)
+    if (pathname === '/api/scan-compendium' && req.method === 'GET') {
+        if (!isHost) {
+            return sendJson(res, 403, { ok: false, error: 'Apenas o Host pode escanear pastas do computador.' });
+        }
+        try {
+            const { scanned, counts } = scanCompendiumDirectories();
+            return sendJson(res, 200, { ok: true, counts, scanned });
+        } catch (err) {
+            return sendJson(res, 500, { ok: false, error: err.message });
+        }
+    }
+
+    if (pathname === '/api/scan-compendium' && req.method === 'POST') {
+        if (!isHost) {
+            return sendJson(res, 403, { ok: false, error: 'Apenas o Host pode importar pastas do servidor.' });
+        }
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk;
+            if (body.length > 256 * 1024) req.destroy();
+        });
+        req.on('end', () => {
+            try {
+                const incoming = JSON.parse(body || '{}');
+                const mode = incoming.mode === 'replace' ? 'replace' : 'merge';
+                const targetCats = Array.isArray(incoming.categories) && incoming.categories.length > 0
+                    ? incoming.categories
+                    : ['monsters', 'npcs', 'maps', 'items', 'curio', 'session'];
+                const defaultVis = ['hidden', 'sighted', 'studied'].includes(incoming.defaultVisibility)
+                    ? incoming.defaultVisibility
+                    : null;
+
+                const { scanned, counts } = scanCompendiumDirectories();
+                const current = Object.assign({ monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} }, sessionState.compendioData || {});
+
+                for (const catKey of targetCats) {
+                    if (!scanned[catKey]) continue;
+                    current[catKey] = (mode === 'replace')
+                        ? scanned[catKey]
+                        : mergeCatalogCollections(current[catKey], scanned[catKey]);
+                    if (defaultVis) {
+                        applyScannedVisibility(catKey, scanned[catKey], sessionState.knowledge, defaultVis);
+                    }
+                }
+
+                sessionState.compendioData = current;
+                sessionState.updatedAt = Date.now();
+                const dadosPath = safePublicPath('dados.js');
+                fs.writeFileSync(dadosPath, `const compendioData = ${JSON.stringify(current, null, 4)};\n`, 'utf8');
+                schedulePersistSession();
+                broadcastSessionSync(null, 'host-scan');
+
+                return sendJson(res, 200, {
+                    ok: true,
+                    counts,
+                    compendioData: current,
+                    knowledge: sessionState.knowledge,
+                    updatedAt: sessionState.updatedAt
+                });
+            } catch (err) {
+                return sendJson(res, 500, { ok: false, error: err.message });
+            }
+        });
+        return;
+    }
+
     // API: Listar Mods instalados na pasta public/mods/
     if (req.method === 'GET' && pathname === '/api/mods') {
         try {
@@ -728,6 +1122,8 @@ const server = http.createServer((req, res) => {
                         sessionState.diceLog = [];
                     } else if (d.type === 'MAP_PING' && d.ping) {
                         sessionState.lastPing = d.ping;
+                    } else if (d.type === 'STUDY_REQUEST') {
+                        sessionState.lastStudyRequest = Object.assign({ id: 'study-' + Date.now(), at: Date.now() }, d);
                     } else if (d.type === 'PRESENCE_UPDATE') {
                         broadcastSseEvent('presence', {
                             onlinePlayers: getOnlinePlayersList(),
@@ -747,6 +1143,7 @@ const server = http.createServer((req, res) => {
                 }
 
                 // 2. Sincronização de estado de módulos
+                const isAuthorizedHostGm = isHost && incoming.senderRole !== 'player';
                 if (Array.isArray(incoming.players)) {
                     // Preserva PINs originais caso um cliente remoto envie versão sanitizada sem PIN
                     const existingPinMap = new Map((sessionState.players || []).map(p => [p.id, p.pin || '']));
@@ -759,7 +1156,12 @@ const server = http.createServer((req, res) => {
                 }
                 if (Array.isArray(incoming.characters)) sessionState.characters = incoming.characters;
                 if (incoming.tabletop && typeof incoming.tabletop === 'object') sessionState.tabletop = incoming.tabletop;
-                if (incoming.knowledge && typeof incoming.knowledge === 'object') sessionState.knowledge = incoming.knowledge;
+                if (isAuthorizedHostGm) {
+                    if (incoming.knowledge && typeof incoming.knowledge === 'object') sessionState.knowledge = incoming.knowledge;
+                    if (incoming.compendioData && typeof incoming.compendioData === 'object') sessionState.compendioData = incoming.compendioData;
+                    if (Array.isArray(incoming.quests)) sessionState.quests = incoming.quests;
+                    if (Array.isArray(incoming.hitDice)) sessionState.hitDice = incoming.hitDice;
+                }
                 if (Array.isArray(incoming.combatCards)) sessionState.combatCards = incoming.combatCards;
                 if (incoming.combatTurn && typeof incoming.combatTurn === 'object') sessionState.combatTurn = incoming.combatTurn;
                 if (Array.isArray(incoming.diceLog)) sessionState.diceLog = incoming.diceLog.slice(-80);
@@ -768,12 +1170,7 @@ const server = http.createServer((req, res) => {
                 sessionState.updatedAt = Date.now();
                 schedulePersistSession();
 
-                broadcastSseEvent('sync', {
-                    senderId,
-                    senderClientId,
-                    session: sanitizeSessionForClient(false),
-                    updatedAt: sessionState.updatedAt
-                }, senderClientId);
+                broadcastSessionSync(senderClientId, senderId);
                 broadcastSseEvent('presence', {
                     onlinePlayers: getOnlinePlayersList(),
                     updatedAt: sessionState.updatedAt
@@ -832,11 +1229,20 @@ const server = http.createServer((req, res) => {
                     }
                 }
 
-                // 2. Atualizar public/dados.js se enviado
+                // 2. Atualizar public/dados.js e propagar em tempo real na sessão online
                 if (payload.compendioData && typeof payload.compendioData === 'object') {
                     const dadosPath = safePublicPath('dados.js');
                     const jsContent = `const compendioData = ${JSON.stringify(payload.compendioData, null, 4)};\n`;
                     fs.writeFileSync(dadosPath, jsContent, 'utf8');
+                    sessionState.compendioData = payload.compendioData;
+                }
+                if (payload.knowledge && typeof payload.knowledge === 'object') {
+                    sessionState.knowledge = payload.knowledge;
+                }
+                if (payload.compendioData || payload.knowledge) {
+                    sessionState.updatedAt = Date.now();
+                    schedulePersistSession();
+                    broadcastSessionSync(null, 'host-save');
                 }
 
                 return sendJson(res, 200, { ok: true, message: 'Salvo com sucesso nos arquivos do projeto!' });

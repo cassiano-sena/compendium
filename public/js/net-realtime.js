@@ -18,6 +18,11 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
 
     CompendioNetAdapter.init = function() {
         origInit();
+        this._lastStudyReqId = '';
+        this._lastCatalogJson = '';
+        this._lastKnowledgeJson = '';
+        this._lastQuestsJson = '';
+        this._lastHitDiceJson = '';
 
         // Estende o listener do BroadcastChannel para Combate, Dados, Ping e Regras
         if (this.channel) {
@@ -127,12 +132,23 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             if (msg.rules) window.activeRulesConfig = msg.rules;
             if (Array.isArray(msg.activeMods)) window.installedMods = msg.activeMods;
             if (typeof CompendioRules !== 'undefined') CompendioRules.refreshAllScreens();
+        } else if (msg.type === 'STUDY_REQUEST') {
+            if (getActivePlayer()?.role === 'gm' && typeof showToast === 'function') {
+                showToast(`🖐️ ${msg.playerName || 'Jogador'} pediu para ESTUDAR: "${msg.entityTitle || msg.entityKey}"`);
+            }
         }
     };
 
     CompendioNetAdapter.applyServerSessionSnapshot = function(sess) {
         if (!sess || typeof sess !== 'object') return;
         const isTyping = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+        const studioOpen = document.getElementById('studio-modal-backdrop')?.classList.contains('open');
+        const roleBefore = typeof getActivePlayer === 'function' ? getActivePlayer()?.role : null;
+
+        let catalogChanged = false;
+        let knowledgeChanged = false;
+        let questsChanged = false;
+        let hitDiceChanged = false;
 
         if (sess.roomConfig && typeof sess.roomConfig === 'object') {
             window.onlineRoomConfig = sess.roomConfig;
@@ -147,7 +163,7 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             });
             if (!isTyping) renderPlayerIdentitySelector();
         }
-        if (Array.isArray(sess.characters) && sess.characters.length > 0) {
+        if (Array.isArray(sess.characters) && (sess.characters.length > 0 || !window.isHostClient || (Array.isArray(sess.players) && sess.players.length > 0))) {
             charactersData = sess.characters;
             if (!isTyping && activeModule === 'character') renderCharacterModule();
         }
@@ -155,9 +171,62 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             tabletopState = sess.tabletop;
             if (!isTyping && activeModule === 'tabletop') renderTabletopModule();
         }
-        if (sess.knowledge && typeof sess.knowledge === 'object' && Object.keys(sess.knowledge).length > 0) {
-            entityKnowledge = sess.knowledge;
+
+        if (sess.knowledge && typeof sess.knowledge === 'object') {
+            const nextKnowJson = JSON.stringify(sess.knowledge);
+            const curKnowJson = this._lastKnowledgeJson || (typeof entityKnowledge !== 'undefined' ? JSON.stringify(entityKnowledge) : '');
+            if (nextKnowJson !== curKnowJson || (Object.keys(sess.knowledge).length === 0 && typeof entityKnowledge !== 'undefined' && Object.keys(entityKnowledge).length > 0)) {
+                this._lastKnowledgeJson = nextKnowJson;
+                entityKnowledge = sess.knowledge;
+                knowledgeChanged = true;
+            } else {
+                this._lastKnowledgeJson = nextKnowJson;
+            }
         }
+
+        if (sess.compendioData && typeof sess.compendioData === 'object') {
+            const nextCatJson = JSON.stringify(sess.compendioData);
+            const curCatJson = this._lastCatalogJson || (typeof compendioData !== 'undefined' ? JSON.stringify(compendioData) : '');
+            if (nextCatJson !== curCatJson) {
+                this._lastCatalogJson = nextCatJson;
+                compendioData = sess.compendioData;
+                catalogChanged = true;
+            } else {
+                this._lastCatalogJson = nextCatJson;
+            }
+        }
+
+        if (Array.isArray(sess.quests)) {
+            const nextQuestsJson = JSON.stringify(sess.quests);
+            const curQuestsJson = this._lastQuestsJson || (typeof questsData !== 'undefined' ? JSON.stringify(questsData) : '');
+            if (nextQuestsJson !== curQuestsJson) {
+                this._lastQuestsJson = nextQuestsJson;
+                questsData = sess.quests;
+                questsChanged = true;
+            } else {
+                this._lastQuestsJson = nextQuestsJson;
+            }
+        }
+
+        if (Array.isArray(sess.hitDice)) {
+            const nextHdJson = JSON.stringify(sess.hitDice);
+            const curHdJson = this._lastHitDiceJson || (typeof hitDiceData !== 'undefined' ? JSON.stringify(hitDiceData) : '');
+            if (nextHdJson !== curHdJson) {
+                this._lastHitDiceJson = nextHdJson;
+                hitDiceData = sess.hitDice;
+                hitDiceChanged = true;
+            } else {
+                this._lastHitDiceJson = nextHdJson;
+            }
+        }
+
+        if (sess.lastStudyRequest && sess.lastStudyRequest.id && sess.lastStudyRequest.id !== this._lastStudyReqId) {
+            this._lastStudyReqId = sess.lastStudyRequest.id;
+            if (getActivePlayer()?.role === 'gm' && typeof showToast === 'function') {
+                showToast(`🖐️ ${sess.lastStudyRequest.playerName || 'Jogador'} pediu para ESTUDAR: "${sess.lastStudyRequest.entityTitle || sess.lastStudyRequest.entityKey}"`);
+            }
+        }
+
         if (Array.isArray(sess.combatCards)) {
             combatCards = sess.combatCards;
             if (sess.combatTurn) window.combatTurnState = sess.combatTurn;
@@ -172,8 +241,25 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
             window.activeRulesConfig = sess.rules;
             if (typeof CompendioRules !== 'undefined') CompendioRules.updateRulesSidebarBadge();
         }
+
         if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
+
+        const roleAfter = typeof getActivePlayer === 'function' ? getActivePlayer()?.role : null;
+        const roleChanged = roleBefore !== roleAfter;
+
+        if ((catalogChanged || knowledgeChanged || questsChanged || hitDiceChanged) && window.isHostClient && typeof saveLocalPersistence === 'function') {
+            saveLocalPersistence();
+        }
+
+        if ((catalogChanged || knowledgeChanged || questsChanged || hitDiceChanged || roleChanged) && !studioOpen && typeof refreshCompendiumViewAfterSync === 'function') {
+            refreshCompendiumViewAfterSync({
+                catalogChanged: catalogChanged || roleChanged,
+                knowledgeChanged: knowledgeChanged || roleChanged,
+                questsChanged,
+                hitDiceChanged
+            });
+        }
     };
 
     CompendioNetAdapter.connectRealtimeServer = async function() {
@@ -227,6 +313,10 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                         if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
                         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
                         if (activeModule === 'tabletop' && typeof renderTabletopModule === 'function') renderTabletopModule();
+                        else if (activeModule === 'character' && typeof renderCharacterModule === 'function') renderCharacterModule();
+                        else if (activeModule === 'compendium' && !window.isHostClient && typeof refreshCompendiumViewAfterSync === 'function') {
+                            refreshCompendiumViewAfterSync({ catalogChanged: true, knowledgeChanged: true });
+                        }
                     } catch (e) {}
                 });
 
@@ -286,6 +376,15 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                             this.handleIncomingRealtimeMessage({ type: 'DICE_CLEAR' });
                         } else if (d.type === 'MAP_PING' && d.ping) {
                             this.handleIncomingRealtimeMessage({ type: 'MAP_PING', ping: d.ping });
+                        } else if (d.type === 'STUDY_REQUEST') {
+                            if (d.id) this._lastStudyReqId = d.id;
+                            this.handleIncomingRealtimeMessage({
+                                type: 'STUDY_REQUEST',
+                                entityKey: d.entityKey,
+                                entityTitle: d.entityTitle,
+                                playerId: d.playerId || data.senderId,
+                                playerName: d.playerName || data.senderName
+                            });
                         } else if (d.type === 'TOKEN_MOVE' && d.token && tabletopState && Array.isArray(tabletopState.tokens)) {
                             const idx = tabletopState.tokens.findIndex(t => t.id === d.token.id);
                             if (idx >= 0) Object.assign(tabletopState.tokens[idx], d.token);
@@ -328,9 +427,17 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                         if (d && d.room) window.onlineRoomConfig = d.room;
                         if (d && Array.isArray(d.onlinePlayers)) window.onlinePlayersList = d.onlinePlayers;
                         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
-                        if (d && d.session && d.session.updatedAt > this.lastServerUpdatedAt) {
-                            this.lastServerUpdatedAt = d.session.updatedAt;
-                            this.applyServerSessionSnapshot(d.session);
+                        if (d && d.session) {
+                            const isFirstPoll = this.lastServerUpdatedAt === 0;
+                            const serverHasPlayers = Array.isArray(d.session.players) && d.session.players.length > 0;
+                            const serverHasChars = Array.isArray(d.session.characters) && d.session.characters.length > 0;
+                            if (isFirstPoll && !serverHasPlayers && !serverHasChars && window.isHostClient) {
+                                this.lastServerUpdatedAt = d.session.updatedAt || Date.now();
+                                this.syncServerSession();
+                            } else if (d.session.updatedAt > this.lastServerUpdatedAt) {
+                                this.lastServerUpdatedAt = d.session.updatedAt;
+                                this.applyServerSessionSnapshot(d.session);
+                            }
                         }
                     } catch (e) {}
                 }, 2500);
@@ -392,7 +499,9 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
     };
 
     CompendioNetAdapter.syncServerSession = async function() {
-        await this.postSessionPayload({
+        const activeP = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
+        const senderIsGm = (window.isHostClient !== false) && activeP && activeP.role === 'gm';
+        const payload = {
             players: window.isHostClient
                 ? playersData
                 : (playersData || []).map(p => ({
@@ -405,12 +514,18 @@ window.localClientId = 'cl-' + Date.now().toString(36) + '-' + Math.floor(Math.r
                 })),
             characters: charactersData,
             tabletop: tabletopState,
-            knowledge: entityKnowledge,
             combatCards,
             combatTurn: window.combatTurnState,
             diceLog: window.diceLogData,
             rules: window.activeRulesConfig,
             activeMods: window.installedMods
-        });
+        };
+        if (senderIsGm) {
+            payload.knowledge = entityKnowledge;
+            if (typeof compendioData !== 'undefined') payload.compendioData = compendioData;
+            if (typeof questsData !== 'undefined') payload.quests = questsData;
+            if (typeof hitDiceData !== 'undefined') payload.hitDice = hitDiceData;
+        }
+        await this.postSessionPayload(payload);
     };
 })();
