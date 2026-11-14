@@ -327,7 +327,19 @@ function sanitizeTabletopForRemote(tt) {
             }
             return copy;
         });
-    return Object.assign({}, tt, { tokens: safeTokens });
+    const safeTextBoxes = (Array.isArray(tt.textBoxes) ? tt.textBoxes : [])
+        .filter(tb => tb && !tb.hiddenFromPlayers);
+    const safeDrawings = (Array.isArray(tt.drawings) ? tt.drawings : [])
+        .filter(dr => dr && !dr.hiddenFromPlayers);
+    const out = Object.assign({}, tt, {
+        tokens: safeTokens,
+        textBoxes: safeTextBoxes,
+        drawings: safeDrawings
+    });
+    // Cenas inativas e fogs salvos por mapa pertencem apenas ao Host/Mestre
+    delete out.mapInstances;
+    delete out.savedMapFogs;
+    return out;
 }
 
 function sanitizeCombatCardsForRemote(cards, tabletop) {
@@ -434,6 +446,12 @@ function ensureTabletopContainer() {
             aoeTemplates: [],
             fogRects: [],
             fogRegions: [],
+            textBoxes: [],
+            drawings: [],
+            mapInstances: {},
+            activeMapInstanceId: '',
+            activeMapInstanceName: '',
+            savedMapFogs: {},
             gridSize: 56,
             gridSizeY: 56,
             gridOffsetX: 0,
@@ -450,6 +468,17 @@ function ensureTabletopContainer() {
     if (!Array.isArray(sessionState.tabletop.aoeTemplates)) sessionState.tabletop.aoeTemplates = [];
     if (!Array.isArray(sessionState.tabletop.fogRects)) sessionState.tabletop.fogRects = [];
     if (!Array.isArray(sessionState.tabletop.fogRegions)) sessionState.tabletop.fogRegions = [];
+    if (sessionState.tabletop.fogRegions.length === 0 && sessionState.tabletop.fogRects.length > 0) {
+        sessionState.tabletop.fogRegions = sessionState.tabletop.fogRects.slice();
+    }
+    if (!Array.isArray(sessionState.tabletop.textBoxes)) sessionState.tabletop.textBoxes = [];
+    if (!Array.isArray(sessionState.tabletop.drawings)) sessionState.tabletop.drawings = [];
+    if (!sessionState.tabletop.mapInstances || typeof sessionState.tabletop.mapInstances !== 'object' || Array.isArray(sessionState.tabletop.mapInstances)) {
+        sessionState.tabletop.mapInstances = {};
+    }
+    if (!sessionState.tabletop.savedMapFogs || typeof sessionState.tabletop.savedMapFogs !== 'object' || Array.isArray(sessionState.tabletop.savedMapFogs)) {
+        sessionState.tabletop.savedMapFogs = {};
+    }
     return sessionState.tabletop;
 }
 
@@ -916,6 +945,18 @@ function broadcastDeltaEvent(delta, senderId, excludeSenderClientId = null) {
                         patch: Object.assign({}, delta.patch, { chestItems: [] })
                     });
                 }
+            } else if (delta.type === 'TEXTBOX_UPSERT' && delta.textBox) {
+                if (delta.textBox.hiddenFromPlayers) {
+                    outDelta = { type: 'TEXTBOX_DELETE', textBoxId: delta.textBox.id };
+                }
+            } else if (delta.type === 'DRAWING_UPSERT' && delta.drawing) {
+                if (delta.drawing.hiddenFromPlayers) {
+                    outDelta = { type: 'DRAWING_DELETE', drawingId: delta.drawing.id };
+                }
+            } else if (delta.type === 'TABLETOP_SCENE_SYNC' && delta.scene) {
+                outDelta = Object.assign({}, delta, {
+                    scene: sanitizeTabletopForRemote(delta.scene)
+                });
             }
         }
         try {
@@ -2311,20 +2352,112 @@ const server = http.createServer((req, res) => {
                         tt.aoeTemplates = tt.aoeTemplates.filter(s => s.id !== d.shapeId);
                     } else if (d.type === 'FOG_UPSERT' && d.fog) {
                         if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode editar a Névoa de Guerra.' });
-                        const idx = tt.fogRects.findIndex(f => f.id === d.fog.id);
-                        if (idx >= 0) tt.fogRects[idx] = Object.assign({}, tt.fogRects[idx], d.fog);
-                        else tt.fogRects.push(d.fog);
+                        const idx = tt.fogRegions.findIndex(f => f && f.id === d.fog.id);
+                        if (idx >= 0) tt.fogRegions[idx] = Object.assign({}, tt.fogRegions[idx], d.fog);
+                        else tt.fogRegions.push(d.fog);
+                        tt.fogRects = tt.fogRects.filter(f => f && f.id !== d.fog.id);
                     } else if (d.type === 'FOG_DELETE' && d.fogId) {
                         if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode remover a Névoa de Guerra.' });
-                        tt.fogRects = tt.fogRects.filter(f => f.id !== d.fogId);
+                        tt.fogRegions = tt.fogRegions.filter(f => f && f.id !== d.fogId);
+                        tt.fogRects = tt.fogRects.filter(f => f && f.id !== d.fogId);
                     } else if (d.type === 'FOG_TOGGLE') {
                         if (!isEffectiveGm) return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode alternar a Névoa de Guerra.' });
                         tt.fogEnabled = Boolean(d.fogEnabled);
+                    } else if (d.type === 'TEXTBOX_UPSERT' && d.textBox && d.textBox.id) {
+                        const idx = tt.textBoxes.findIndex(tb => tb && tb.id === d.textBox.id);
+                        const incomingTb = Object.assign({}, d.textBox);
+                        if (idx >= 0) {
+                            const cur = tt.textBoxes[idx];
+                            if (!isEffectiveGm && (cur.hiddenFromPlayers || !cur.ownerId || cur.ownerId !== senderId)) {
+                                return sendJson(res, 403, { ok: false, error: 'Sem permissão para editar este texto.' });
+                            }
+                            if (!isEffectiveGm) {
+                                delete incomingTb.hiddenFromPlayers;
+                                delete incomingTb.ownerId;
+                            }
+                            tt.textBoxes[idx] = Object.assign({}, cur, incomingTb);
+                            d.textBox = tt.textBoxes[idx];
+                        } else {
+                            if (!isEffectiveGm) {
+                                incomingTb.hiddenFromPlayers = false;
+                                incomingTb.ownerId = senderId;
+                            } else if (!incomingTb.ownerId) {
+                                incomingTb.ownerId = senderId || 'gm-master';
+                            }
+                            tt.textBoxes.push(incomingTb);
+                            d.textBox = incomingTb;
+                        }
+                    } else if (d.type === 'TEXTBOX_DELETE' && d.textBoxId) {
+                        const idx = tt.textBoxes.findIndex(tb => tb && tb.id === d.textBoxId);
+                        if (idx >= 0) {
+                            const cur = tt.textBoxes[idx];
+                            if (!isEffectiveGm && (cur.hiddenFromPlayers || !cur.ownerId || cur.ownerId !== senderId)) {
+                                return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre ou o criador pode remover este texto.' });
+                            }
+                            tt.textBoxes.splice(idx, 1);
+                        }
+                    } else if (d.type === 'DRAWING_UPSERT' && d.drawing && d.drawing.id) {
+                        const idx = tt.drawings.findIndex(dr => dr && dr.id === d.drawing.id);
+                        const incomingDr = Object.assign({}, d.drawing);
+                        if (idx >= 0) {
+                            const cur = tt.drawings[idx];
+                            if (!isEffectiveGm && (cur.hiddenFromPlayers || !cur.ownerId || cur.ownerId !== senderId)) {
+                                return sendJson(res, 403, { ok: false, error: 'Sem permissão para editar este desenho.' });
+                            }
+                            if (!isEffectiveGm) {
+                                delete incomingDr.hiddenFromPlayers;
+                                delete incomingDr.ownerId;
+                            }
+                            tt.drawings[idx] = Object.assign({}, cur, incomingDr);
+                            d.drawing = tt.drawings[idx];
+                        } else {
+                            if (!isEffectiveGm) {
+                                incomingDr.hiddenFromPlayers = false;
+                                incomingDr.ownerId = senderId;
+                            } else if (!incomingDr.ownerId) {
+                                incomingDr.ownerId = senderId || 'gm-master';
+                            }
+                            tt.drawings.push(incomingDr);
+                            d.drawing = incomingDr;
+                        }
+                    } else if (d.type === 'DRAWING_DELETE' && d.drawingId) {
+                        const idx = tt.drawings.findIndex(dr => dr && dr.id === d.drawingId);
+                        if (idx >= 0) {
+                            const cur = tt.drawings[idx];
+                            if (!isEffectiveGm && (cur.hiddenFromPlayers || !cur.ownerId || cur.ownerId !== senderId)) {
+                                return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre ou o criador pode remover este desenho.' });
+                            }
+                            tt.drawings.splice(idx, 1);
+                        }
+                    } else if (d.type === 'TABLETOP_SCENE_SYNC' && d.scene && typeof d.scene === 'object') {
+                        if (!isEffectiveGm) {
+                            return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode trocar a cena/instância de mapa do Tabletop.' });
+                        }
+                        const sceneFields = [
+                            'activeMapInstanceId', 'activeMapInstanceName', 'mapPath', 'mapBg',
+                            'stageWidth', 'stageHeight', 'gridEnabled', 'gridSize', 'gridSizeY',
+                            'gridOffsetX', 'gridOffsetY', 'gridSnap', 'snapToGrid', 'fogEnabled',
+                            'tokens', 'aoeTemplates', 'fogRegions', 'textBoxes', 'drawings',
+                            'mapInstances', 'savedMapFogs'
+                        ];
+                        for (const k of sceneFields) {
+                            if (d.scene[k] !== undefined) tt[k] = d.scene[k];
+                        }
+                        tt.fogRects = [];
+                        if (d.scene.snapToGrid !== undefined) tt.gridSnap = Boolean(d.scene.snapToGrid);
+                        else if (d.scene.gridSnap !== undefined) tt.snapToGrid = Boolean(d.scene.gridSnap);
+                        ensureTabletopContainer();
                     } else if (d.type === 'TABLETOP_META' && d.meta && typeof d.meta === 'object') {
                         if (!isEffectiveGm) {
                             return sendJson(res, 403, { ok: false, error: 'Apenas o Mestre pode alterar grade, snap, calibração ou mapa do Tabletop.' });
                         }
-                        const allowedKeys = ['gridEnabled', 'gridSize', 'gridSizeY', 'gridOffsetX', 'gridOffsetY', 'gridSnap', 'snapToGrid', 'fogEnabled', 'mapBg', 'mapPath', 'fogRegions', 'activeMapKey', 'activeMapName', 'stageWidth', 'stageHeight'];
+                        const allowedKeys = [
+                            'gridEnabled', 'gridSize', 'gridSizeY', 'gridOffsetX', 'gridOffsetY',
+                            'gridSnap', 'snapToGrid', 'fogEnabled', 'mapBg', 'mapPath',
+                            'fogRegions', 'textBoxes', 'drawings',
+                            'activeMapInstanceId', 'activeMapInstanceName', 'mapInstances', 'savedMapFogs',
+                            'activeMapKey', 'activeMapName', 'stageWidth', 'stageHeight'
+                        ];
                         for (const k of allowedKeys) {
                             if (d.meta[k] !== undefined) tt[k] = d.meta[k];
                         }

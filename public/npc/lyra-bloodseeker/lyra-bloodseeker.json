@@ -1,0 +1,148 @@
+{
+  "name": "Lyra Bloodseeker",
+  "size": [
+    "M"
+  ],
+  "type": "humanoid",
+  "alignment": [
+    "N"
+  ],
+  "ac": [
+    18
+  ],
+  "hp": {
+    "average": 153,
+    "formula": "18d8 + 72"
+  },
+  "speed": {
+    "walk": 9,
+    "climb": 9,
+    "swim": 9
+  },
+  "str": 20,
+  "dex": 14,
+  "con": 18,
+  "int": 12,
+  "wis": 14,
+  "cha": 14,
+  "save": {
+    "str": "+9",
+    "con": "+8",
+    "dex": "+6"
+  },
+  "skill": {
+    "athletics": "+9",
+    "intimidation": "+6",
+    "perception": "+6",
+    "survival": "+6"
+  },
+  "passive": 16,
+  "resist": [
+    "bludgeoning, piercing, and slashing from nonmagical attacks that aren't silvered"
+  ],
+  "conditionImmune": [],
+  "senses": [
+    "darkvision 18 m"
+  ],
+  "languages": [
+    "Common",
+    "Lupine"
+  ],
+  "cr": "9",
+  "trait": [
+    {
+      "name": "Licantropia — Forma Híbrida",
+      "entries": [
+        "Lyra pode alternar entre sua forma humana e híbrida. Em sua forma híbrida, possui garras e presas, mantendo suas estatísticas. Seus ataques desarmados podem causar dano cortante."
+      ]
+    },
+    {
+      "name": "Regeneração Licântropa",
+      "entries": [
+        "Lyra recupera 10 pontos de vida no início de cada turno se possuir pelo menos 1 PV. Esta característica não funciona se Lyra sofrer dano radiante ou dano de uma arma de prata desde o final de seu último turno."
+      ]
+    },
+    {
+      "name": "Fúria da Besta (3/Dia)",
+      "entries": [
+        "Como ação bônus, Lyra entra em fúria por 1 minuto. Enquanto estiver em fúria, possui vantagem em testes de Força e salvaguardas de Força, causa 3 pontos adicionais de dano em ataques corpo a corpo usando Força e mantém resistência a dano contundente, cortante e perfurante."
+      ]
+    },
+    {
+      "name": "Campeã — Crítico Aprimorado",
+      "entries": [
+        "Os ataques de Lyra são acertos críticos com resultados naturais de 19 ou 20 no d20."
+      ]
+    },
+    {
+      "name": "Ataque Imprudente",
+      "entries": [
+        "No início de seu turno, Lyra pode decidir atacar de maneira imprudente, recebendo vantagem em ataques corpo a corpo usando Força durante aquele turno. Até o início de seu próximo turno, ataques contra ela possuem vantagem."
+      ]
+    },
+    {
+      "name": "Atleta Extraordinária",
+      "entries": [
+        "Lyra adiciona metade de seu bônus de proficiência, arredondado para cima, a testes de Força, Destreza e Constituição nos quais não seja proficiente."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiataque",
+      "entries": [
+        "Lyra realiza três ataques, utilizando suas garras, mordida ou machado de batalha."
+      ]
+    },
+    {
+      "name": "Garras",
+      "entries": [
+        "Ataque Corpo a Corpo: +9 para atingir, alcance 1,5 m, um alvo. Acerto: 12 (2d6 + 5) de dano cortante."
+      ]
+    },
+    {
+      "name": "Mordida",
+      "entries": [
+        "Ataque Corpo a Corpo: +9 para atingir, alcance 1,5 m, um alvo. Acerto: 10 (1d10 + 5) de dano perfurante. O alvo deve passar em uma salvaguarda de Constituição CD 16 ou sofrer 7 (2d6) de dano adicional no início do próximo turno de Lyra."
+      ]
+    },
+    {
+      "name": "Machado de Batalha",
+      "entries": [
+        "Ataque Corpo a Corpo: +9 para atingir, alcance 1,5 m, um alvo. Acerto: 12 (2d6 + 5) de dano cortante."
+      ]
+    },
+    {
+      "name": "Investida da Matilha (Recarga 5–6)",
+      "entries": [
+        "Lyra se move até seu deslocamento em linha reta e realiza um ataque de garras. Se acertar, causa 14 (4d6) de dano cortante adicional e o alvo deve passar em uma salvaguarda de Força CD 17 ou cair no chão."
+      ]
+    }
+  ],
+  "bonus": [
+    {
+      "name": "Entrar em Fúria",
+      "entries": [
+        "Lyra ativa sua Fúria da Besta."
+      ]
+    },
+    {
+      "name": "Ataque Adicional da Campeã",
+      "entries": [
+        "Após realizar um ataque crítico ou reduzir uma criatura a 0 PV, Lyra pode realizar um ataque de arma corpo a corpo como ação bônus."
+      ]
+    }
+  ],
+  "reaction": [
+    {
+      "name": "Proteger a Matilha",
+      "entries": [
+        "Quando uma criatura que Lyra possa ver a até 1,5 m dela for atingida por um ataque, Lyra pode reduzir o dano sofrido pela criatura em 10 pontos, recebendo a mesma quantidade de dano reduzido."
+      ]
+    }
+  ],
+  "hasToken": true,
+  "customToken": "./npc/lyra-bloodseeker/lyra-bloodseeker.png",
+  "hasFluffImages": true,
+  "customArt": "./npc/lyra-bloodseeker/lyra-bloodseeker-art.png"
+}

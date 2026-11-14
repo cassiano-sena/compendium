@@ -153,6 +153,9 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                         ? getPlayerDisplayName(msg.roll.actorId || msg.senderId, msg.roll.actorName)
                         : msg.roll.actorName;
                     showToast(`🎲 ${actorShown} rolou ${msg.roll.label}: ${msg.roll.total}`);
+                    if (typeof CompendioDice3D !== 'undefined' && CompendioDice3D.shouldShowRemote()) {
+                        CompendioDice3D.showRoll(msg.roll, { isRemote: true });
+                    }
                 }
             }
         } else if (msg.type === 'DICE_CLEAR') {
@@ -236,7 +239,13 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             const inter = window.ttActiveInteraction;
             const prevLocalTokens = (tabletopState && Array.isArray(tabletopState.tokens)) ? tabletopState.tokens : [];
             const prevLocalShapes = (tabletopState && Array.isArray(tabletopState.aoeTemplates)) ? tabletopState.aoeTemplates : [];
+            const prevLocalFog = (tabletopState && Array.isArray(tabletopState.fogRegions)) ? tabletopState.fogRegions : [];
+            const prevLocalText = (tabletopState && Array.isArray(tabletopState.textBoxes)) ? tabletopState.textBoxes : [];
+            const prevLocalDraw = (tabletopState && Array.isArray(tabletopState.drawings)) ? tabletopState.drawings : [];
             tabletopState = sess.tabletop;
+            if (!Array.isArray(tabletopState.fogRegions)) tabletopState.fogRegions = [];
+            if (!Array.isArray(tabletopState.textBoxes)) tabletopState.textBoxes = [];
+            if (!Array.isArray(tabletopState.drawings)) tabletopState.drawings = [];
             if (tabletopState.gridSnap !== undefined && tabletopState.snapToGrid === undefined) {
                 tabletopState.snapToGrid = Boolean(tabletopState.gridSnap);
             }
@@ -249,6 +258,18 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                 const mine = prevLocalShapes.find(s => s.id === inter.id);
                 const idx = tabletopState.aoeTemplates.findIndex(s => s.id === inter.id);
                 if (mine && idx >= 0) tabletopState.aoeTemplates[idx] = mine;
+            } else if (inter && inter.type === 'fog' && inter.id && Array.isArray(tabletopState.fogRegions)) {
+                const mine = prevLocalFog.find(f => f.id === inter.id);
+                const idx = tabletopState.fogRegions.findIndex(f => f.id === inter.id);
+                if (mine && idx >= 0) tabletopState.fogRegions[idx] = mine;
+            } else if (inter && inter.type === 'textbox' && inter.id && Array.isArray(tabletopState.textBoxes)) {
+                const mine = prevLocalText.find(tb => tb.id === inter.id);
+                const idx = tabletopState.textBoxes.findIndex(tb => tb.id === inter.id);
+                if (mine && idx >= 0) tabletopState.textBoxes[idx] = mine;
+            } else if (inter && inter.type === 'drawing' && inter.id && Array.isArray(tabletopState.drawings)) {
+                const mine = prevLocalDraw.find(dr => dr.id === inter.id);
+                const idx = tabletopState.drawings.findIndex(dr => dr.id === inter.id);
+                if (mine && idx >= 0) tabletopState.drawings[idx] = mine;
             }
             if (!isTyping && !inter && activeModule === 'tabletop') renderTabletopModule();
         }
@@ -731,7 +752,10 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         if (!tabletopState || typeof tabletopState !== 'object') return;
         if (!Array.isArray(tabletopState.tokens)) tabletopState.tokens = [];
         if (!Array.isArray(tabletopState.aoeTemplates)) tabletopState.aoeTemplates = [];
+        if (!Array.isArray(tabletopState.fogRegions)) tabletopState.fogRegions = [];
         if (!Array.isArray(tabletopState.fogRects)) tabletopState.fogRects = [];
+        if (!Array.isArray(tabletopState.textBoxes)) tabletopState.textBoxes = [];
+        if (!Array.isArray(tabletopState.drawings)) tabletopState.drawings = [];
 
         if (d.type === 'TOKEN_MOVE' && d.token) {
             if (inter && inter.type === 'token' && inter.id === d.token.id) return;
@@ -788,19 +812,87 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             return;
         }
         if (d.type === 'FOG_UPSERT' && d.fog) {
-            const idx = tabletopState.fogRects.findIndex(f => f.id === d.fog.id);
-            if (idx >= 0) tabletopState.fogRects[idx] = Object.assign({}, tabletopState.fogRects[idx], d.fog);
-            else tabletopState.fogRects.push(d.fog);
-            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            if (inter && inter.type === 'fog' && inter.id === d.fog.id) return;
+            const idx = tabletopState.fogRegions.findIndex(f => f && f.id === d.fog.id);
+            if (idx >= 0) tabletopState.fogRegions[idx] = Object.assign({}, tabletopState.fogRegions[idx], d.fog);
+            else tabletopState.fogRegions.push(d.fog);
+            tabletopState.fogRects = tabletopState.fogRects.filter(f => f && f.id !== d.fog.id);
+            if (activeModule === 'tabletop') {
+                if (typeof updateTabletopFogDom === 'function' && updateTabletopFogDom(d.fog.id)) return;
+                if (!inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            }
             return;
         }
         if (d.type === 'FOG_DELETE' && d.fogId) {
-            tabletopState.fogRects = tabletopState.fogRects.filter(f => f.id !== d.fogId);
+            tabletopState.fogRegions = tabletopState.fogRegions.filter(f => f && f.id !== d.fogId);
+            tabletopState.fogRects = tabletopState.fogRects.filter(f => f && f.id !== d.fogId);
+            if (typeof window !== 'undefined' && window.selectedFogId === d.fogId) window.selectedFogId = null;
             if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
             return;
         }
         if (d.type === 'FOG_TOGGLE') {
             tabletopState.fogEnabled = Boolean(d.fogEnabled);
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'TEXTBOX_UPSERT' && d.textBox) {
+            if (inter && inter.type === 'textbox' && inter.id === d.textBox.id) return;
+            const localIsGm = typeof isEffectiveGmUser === 'function' ? isEffectiveGmUser() : (window.isHostClient === true);
+            if (!localIsGm && d.textBox.hiddenFromPlayers) {
+                tabletopState.textBoxes = tabletopState.textBoxes.filter(tb => tb && tb.id !== d.textBox.id);
+                if (window.selectedTextBoxId === d.textBox.id) window.selectedTextBoxId = null;
+                if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+                return;
+            }
+            const idx = tabletopState.textBoxes.findIndex(tb => tb && tb.id === d.textBox.id);
+            if (idx >= 0) tabletopState.textBoxes[idx] = Object.assign({}, tabletopState.textBoxes[idx], d.textBox);
+            else tabletopState.textBoxes.push(d.textBox);
+            if (activeModule === 'tabletop') {
+                if (typeof updateTabletopTextBoxDom === 'function' && updateTabletopTextBoxDom(d.textBox.id)) return;
+                if (!inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            }
+            return;
+        }
+        if (d.type === 'TEXTBOX_DELETE' && d.textBoxId) {
+            tabletopState.textBoxes = tabletopState.textBoxes.filter(tb => tb && tb.id !== d.textBoxId);
+            if (window.selectedTextBoxId === d.textBoxId) window.selectedTextBoxId = null;
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'DRAWING_UPSERT' && d.drawing) {
+            if (inter && inter.type === 'drawing' && inter.id === d.drawing.id) return;
+            const localIsGm = typeof isEffectiveGmUser === 'function' ? isEffectiveGmUser() : (window.isHostClient === true);
+            if (!localIsGm && d.drawing.hiddenFromPlayers) {
+                tabletopState.drawings = tabletopState.drawings.filter(dr => dr && dr.id !== d.drawing.id);
+                if (window.selectedDrawingId === d.drawing.id) window.selectedDrawingId = null;
+                if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+                return;
+            }
+            const idx = tabletopState.drawings.findIndex(dr => dr && dr.id === d.drawing.id);
+            if (idx >= 0) tabletopState.drawings[idx] = Object.assign({}, tabletopState.drawings[idx], d.drawing);
+            else tabletopState.drawings.push(d.drawing);
+            if (activeModule === 'tabletop') {
+                if (typeof updateTabletopDrawingDom === 'function' && updateTabletopDrawingDom(d.drawing.id)) return;
+                if (!inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            }
+            return;
+        }
+        if (d.type === 'DRAWING_DELETE' && d.drawingId) {
+            tabletopState.drawings = tabletopState.drawings.filter(dr => dr && dr.id !== d.drawingId);
+            if (window.selectedDrawingId === d.drawingId) window.selectedDrawingId = null;
+            if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
+            return;
+        }
+        if (d.type === 'TABLETOP_SCENE_SYNC' && d.scene && typeof d.scene === 'object') {
+            Object.assign(tabletopState, d.scene);
+            tabletopState.fogRects = [];
+            if (typeof selectedTabletopTokenId !== 'undefined') selectedTabletopTokenId = null;
+            window.selectedShapeId = null;
+            window.selectedTextBoxId = null;
+            window.selectedDrawingId = null;
+            window.selectedFogId = null;
+            if (window.tabletopCamera) window.tabletopCamera.initialized = false;
+            if (typeof saveLocalPersistence === 'function') saveLocalPersistence();
             if (activeModule === 'tabletop' && !inter && typeof renderTabletopModule === 'function') renderTabletopModule();
             return;
         }
@@ -922,6 +1014,20 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         if (action === 'toggle') return this.sendDelta({ type: 'FOG_TOGGLE', fogEnabled: Boolean(fogOrFlag) });
         if (action === 'delete') return this.sendDelta({ type: 'FOG_DELETE', fogId: fogOrFlag });
         return this.sendDelta({ type: 'FOG_UPSERT', fog: fogOrFlag });
+    };
+
+    CompendioNetAdapter.broadcastTextBoxDelta = function(action, textBoxOrId) {
+        if (action === 'delete') return this.sendDelta({ type: 'TEXTBOX_DELETE', textBoxId: textBoxOrId });
+        return this.sendDelta({ type: 'TEXTBOX_UPSERT', textBox: textBoxOrId });
+    };
+
+    CompendioNetAdapter.broadcastDrawingDelta = function(action, drawingOrId) {
+        if (action === 'delete') return this.sendDelta({ type: 'DRAWING_DELETE', drawingId: drawingOrId });
+        return this.sendDelta({ type: 'DRAWING_UPSERT', drawing: drawingOrId });
+    };
+
+    CompendioNetAdapter.broadcastTabletopSceneSync = function(scenePayload) {
+        return this.sendDelta({ type: 'TABLETOP_SCENE_SYNC', scene: scenePayload });
     };
 
     CompendioNetAdapter.broadcastTabletopMeta = function(metaObj) {

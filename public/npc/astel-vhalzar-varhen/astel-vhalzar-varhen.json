@@ -1,0 +1,169 @@
+{
+  "name": "Astel Vhalzar Varhen",
+  "size": [
+    "M"
+  ],
+  "type": "humanoid",
+  "alignment": [
+    "N"
+  ],
+  "ac": [
+    20
+  ],
+  "hp": {
+    "average": 285,
+    "formula": "30d8 + 150"
+  },
+  "speed": {
+    "walk": 9,
+    "fly": 9
+  },
+  "str": 12,
+  "dex": 16,
+  "con": 20,
+  "int": 24,
+  "wis": 24,
+  "cha": 22,
+  "save": {
+    "con": "+11",
+    "int": "+13",
+    "wis": "+13",
+    "cha": "+12"
+  },
+  "skill": {
+    "arcana": "+19",
+    "history": "+19",
+    "insight": "+13",
+    "religion": "+19",
+    "persuasion": "+12"
+  },
+  "passive": 17,
+  "resist": [
+    "psychic",
+    "necrotic",
+    "force"
+  ],
+  "conditionImmune": [
+    "charmed",
+    "frightened"
+  ],
+  "senses": [
+    "truesight 18 m",
+    "passive Perception 17"
+  ],
+  "languages": [
+    "Common",
+    "Abyssal",
+    "Celestial",
+    "Deep Speech"
+  ],
+  "cr": "18",
+  "trait": [
+    {
+      "name": "Primogênito Varhen",
+      "entries": [
+        "Astel possui vantagem em salvaguardas contra magias e outros efeitos mágicos. Além disso, não pode ser envelhecido magicamente e não sofre os efeitos de doenças ou venenos."
+      ]
+    },
+    {
+      "name": "Senhor da Dimensão Fraturada",
+      "entries": [
+        "Enquanto estiver dentro de sua dimensão, Astel pode manipular a arquitetura e o espaço ao seu redor. Como ação bônus, pode teleportar-se até 9 m para um espaço desocupado que possa ver. Além disso, pode abrir ou fechar portas, mover objetos e alterar a iluminação de áreas próximas sem gastar ações."
+      ]
+    },
+    {
+      "name": "Domínio sobre Hadar",
+      "entries": [
+        "Astel possui controle parcial sobre manifestações de Hadar. Uma vez por turno, quando uma criatura que ele possa ver a até 36 m utilizar um poder proveniente de um Fragmento de Hadar ou de uma maldição relacionada, Astel pode forçar a criatura a realizar uma salvaguarda de Carisma CD 20. Em caso de falha, Astel escolhe um dos seguintes efeitos: impedir a ativação do poder, alterar seu alvo para outra criatura válida ou reduzir seu efeito pela metade. Não pode utilizar esta característica contra uma criatura que esteja sob proteção direta de uma divindade."
+      ]
+    },
+    {
+      "name": "Resistência Lendária (3/Dia)",
+      "entries": [
+        "Se Astel falhar em uma salvaguarda, pode escolher obter sucesso."
+      ]
+    },
+    {
+      "name": "Conjuração",
+      "entries": [
+        "Astel é um conjurador de 20º nível. Sua habilidade de conjuração é Sabedoria (CD 21 para evitar magias, +13 para atingir com ataques mágicos). Ele não precisa de componentes materiais sem custo.",
+        "À vontade: Detectar Magia, Luz, Raio Guia, Taumaturgia.",
+        "3/dia cada: Dissipar Magia, Contramágica, Banimento, Muralha de Força.",
+        "2/dia cada: Desintegrar, Palavra de Poder Atordoar, Teletransporte.",
+        "1/dia cada: Cura Completa, Palavra de Poder Matar, Tempestade de Vingança."
+      ]
+    },
+    {
+      "name": "Aura da Estrela Faminta",
+      "entries": [
+        "Criaturas hostis a Astel que iniciem seus turnos a até 6 m dele devem realizar uma salvaguarda de Sabedoria CD 20. Em caso de falha, sofrem 7 (2d6) de dano psíquico e não podem realizar reações até o início do próximo turno. Uma criatura bem-sucedida fica imune a esta aura por 24 horas."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiataque",
+      "entries": [
+        "Astel realiza dois ataques de Ruptura Cósmica ou utiliza uma magia e realiza um ataque de Ruptura Cósmica."
+      ]
+    },
+    {
+      "name": "Ruptura Cósmica",
+      "entries": [
+        "Ataque Mágico à Distância: +13 para atingir, alcance 36 m, um alvo. Acerto: 27 (6d8) de dano de força e 13 (3d8) de dano necrótico."
+      ]
+    },
+    {
+      "name": "Estrela Devoradora (Recarga 5–6)",
+      "entries": [
+        "Astel cria uma esfera de energia cósmica em um ponto que possa ver a até 36 m. Cada criatura em um raio de 6 m deve realizar uma salvaguarda de Destreza CD 21. Em caso de falha, sofre 45 (10d8) de dano de força e 22 (5d8) de dano necrótico. Em caso de sucesso, sofre metade do dano."
+      ]
+    },
+    {
+      "name": "Supressão da Maldição (1/Dia)",
+      "entries": [
+        "Astel escolhe uma criatura que possua uma maldição ou manifestação de Hadar a até 36 m. A criatura deve realizar uma salvaguarda de Carisma CD 21. Em caso de falha, todos os poderes provenientes daquela maldição ficam suprimidos até o final do próximo minuto. A criatura pode repetir a salvaguarda no final de cada um de seus turnos."
+      ]
+    }
+  ],
+  "bonus": [
+    {
+      "name": "Passo Dimensional",
+      "entries": [
+        "Astel se teleporta até 9 m para um espaço desocupado que possa ver."
+      ]
+    }
+  ],
+  "reaction": [
+    {
+      "name": "Distorção Espacial",
+      "entries": [
+        "Quando Astel for atingido por um ataque, pode impor desvantagem à jogada de ataque, fazendo com que o espaço entre ele e o atacante se distorça."
+      ]
+    }
+  ],
+  "legendary": [
+    {
+      "name": "Movimento Impossível",
+      "entries": [
+        "Astel se move até metade de seu deslocamento sem provocar ataques de oportunidade."
+      ]
+    },
+    {
+      "name": "Ruptura Menor",
+      "entries": [
+        "Astel realiza um ataque de Ruptura Cósmica."
+      ]
+    },
+    {
+      "name": "Distorcer a Realidade (Custa 2 Ações)",
+      "entries": [
+        "Astel escolhe um ponto que possa ver a até 18 m. O espaço em um raio de 3 m se distorce. Criaturas naquela área devem realizar uma salvaguarda de Destreza CD 21 ou sofrer 18 (4d8) de dano de força e serem deslocadas até 6 m para uma direção escolhida por Astel."
+      ]
+    }
+  ],
+  "hasToken": true,
+  "customToken": "./npc/astel-vhalzar-varhen/astel-vhalzar-varhen.png",
+  "hasFluffImages": true,
+  "customArt": "./npc/astel-vhalzar-varhen/astel-vhalzar-varhen-art.png"
+}

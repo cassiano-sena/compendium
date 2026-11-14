@@ -321,6 +321,7 @@ const CompendioDice = {
 
         let total = 0;
         const breakdownParts = [];
+        const diceResults = [];
         let isNat20 = false;
         let isNat1 = false;
 
@@ -333,13 +334,24 @@ const CompendioDice = {
             const rollPoolAttempt = () => {
                 let sum = 0;
                 const parts = [];
+                const dice = [];
                 for (const token of dieTokens) {
                     const signStr = token.sign < 0 ? '-' : (parts.length > 0 ? '+' : '');
                     const res = rollStandardDieTerm(token, hookPayload.isCrit, rules, signStr);
                     sum += res.signedTotal;
                     parts.push(res.partText);
+                    (res.rolls || []).forEach(v => {
+                        dice.push({
+                            faces: token.faces,
+                            isFudge: Boolean(token.isFudge),
+                            value: v,
+                            isCrit: !token.isFudge && token.faces === 20 && v === 20,
+                            isFumble: !token.isFudge && token.faces === 20 && v === 1,
+                            sign: token.sign
+                        });
+                    });
                 }
-                return { sum, text: `${parts.join(' ')} = ${sum}` };
+                return { sum, text: `${parts.join(' ')} = ${sum}`, dice };
             };
 
             const attemptA = rollPoolAttempt();
@@ -349,6 +361,8 @@ const CompendioDice = {
                 : (attemptA.sum <= attemptB.sum);
             const chosenDiceSum = useA ? attemptA.sum : attemptB.sum;
             const tag = hookPayload.mode === 'adv' ? 'Vant' : 'Desv';
+            attemptA.dice.forEach(d => diceResults.push(Object.assign({}, d, { isDropped: !useA })));
+            attemptB.dice.forEach(d => diceResults.push(Object.assign({}, d, { isDropped: useA })));
 
             total += chosenDiceSum;
             breakdownParts.push(`${tag}: [${attemptA.text}] vs [${attemptB.text}] ➔ ${chosenDiceSum}`);
@@ -364,9 +378,14 @@ const CompendioDice = {
                     if (token.faces === 20 && token.count === 1 && isAdvOrDis) {
                         const r1 = Math.floor(Math.random() * 20) + 1;
                         const r2 = Math.floor(Math.random() * 20) + 1;
-                        const chosen = hookPayload.mode === 'adv' ? Math.max(r1, r2) : Math.min(r1, r2);
+                        const keepFirst = hookPayload.mode === 'adv' ? (r1 >= r2) : (r1 <= r2);
+                        const chosen = keepFirst ? r1 : r2;
                         if (chosen === 20) isNat20 = true;
                         if (chosen === 1) isNat1 = true;
+                        diceResults.push(
+                            { faces: 20, isFudge: false, value: r1, isDropped: !keepFirst, isCrit: r1 === 20, isFumble: r1 === 1, sign: token.sign },
+                            { faces: 20, isFudge: false, value: r2, isDropped: keepFirst, isCrit: r2 === 20, isFumble: r2 === 1, sign: token.sign }
+                        );
                         total += token.sign * chosen;
                         const tag = hookPayload.mode === 'adv' ? 'Vant' : 'Desv';
                         breakdownParts.push(`${signStr}2d20(${tag}: ${r1}, ${r2} ➔ ${chosen})`);
@@ -376,6 +395,17 @@ const CompendioDice = {
                             if (res.rolls[0] === 20) isNat20 = true;
                             if (res.rolls[0] === 1) isNat1 = true;
                         }
+                        (res.rolls || []).forEach(v => {
+                            diceResults.push({
+                                faces: token.faces,
+                                isFudge: Boolean(token.isFudge),
+                                value: v,
+                                isDropped: false,
+                                isCrit: !token.isFudge && token.faces === 20 && v === 20,
+                                isFumble: !token.isFudge && token.faces === 20 && v === 1,
+                                sign: token.sign
+                            });
+                        });
                         total += res.signedTotal;
                         breakdownParts.push(res.partText);
                     }
@@ -411,7 +441,8 @@ const CompendioDice = {
             isNat20,
             isNat1,
             isSecret: hookPayload.isSecret,
-            isDamage: hookPayload.isDamage
+            isDamage: hookPayload.isDamage,
+            diceResults: diceResults.slice(0, 24)
         };
 
         if (typeof CompendioModAPI !== 'undefined') {
@@ -428,6 +459,10 @@ const CompendioDice = {
         }
 
         this.renderWidget();
+
+        if (!options.skip3d && typeof CompendioDice3D !== 'undefined' && CompendioDice3D.shouldShowLocal(rollRecord)) {
+            CompendioDice3D.showRoll(rollRecord);
+        }
 
         if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.sendDiceRoll) {
             CompendioNetAdapter.sendDiceRoll(rollRecord);
@@ -594,11 +629,12 @@ const CompendioDice = {
                     </div>
                 </div>
 
-                <!-- Modos de Rolagem (Normal / Vantagem / Desvantagem / Oculto GM) -->
+                <!-- Modos de Rolagem (Normal / Vantagem / Desvantagem / Bandeja 3D / Oculto GM) -->
                 <div class="dice-modes-bar">
                     <button type="button" class="vis-pill ${window.diceRollMode === 'normal' ? 'active-studied' : ''}" onclick="CompendioDice.setMode('normal')">Normal</button>
                     <button type="button" class="vis-pill ${window.diceRollMode === 'adv' ? 'active-studied' : ''}" onclick="CompendioDice.setMode('adv')" title="Rola com Vantagem (2× e escolhe o maior resultado)">🟢 Vantagem</button>
                     <button type="button" class="vis-pill ${window.diceRollMode === 'dis' ? 'active-hidden' : ''}" onclick="CompendioDice.setMode('dis')" title="Rola com Desvantagem (2× e escolhe o menor resultado)">🔴 Desvant.</button>
+                    <button type="button" class="vis-pill ${window.dice3dEnabled !== false ? 'active-studied' : ''}" onclick="if(typeof CompendioDice3D!=='undefined') CompendioDice3D.toggleEnabled()" title="Ativar/Desativar animação 3D no canto inferior esquerdo">🎲 3D</button>
                     ${isGm ? `<button type="button" class="vis-pill ${window.diceSecretGm ? 'active-hidden' : ''}" onclick="CompendioDice.toggleSecretGm()" title="Oculta o resultado desta rolagem para os jogadores">🔒 GM</button>` : ''}
                 </div>
 
@@ -975,4 +1011,5 @@ const CompendioDice = {
     }
 };
 
+window.CompendioDice = CompendioDice;
 window.enrichTextWithRollButtons = (text) => CompendioDice.enrichTextWithRollButtons(text);

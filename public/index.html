@@ -638,6 +638,9 @@
         <div class="studio-modal" id="dice-macro-modal-content" style="max-width:820px; height:auto; max-height:88vh;"></div>
     </div>
 
+    <!-- BANDEJA 3D DE DADOS NO CANTO (OWLBEAR-STYLE) -->
+    <div id="dice-3d-tray-root"></div>
+
     <!-- TORRE DE DADOS FLUTUANTE & LOG COMPARTILHADO -->
     <div id="dice-tower-floating-root"></div>
 
@@ -714,6 +717,9 @@
                             const inter = window.ttActiveInteraction;
                             const prevTokens = Array.isArray(tabletopState?.tokens) ? tabletopState.tokens : [];
                             const prevShapes = Array.isArray(tabletopState?.aoeTemplates) ? tabletopState.aoeTemplates : [];
+                            const prevFog = Array.isArray(tabletopState?.fogRegions) ? tabletopState.fogRegions : [];
+                            const prevText = Array.isArray(tabletopState?.textBoxes) ? tabletopState.textBoxes : [];
+                            const prevDraw = Array.isArray(tabletopState?.drawings) ? tabletopState.drawings : [];
                             tabletopState = msg.state;
                             if (inter?.type === 'token' && inter.id && Array.isArray(tabletopState.tokens)) {
                                 const mine = prevTokens.find(t => t.id === inter.id);
@@ -723,6 +729,18 @@
                                 const mine = prevShapes.find(s => s.id === inter.id);
                                 const idx = tabletopState.aoeTemplates.findIndex(s => s.id === inter.id);
                                 if (mine && idx >= 0) tabletopState.aoeTemplates[idx] = mine;
+                            } else if (inter?.type === 'fog' && inter.id && Array.isArray(tabletopState.fogRegions)) {
+                                const mine = prevFog.find(f => f.id === inter.id);
+                                const idx = tabletopState.fogRegions.findIndex(f => f.id === inter.id);
+                                if (mine && idx >= 0) tabletopState.fogRegions[idx] = mine;
+                            } else if (inter?.type === 'textbox' && inter.id && Array.isArray(tabletopState.textBoxes)) {
+                                const mine = prevText.find(tb => tb.id === inter.id);
+                                const idx = tabletopState.textBoxes.findIndex(tb => tb.id === inter.id);
+                                if (mine && idx >= 0) tabletopState.textBoxes[idx] = mine;
+                            } else if (inter?.type === 'drawing' && inter.id && Array.isArray(tabletopState.drawings)) {
+                                const mine = prevDraw.find(dr => dr.id === inter.id);
+                                const idx = tabletopState.drawings.findIndex(dr => dr.id === inter.id);
+                                if (mine && idx >= 0) tabletopState.drawings[idx] = mine;
                             }
                             localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
                             if (activeModule === 'tabletop' && !inter) renderTabletopModule();
@@ -6687,6 +6705,7 @@
     <script src="js/rules-mods.js"></script>
     <script src="js/profiles-lobby.js"></script>
     <script src="js/dice-engine.js"></script>
+    <script src="js/dice-3d-tray.js"></script>
     <script src="js/combat-sync.js"></script>
     <script src="js/character-vtt.js"></script>
     <script src="js/compendium-import-sync.js"></script>

@@ -5,10 +5,31 @@
    - Tabletop: Tokens 1x1..4x4, Régua Tática, Templates AoE, Fog of War e Ping.
    ========================================================================= */
 
-window.tabletopToolMode = 'move'; // 'move' | 'ruler' | 'aoe' | 'fog' | 'ping' | 'calibrate'
+window.tabletopToolMode = 'move'; // 'move' | 'ruler' | 'aoe' | 'fog' | 'ping' | 'calibrate' | 'text' | 'brush'
 window.aoeDraftConfig = { shape: 'circle', sizeSquares: 4, color: '#e65100', label: 'Esfera 6m (20ft)' };
+window.textBoxDraftConfig = window.textBoxDraftConfig || {
+    fontFamily: 'Georgia, serif',
+    fontSize: 22,
+    color: '#f2cf83',
+    bgColor: 'rgba(14, 15, 20, 0.72)',
+    bold: false,
+    italic: false,
+    align: 'center'
+};
+window.brushDraftConfig = window.brushDraftConfig || {
+    color: '#ff5252',
+    strokeWidth: 6,
+    opacity: 0.92
+};
+window.fogDrawShape = window.fogDrawShape || 'rect'; // 'rect' | 'polygon'
+window.fogPolygonDraft = window.fogPolygonDraft || [];
 window.activeRulerDrag = null;
 window.selectedShapeId = window.selectedShapeId || null;
+window.selectedTextBoxId = window.selectedTextBoxId || null;
+window.selectedDrawingId = window.selectedDrawingId || null;
+window.selectedFogId = window.selectedFogId || null;
+window.selectedFogVertexIdx = (window.selectedFogVertexIdx !== undefined) ? window.selectedFogVertexIdx : null;
+window.editingTextBoxId = window.editingTextBoxId || null;
 window.ttDrawerOpen = Boolean(window.ttDrawerOpen);
 window.ttDrawerTab = window.ttDrawerTab || 'monsters';
 window.ttDrawerSearch = window.ttDrawerSearch || '';
@@ -855,11 +876,42 @@ function renderCharacterModule() {
    FORMAS SVG INTERATIVAS, GAVETA DE TOKENS, BAÚS & OURO + INTEGRACÃO RUNA
    ========================================================================= */
 
+function _cloneVttData(obj) {
+    try { return JSON.parse(JSON.stringify(obj)); } catch (e) { return obj; }
+}
+
+function getTabletopMapFogKey(mapPath) {
+    return String(mapPath || '').trim() || '__blank_grid__';
+}
+
+function resolveMapDisplayName(mapPath) {
+    const clean = String(mapPath || '').trim();
+    if (!clean) return 'Grade Tática Escura';
+    try {
+        if (typeof getAllCatalogEntities === 'function' && typeof compendioData !== 'undefined') {
+            const allMaps = getAllCatalogEntities(['maps']);
+            const root = compendioData.maps || {};
+            for (const m of allMaps) {
+                const entry = m.groupKey ? root[m.groupKey]?.children?.[m.itemKey] : root[m.itemKey];
+                if (entry && entry.path === clean && m.title) return String(m.title);
+            }
+        }
+    } catch (e) {}
+    const parts = clean.split(/[\\/]/);
+    return parts[parts.length - 1] || clean;
+}
+
 function ensureTabletopExtendedState() {
     if (!tabletopState || typeof tabletopState !== 'object') return;
     if (!Array.isArray(tabletopState.tokens)) tabletopState.tokens = [];
     if (!Array.isArray(tabletopState.aoeTemplates)) tabletopState.aoeTemplates = [];
     if (!Array.isArray(tabletopState.fogRegions)) tabletopState.fogRegions = [];
+    if (Array.isArray(tabletopState.fogRects) && tabletopState.fogRects.length > 0 && tabletopState.fogRegions.length === 0) {
+        tabletopState.fogRegions = tabletopState.fogRects.slice();
+    }
+    tabletopState.fogRects = [];
+    if (!Array.isArray(tabletopState.textBoxes)) tabletopState.textBoxes = [];
+    if (!Array.isArray(tabletopState.drawings)) tabletopState.drawings = [];
     if (tabletopState.fogEnabled === undefined) tabletopState.fogEnabled = false;
     if (tabletopState.gridEnabled === undefined) tabletopState.gridEnabled = true;
     if (tabletopState.gridSize === undefined) tabletopState.gridSize = 56;
@@ -868,6 +920,52 @@ function ensureTabletopExtendedState() {
     if (tabletopState.gridOffsetY === undefined) tabletopState.gridOffsetY = 0;
     if (tabletopState.stageWidth === undefined) tabletopState.stageWidth = 1600;
     if (tabletopState.stageHeight === undefined) tabletopState.stageHeight = 1000;
+
+    if (!tabletopState.savedMapFogs || typeof tabletopState.savedMapFogs !== 'object' || Array.isArray(tabletopState.savedMapFogs)) {
+        tabletopState.savedMapFogs = {};
+    }
+    if (!tabletopState.mapInstances || typeof tabletopState.mapInstances !== 'object' || Array.isArray(tabletopState.mapInstances)) {
+        tabletopState.mapInstances = {};
+    }
+    if (!tabletopState.activeMapInstanceId || !tabletopState.mapInstances[tabletopState.activeMapInstanceId]) {
+        const initId = tabletopState.activeMapInstanceId || 'inst-default';
+        const initName = tabletopState.activeMapInstanceName || resolveMapDisplayName(tabletopState.mapPath);
+        tabletopState.activeMapInstanceId = initId;
+        tabletopState.activeMapInstanceName = initName;
+        tabletopState.mapInstances[initId] = {
+            id: initId,
+            name: initName,
+            mapPath: tabletopState.mapPath || '',
+            mapBg: tabletopState.mapBg || '',
+            stageWidth: Number(tabletopState.stageWidth) || 1600,
+            stageHeight: Number(tabletopState.stageHeight) || 1000,
+            gridEnabled: tabletopState.gridEnabled !== false,
+            gridSize: Number(tabletopState.gridSize) || 56,
+            gridSizeY: Number(tabletopState.gridSizeY) || 56,
+            gridOffsetX: Number(tabletopState.gridOffsetX) || 0,
+            gridOffsetY: Number(tabletopState.gridOffsetY) || 0,
+            snapToGrid: Boolean(tabletopState.snapToGrid),
+            gridSnap: Boolean(tabletopState.snapToGrid),
+            fogEnabled: Boolean(tabletopState.fogEnabled),
+            tokens: _cloneVttData(tabletopState.tokens),
+            aoeTemplates: _cloneVttData(tabletopState.aoeTemplates),
+            fogRegions: _cloneVttData(tabletopState.fogRegions),
+            textBoxes: _cloneVttData(tabletopState.textBoxes),
+            drawings: _cloneVttData(tabletopState.drawings),
+            updatedAt: Date.now()
+        };
+    }
+}
+
+function clearAllTabletopSelections(exceptKind = null) {
+    if (exceptKind !== 'token') selectedTabletopTokenId = null;
+    if (exceptKind !== 'shape') window.selectedShapeId = null;
+    if (exceptKind !== 'textbox') window.selectedTextBoxId = null;
+    if (exceptKind !== 'drawing') window.selectedDrawingId = null;
+    if (exceptKind !== 'fog') {
+        window.selectedFogId = null;
+        window.selectedFogVertexIdx = null;
+    }
 }
 
 function getTabletopGridMetrics() {
@@ -1034,6 +1132,9 @@ function setTabletopToolMode(mode) {
         showToast('🔒 Apenas o Mestre pode usar esta ferramenta.');
         return;
     }
+    if (mode !== 'fog' && Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
+        window.fogPolygonDraft = [];
+    }
     window.tabletopToolMode = mode;
     updateTabletopSelectionUI();
     const tb = document.getElementById('tt-toolbar-tools-root');
@@ -1152,21 +1253,441 @@ function updateTabletopGridVisualsOnly() {
     }
 }
 
-function onTabletopMapChange(newMapPath) {
+/* ------------------ PERSISTÊNCIA DE CENAS / INSTÂNCIAS DE MAPA & FOG POR MAPA ------------------ */
+function extractCurrentSceneSnapshot(overrideName = null) {
+    ensureTabletopExtendedState();
+    const id = tabletopState.activeMapInstanceId || 'inst-default';
+    const curStored = tabletopState.mapInstances[id];
+    const name = String(overrideName || tabletopState.activeMapInstanceName || curStored?.name || resolveMapDisplayName(tabletopState.mapPath)).trim() || 'Cena Atual';
+    return {
+        id,
+        name,
+        mapPath: tabletopState.mapPath || '',
+        mapBg: tabletopState.mapBg || '',
+        stageWidth: Number(tabletopState.stageWidth) || 1600,
+        stageHeight: Number(tabletopState.stageHeight) || 1000,
+        gridEnabled: tabletopState.gridEnabled !== false,
+        gridSize: Number(tabletopState.gridSize) || 56,
+        gridSizeY: Number(tabletopState.gridSizeY) || 56,
+        gridOffsetX: Number(tabletopState.gridOffsetX) || 0,
+        gridOffsetY: Number(tabletopState.gridOffsetY) || 0,
+        snapToGrid: Boolean(tabletopState.snapToGrid),
+        gridSnap: Boolean(tabletopState.snapToGrid),
+        fogEnabled: Boolean(tabletopState.fogEnabled),
+        tokens: _cloneVttData(tabletopState.tokens || []),
+        aoeTemplates: _cloneVttData(tabletopState.aoeTemplates || []),
+        fogRegions: _cloneVttData(tabletopState.fogRegions || []),
+        textBoxes: _cloneVttData(tabletopState.textBoxes || []),
+        drawings: _cloneVttData(tabletopState.drawings || []),
+        updatedAt: Date.now()
+    };
+}
+
+function buildSceneSyncPayloadFromActive() {
+    ensureTabletopExtendedState();
+    return {
+        activeMapInstanceId: tabletopState.activeMapInstanceId,
+        activeMapInstanceName: tabletopState.activeMapInstanceName,
+        mapPath: tabletopState.mapPath || '',
+        mapBg: tabletopState.mapBg || '',
+        stageWidth: Number(tabletopState.stageWidth) || 1600,
+        stageHeight: Number(tabletopState.stageHeight) || 1000,
+        gridEnabled: tabletopState.gridEnabled !== false,
+        gridSize: Number(tabletopState.gridSize) || 56,
+        gridSizeY: Number(tabletopState.gridSizeY) || 56,
+        gridOffsetX: Number(tabletopState.gridOffsetX) || 0,
+        gridOffsetY: Number(tabletopState.gridOffsetY) || 0,
+        snapToGrid: Boolean(tabletopState.snapToGrid),
+        gridSnap: Boolean(tabletopState.snapToGrid),
+        fogEnabled: Boolean(tabletopState.fogEnabled),
+        tokens: _cloneVttData(tabletopState.tokens || []),
+        aoeTemplates: _cloneVttData(tabletopState.aoeTemplates || []),
+        fogRegions: _cloneVttData(tabletopState.fogRegions || []),
+        textBoxes: _cloneVttData(tabletopState.textBoxes || []),
+        drawings: _cloneVttData(tabletopState.drawings || []),
+        mapInstances: tabletopState.mapInstances,
+        savedMapFogs: tabletopState.savedMapFogs
+    };
+}
+
+function saveCurrentMapInstanceState(opts = {}) {
+    if (!_isVttEffectiveGm() && !opts.allowLocalOnly) return null;
+    ensureTabletopExtendedState();
+    const snap = extractCurrentSceneSnapshot(opts.name || null);
+    tabletopState.activeMapInstanceId = snap.id;
+    tabletopState.activeMapInstanceName = snap.name;
+    tabletopState.mapInstances[snap.id] = snap;
+    if (opts.persist !== false) saveLocalPersistence();
+    if (opts.sync !== false && _isVttEffectiveGm() && typeof CompendioNetAdapter !== 'undefined') {
+        if (CompendioNetAdapter.broadcastTabletopMeta) {
+            CompendioNetAdapter.broadcastTabletopMeta({
+                activeMapInstanceId: tabletopState.activeMapInstanceId,
+                activeMapInstanceName: tabletopState.activeMapInstanceName,
+                mapInstances: tabletopState.mapInstances,
+                savedMapFogs: tabletopState.savedMapFogs
+            });
+        }
+    }
+    if (opts.notify) showToast(`💾 Instância "${snap.name}" salva!`);
+    return snap;
+}
+
+function switchToMapInstance(instanceId, opts = {}) {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre pode trocar a instância/cena do mapa.');
+        return false;
+    }
+    ensureTabletopExtendedState();
+    if (!opts.skipSaveCurrent && tabletopState.activeMapInstanceId && tabletopState.mapInstances[tabletopState.activeMapInstanceId]) {
+        saveCurrentMapInstanceState({ persist: false, sync: false });
+    }
+    const target = tabletopState.mapInstances[instanceId];
+    if (!target) {
+        showToast('⚠️ Instância de mapa não encontrada.');
+        return false;
+    }
+    tabletopState.activeMapInstanceId = target.id;
+    tabletopState.activeMapInstanceName = target.name;
+    tabletopState.mapPath = target.mapPath || '';
+    tabletopState.mapBg = target.mapBg || '';
+    tabletopState.stageWidth = Number(target.stageWidth) || 1600;
+    tabletopState.stageHeight = Number(target.stageHeight) || 1000;
+    tabletopState.gridEnabled = target.gridEnabled !== false;
+    tabletopState.gridSize = Number(target.gridSize) || 56;
+    tabletopState.gridSizeY = Number(target.gridSizeY) || Number(target.gridSize) || 56;
+    tabletopState.gridOffsetX = Number(target.gridOffsetX) || 0;
+    tabletopState.gridOffsetY = Number(target.gridOffsetY) || 0;
+    tabletopState.snapToGrid = Boolean(target.snapToGrid);
+    tabletopState.gridSnap = Boolean(target.snapToGrid);
+    tabletopState.fogEnabled = Boolean(target.fogEnabled);
+    tabletopState.tokens = _cloneVttData(target.tokens || []);
+    tabletopState.aoeTemplates = _cloneVttData(target.aoeTemplates || []);
+    tabletopState.fogRegions = _cloneVttData(target.fogRegions || []);
+    tabletopState.fogRects = [];
+    tabletopState.textBoxes = _cloneVttData(target.textBoxes || []);
+    tabletopState.drawings = _cloneVttData(target.drawings || []);
+
+    clearAllTabletopSelections();
+    window.fogPolygonDraft = [];
+    window.editingTextBoxId = null;
+    window.tabletopCamera.initialized = false;
+    saveLocalPersistence();
+
+    if (typeof CompendioNetAdapter !== 'undefined') {
+        if (CompendioNetAdapter.broadcastTabletopSceneSync) {
+            CompendioNetAdapter.broadcastTabletopSceneSync(buildSceneSyncPayloadFromActive());
+        } else {
+            CompendioNetAdapter.broadcastTabletop();
+        }
+    }
+    if (activeModule === 'tabletop') renderTabletopModule();
+    if (!opts.silent) showToast(`🗺️ Cena ativa: "${target.name}" (${tabletopState.tokens.length} tokens, ${tabletopState.fogRegions.length} fogs)`);
+    return true;
+}
+
+function createNewMapInstance(params = {}) {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre pode criar instâncias de mapa.');
+        return null;
+    }
+    ensureTabletopExtendedState();
+    saveCurrentMapInstanceState({ persist: false, sync: false });
+
+    const mapPath = (params.mapPath !== undefined) ? String(params.mapPath || '') : (tabletopState.mapPath || '');
+    const mapKey = getTabletopMapFogKey(mapPath);
+    const savedFog = (params.useSavedMapFog !== false) ? tabletopState.savedMapFogs[mapKey] : null;
+    const sameMapCount = Object.values(tabletopState.mapInstances).filter(inst => inst && inst.mapPath === mapPath).length;
+    const defaultName = sameMapCount > 0
+        ? `${resolveMapDisplayName(mapPath)} #${sameMapCount + 1}`
+        : resolveMapDisplayName(mapPath);
+    const name = String(params.name || defaultName).trim() || defaultName;
+    const newId = 'inst-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000);
+
+    let initialTokens = [];
+    if (params.cloneCurrent) {
+        const curSnap = extractCurrentSceneSnapshot(name);
+        tabletopState.mapInstances[newId] = Object.assign({}, curSnap, { id: newId, name, updatedAt: Date.now() });
+        switchToMapInstance(newId, { skipSaveCurrent: true, silent: true });
+        showToast(`📋 Instância duplicada: "${name}"!`);
+        return tabletopState.mapInstances[newId];
+    }
+
+    if (params.keepPartyTokens) {
+        initialTokens = _cloneVttData((tabletopState.tokens || []).filter(t => t && t.type === 'pc'));
+    }
+
+    const newInst = {
+        id: newId,
+        name,
+        mapPath,
+        mapBg: '',
+        stageWidth: 1600,
+        stageHeight: 1000,
+        gridEnabled: true,
+        gridSize: 56,
+        gridSizeY: 56,
+        gridOffsetX: 0,
+        gridOffsetY: 0,
+        snapToGrid: tabletopState.snapToGrid !== false,
+        gridSnap: tabletopState.snapToGrid !== false,
+        fogEnabled: savedFog ? Boolean(savedFog.fogEnabled) : false,
+        tokens: initialTokens,
+        aoeTemplates: [],
+        fogRegions: savedFog ? _cloneVttData(savedFog.fogRegions || []) : [],
+        textBoxes: [],
+        drawings: [],
+        updatedAt: Date.now()
+    };
+    tabletopState.mapInstances[newId] = newInst;
+    switchToMapInstance(newId, { skipSaveCurrent: true, silent: true });
+    const fogNote = savedFog && savedFog.fogRegions?.length ? ` + ${savedFog.fogRegions.length} fog salva carregada` : '';
+    showToast(`✨ Nova instância criada: "${name}"${fogNote}!`);
+    return newInst;
+}
+
+function renameMapInstance(instanceId, newName) {
+    if (!_isVttEffectiveGm()) return false;
+    ensureTabletopExtendedState();
+    const inst = tabletopState.mapInstances[instanceId];
+    const clean = String(newName || '').trim();
+    if (!inst || !clean) return false;
+    inst.name = clean;
+    inst.updatedAt = Date.now();
+    if (tabletopState.activeMapInstanceId === instanceId) {
+        tabletopState.activeMapInstanceName = clean;
+    }
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopMeta) {
+        CompendioNetAdapter.broadcastTabletopMeta({
+            activeMapInstanceName: tabletopState.activeMapInstanceName,
+            mapInstances: tabletopState.mapInstances
+        });
+    }
+    if (activeModule === 'tabletop') renderTabletopModule();
+    return true;
+}
+
+function deleteMapInstance(instanceId) {
+    if (!_isVttEffectiveGm()) return false;
+    ensureTabletopExtendedState();
+    const allIds = Object.keys(tabletopState.mapInstances || {});
+    if (allIds.length <= 1) {
+        showToast('⚠️ É necessário manter pelo menos 1 instância de mapa ativa.');
+        return false;
+    }
+    if (!tabletopState.mapInstances[instanceId]) return false;
+    const deletedName = tabletopState.mapInstances[instanceId].name;
+    delete tabletopState.mapInstances[instanceId];
+    if (tabletopState.activeMapInstanceId === instanceId) {
+        const nextId = Object.keys(tabletopState.mapInstances)[0];
+        switchToMapInstance(nextId, { skipSaveCurrent: true, silent: true });
+    } else {
+        saveLocalPersistence();
+        if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopMeta) {
+            CompendioNetAdapter.broadcastTabletopMeta({ mapInstances: tabletopState.mapInstances });
+        }
+        if (activeModule === 'tabletop') renderTabletopModule();
+    }
+    showToast(`🗑️ Instância "${deletedName}" excluída.`);
+    return true;
+}
+
+function saveCurrentFogToMapPreset() {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre pode salvar a Névoa de Guerra no mapa.');
+        return null;
+    }
+    ensureTabletopExtendedState();
+    const mapKey = getTabletopMapFogKey(tabletopState.mapPath);
+    const regions = _cloneVttData(tabletopState.fogRegions || []);
+    const preset = {
+        mapPath: tabletopState.mapPath || '',
+        mapName: resolveMapDisplayName(tabletopState.mapPath),
+        fogEnabled: Boolean(tabletopState.fogEnabled || regions.length > 0),
+        fogRegions: regions,
+        updatedAt: Date.now()
+    };
+    tabletopState.savedMapFogs[mapKey] = preset;
+    saveCurrentMapInstanceState({ persist: false, sync: false });
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopMeta) {
+        CompendioNetAdapter.broadcastTabletopMeta({
+            savedMapFogs: tabletopState.savedMapFogs,
+            mapInstances: tabletopState.mapInstances
+        });
+    }
+    if (activeModule === 'tabletop') renderTabletopModule();
+    showToast(`🌫️💾 Névoa (${regions.length} região(ões)) salva no mapa "${preset.mapName}"!`);
+    return preset;
+}
+
+function loadSavedFogFromMapPreset(overrideMapPath = null) {
+    if (!_isVttEffectiveGm()) return false;
+    ensureTabletopExtendedState();
+    const mapKey = getTabletopMapFogKey(overrideMapPath !== null ? overrideMapPath : tabletopState.mapPath);
+    const preset = tabletopState.savedMapFogs[mapKey];
+    if (!preset) {
+        showToast('ℹ️ Este mapa ainda não possui uma Névoa salva.');
+        return false;
+    }
+    tabletopState.fogRegions = _cloneVttData(preset.fogRegions || []);
+    tabletopState.fogRects = [];
+    tabletopState.fogEnabled = Boolean(preset.fogEnabled || tabletopState.fogRegions.length > 0);
+    window.selectedFogId = null;
+    saveCurrentMapInstanceState({ persist: false, sync: false });
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopSceneSync) {
+        CompendioNetAdapter.broadcastTabletopSceneSync(buildSceneSyncPayloadFromActive());
+    }
+    if (activeModule === 'tabletop') renderTabletopModule();
+    showToast(`🌫️📥 Névoa salva carregada (${tabletopState.fogRegions.length} regiões)!`);
+    return true;
+}
+
+function openMapInstancesModal() {
+    if (!_isVttEffectiveGm()) {
+        showToast('🔒 Apenas o Mestre gerencia instâncias e névoa salva de mapas.');
+        return;
+    }
+    ensureTabletopExtendedState();
+    saveCurrentMapInstanceState({ persist: false, sync: false });
+    const backdrop = document.getElementById('tt-chest-backdrop');
+    const panel = document.getElementById('tt-chest-modal-content');
+    if (!backdrop || !panel) return;
+
+    const allMaps = typeof getAllCatalogEntities === 'function' ? getAllCatalogEntities(['maps']) : [];
+    const root = (typeof compendioData !== 'undefined' && compendioData.maps) ? compendioData.maps : {};
+    const mapSelectOpts = `<option value="">🗺️ Grade Tática Escura (Padrão)</option>` + allMaps.map(m => {
+        const entry = m.groupKey ? root[m.groupKey]?.children?.[m.itemKey] : root[m.itemKey];
+        const path = entry?.path || '';
+        if (!path) return '';
+        const hasFog = Boolean(tabletopState.savedMapFogs[getTabletopMapFogKey(path)]?.fogRegions?.length);
+        return `<option value="${escapeHtmlText(path)}" ${tabletopState.mapPath === path ? 'selected' : ''}>🗺️ ${escapeHtmlText(m.title)}${hasFog ? ' (🌫️ Fog Salva)' : ''}</option>`;
+    }).join('');
+
+    const instances = Object.values(tabletopState.mapInstances).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    const currentFogKey = getTabletopMapFogKey(tabletopState.mapPath);
+    const hasCurrentSavedFog = Boolean(tabletopState.savedMapFogs[currentFogKey]);
+    const savedFogList = Object.entries(tabletopState.savedMapFogs);
+
+    panel.innerHTML = `
+        <div class="studio-header">
+            <h3 style="margin:0; color:#d8b467;">🗺️ Gerenciador de Instâncias & Névoa por Mapa</h3>
+            <button type="button" class="btn-mini danger" onclick="closeChestTokenModal()">✕</button>
+        </div>
+        <div style="padding:14px; overflow-y:auto; max-height:74vh; display:flex; flex-direction:column; gap:14px;">
+            <div style="background:#15171e; border:1px solid #3c4257; border-radius:6px; padding:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <strong style="color:#f2cf83; font-size:13px;">Cena Ativa: ${escapeHtmlText(tabletopState.activeMapInstanceName || 'Cena')}</strong>
+                        <div style="font-size:11px; color:#9da3b8;">Mapa base: ${escapeHtmlText(resolveMapDisplayName(tabletopState.mapPath))} • ${tabletopState.tokens.length} tokens · ${tabletopState.fogRegions.length} fogs · ${(tabletopState.textBoxes || []).length} textos · ${(tabletopState.drawings || []).length} desenhos</div>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button type="button" class="btn-mini" onclick="saveCurrentMapInstanceState({notify:true}); openMapInstancesModal();">💾 Salvar Estado</button>
+                        <button type="button" class="btn-mini" onclick="createNewMapInstance({cloneCurrent:true}); openMapInstancesModal();">📋 Duplicar Cena</button>
+                        <button type="button" class="btn-mini" onclick="saveCurrentFogToMapPreset(); openMapInstancesModal();">🌫️💾 Salvar Fog no Mapa</button>
+                        ${hasCurrentSavedFog ? `<button type="button" class="btn-mini" onclick="loadSavedFogFromMapPreset(); openMapInstancesModal();">🌫️📥 Aplicar Fog do Mapa</button>` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#15171e; border:1px solid #3c4257; border-radius:6px; padding:10px;">
+                <strong style="color:#8df596; font-size:12px; display:block; margin-bottom:8px;">➕ Criar Nova Instância (sem apagar a cena atual)</strong>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                    <input type="text" id="tt-new-inst-name" class="form-control" placeholder="Nome da nova cena (ex: Masmo. Sala 2)">
+                    <select id="tt-new-inst-map" class="form-control">${mapSelectOpts}</select>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; gap:12px; font-size:11.5px; color:#c8cde0;">
+                        <label style="cursor:pointer;"><input type="checkbox" id="tt-new-inst-keep-pcs" checked> Manter tokens de PJs</label>
+                        <label style="cursor:pointer;"><input type="checkbox" id="tt-new-inst-load-fog" checked> Usar Fog salva do mapa (se houver)</label>
+                    </div>
+                    <button type="button" class="btn-save-primary" style="padding:5px 12px; font-size:12px;" onclick="createNewMapInstance({ name: document.getElementById('tt-new-inst-name').value, mapPath: document.getElementById('tt-new-inst-map').value, keepPartyTokens: document.getElementById('tt-new-inst-keep-pcs').checked, useSavedMapFog: document.getElementById('tt-new-inst-load-fog').checked }); openMapInstancesModal();">✨ Criar e Abrir</button>
+                </div>
+            </div>
+
+            <div>
+                <strong style="color:#f2cf83; font-size:12px; display:block; margin-bottom:6px;">📚 Instâncias Salvas (${instances.length})</strong>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    ${instances.map(inst => {
+                        const isCur = inst.id === tabletopState.activeMapInstanceId;
+                        const safeId = `'${String(inst.id).replace(/'/g, "\\'")}'`;
+                        return `
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:${isCur ? '#252216' : '#181a22'}; border:1px solid ${isCur ? '#d8b467' : '#303445'};">
+                                <div style="min-width:0;">
+                                    <div style="font-size:12.5px; font-weight:bold; color:${isCur ? '#ffd54f' : '#e4e7f0'};">${isCur ? '▶ ' : ''}${escapeHtmlText(inst.name)}</div>
+                                    <div style="font-size:10.5px; color:#9499ad;">🗺️ ${escapeHtmlText(resolveMapDisplayName(inst.mapPath))} • ${(inst.tokens || []).length} tokens · ${(inst.fogRegions || []).length} fogs · ${(inst.textBoxes || []).length} textos · ${(inst.drawings || []).length} traços</div>
+                                </div>
+                                <div style="display:flex; gap:5px; flex:0 0 auto;">
+                                    ${isCur ? `<span class="vis-pill active-studied">Ativa</span>` : `<button type="button" class="btn-summon-card" style="padding:3px 9px; font-size:11px;" onclick="switchToMapInstance(${safeId}); closeChestTokenModal();">Carregar</button>`}
+                                    <button type="button" class="btn-mini" onclick="const nv=prompt('Novo nome da instância:', '${escapeHtmlText(inst.name).replace(/'/g, "\\'")}'); if(nv){ renameMapInstance(${safeId}, nv); openMapInstancesModal(); }" title="Renomear">✏️</button>
+                                    ${instances.length > 1 ? `<button type="button" class="btn-mini danger" onclick="deleteMapInstance(${safeId}); openMapInstancesModal();" title="Excluir instância">🗑️</button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            ${savedFogList.length > 0 ? `
+                <div>
+                    <strong style="color:#9ecbff; font-size:12px; display:block; margin-bottom:6px;">🌫️ Névoas Salvas por Mapa Base (${savedFogList.length})</strong>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        ${savedFogList.map(([k, fg]) => `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 10px; background:#14161e; border:1px solid #2b3145; border-radius:5px; font-size:11.5px;">
+                                <span>🗺️ ${escapeHtmlText(fg.mapName || resolveMapDisplayName(fg.mapPath))} — <strong>${(fg.fogRegions || []).length}</strong> região(ões)</span>
+                                <button type="button" class="btn-mini danger" onclick="delete tabletopState.savedMapFogs['${k.replace(/'/g, "\\'")}']; saveLocalPersistence(); openMapInstancesModal();">🗑️</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    backdrop.classList.add('open');
+}
+
+function onTabletopMapChange(newMapPath, opts = {}) {
     const p = getActivePlayer();
     if (!_isVttEffectiveGm(p)) {
         showToast('🔒 Apenas o Mestre pode trocar o mapa do Tabletop.');
         return;
     }
-    tabletopState.mapPath = newMapPath || '';
-    saveLocalPersistence();
-    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopMeta) {
-        CompendioNetAdapter.broadcastTabletopMeta({ mapPath: tabletopState.mapPath });
-    } else if (typeof CompendioNetAdapter !== 'undefined') {
-        CompendioNetAdapter.broadcastTabletop();
+    ensureTabletopExtendedState();
+    const targetPath = newMapPath || '';
+
+    // 1. Sempre salva automaticamente o estado completo da instância atual antes de trocar
+    saveCurrentMapInstanceState({ persist: false, sync: false });
+
+    // 2. Se pediu Explicitamente apenas trocar imagem de fundo da instância atual:
+    if (opts.replaceBackgroundOnly) {
+        tabletopState.mapPath = targetPath;
+        saveCurrentMapInstanceState({ persist: false, sync: false });
+        saveLocalPersistence();
+        if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopSceneSync) {
+            CompendioNetAdapter.broadcastTabletopSceneSync(buildSceneSyncPayloadFromActive());
+        }
+        window.tabletopCamera.initialized = false;
+        renderTabletopModule();
+        return;
     }
-    window.tabletopCamera.initialized = false;
-    renderTabletopModule();
+
+    // 3. Caso contrário: procura instância já salva para o mapa de destino; se não existir, cria uma nova (restaurando fog salva do mapa, se houver!)
+    if (!opts.forceNew) {
+        const candidates = Object.values(tabletopState.mapInstances)
+            .filter(inst => inst && inst.mapPath === targetPath && inst.id !== tabletopState.activeMapInstanceId)
+            .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        if (candidates.length > 0) {
+            switchToMapInstance(candidates[0].id, { skipSaveCurrent: true });
+            return;
+        }
+    }
+
+    createNewMapInstance({
+        mapPath: targetPath,
+        keepPartyTokens: Boolean(opts.keepPartyTokens),
+        useSavedMapFog: true
+    });
 }
 
 function isTokenMovableByCurrentUser(tok) {
@@ -1278,8 +1799,8 @@ function setTokenFootprintSize(tokenId, squares) {
 }
 
 function selectTabletopToken(tokenId) {
+    clearAllTabletopSelections('token');
     selectedTabletopTokenId = tokenId;
-    window.selectedShapeId = null;
     updateTabletopSelectionUI();
     const tok = tabletopState.tokens.find(t => t.id === tokenId);
     if (tok) {
@@ -1377,6 +1898,15 @@ function updateTabletopSelectionUI() {
     document.querySelectorAll('.tt-aoe-wrapper[data-shape-id]').forEach(el => {
         el.classList.toggle('is-selected', String(el.getAttribute('data-shape-id')) === String(window.selectedShapeId));
     });
+    document.querySelectorAll('.tt-textbox-wrapper[data-textbox-id]').forEach(el => {
+        el.classList.toggle('is-selected', String(el.getAttribute('data-textbox-id')) === String(window.selectedTextBoxId));
+    });
+    document.querySelectorAll('.tt-drawing-wrapper[data-drawing-id]').forEach(el => {
+        el.classList.toggle('is-selected', String(el.getAttribute('data-drawing-id')) === String(window.selectedDrawingId));
+    });
+    document.querySelectorAll('.tt-fog-wrapper[data-fog-id]').forEach(el => {
+        el.classList.toggle('is-selected', String(el.getAttribute('data-fog-id')) === String(window.selectedFogId));
+    });
     document.querySelectorAll('.tt-drawer-card[data-drawer-token-id]').forEach(el => {
         el.classList.toggle('is-selected', String(el.getAttribute('data-drawer-token-id')) === String(selectedTabletopTokenId));
     });
@@ -1389,8 +1919,8 @@ function updateTabletopSelectionUI() {
 }
 
 function startDragTabletopToken(e, tokenId) {
-    // Passa cliques especiais (Ping / Régua / Calibração) para a lógica do estágio
-    if (e.button === 2 || e.altKey || window.tabletopToolMode === 'ruler' || window.tabletopToolMode === 'ping' || window.tabletopToolMode === 'calibrate') {
+    // Passa cliques especiais (Ping / Régua / Calibração / Pincel / Texto / Desenho de Fog) para a lógica do estágio
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'fog', 'text', 'brush'].includes(window.tabletopToolMode)) {
         return; // deixa propagar para onTabletopStageMouseDown
     }
     if (e.button !== 0) return;
@@ -1402,8 +1932,8 @@ function startDragTabletopToken(e, tokenId) {
 
     // Regra exata no modo 'move': clicar em um token NÃO selecionado apenas seleciona (sem arrastar já)
     if (String(selectedTabletopTokenId) !== String(tokenId)) {
+        clearAllTabletopSelections('token');
         selectedTabletopTokenId = tokenId;
-        window.selectedShapeId = null;
         updateTabletopSelectionUI();
         return;
     }
@@ -1531,9 +2061,12 @@ function renderRemoteCursorsLayer() {
 }
 
 function onTabletopViewportMouseMove(e) {
+    const world = clientToWorldCoords(e.clientX, e.clientY);
+    if (window.tabletopToolMode === 'fog' && window.fogDrawShape === 'polygon' && Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
+        updateFogPolygonDraftPreview(world);
+    }
     if (!window.tabletopCursorShareEnabled) return;
     if (typeof CompendioNetAdapter === 'undefined' || !CompendioNetAdapter.sendCursorMove) return;
-    const world = clientToWorldCoords(e.clientX, e.clientY);
     CompendioNetAdapter.sendCursorMove(world.x, world.y, true);
 }
 
@@ -1577,6 +2110,99 @@ function renderShapeSvgMarkup(a) {
     return `<rect x="2" y="2" width="96" height="96" rx="${a.shape === 'line' ? 3 : 6}" fill="${fill}" stroke="${clr}" stroke-width="2.6" vector-effect="non-scaling-stroke"/>`;
 }
 
+function _renderBoxTransformHandlesHtml(fnName, safeId) {
+    return `
+        <div class="tt-shape-rotate-stem"></div>
+        <div class="tt-shape-rotate-handle" onmousedown="${fnName}(event, ${safeId}, 'rotate')" title="Girar">↻</div>
+        <div class="tt-shape-handle h-nw" onmousedown="${fnName}(event, ${safeId}, 'nw')" title="Redimensionar"></div>
+        <div class="tt-shape-handle h-ne" onmousedown="${fnName}(event, ${safeId}, 'ne')" title="Redimensionar"></div>
+        <div class="tt-shape-handle h-sw" onmousedown="${fnName}(event, ${safeId}, 'sw')" title="Redimensionar"></div>
+        <div class="tt-shape-handle h-se" onmousedown="${fnName}(event, ${safeId}, 'se')" title="Redimensionar"></div>
+        <div class="tt-shape-handle h-n" onmousedown="${fnName}(event, ${safeId}, 'n')" title="Alongar verticalmente"></div>
+        <div class="tt-shape-handle h-s" onmousedown="${fnName}(event, ${safeId}, 's')" title="Alongar verticalmente"></div>
+        <div class="tt-shape-handle h-e" onmousedown="${fnName}(event, ${safeId}, 'e')" title="Alongar horizontalmente"></div>
+        <div class="tt-shape-handle h-w" onmousedown="${fnName}(event, ${safeId}, 'w')" title="Alongar horizontalmente"></div>
+    `;
+}
+
+function _startBoxTransformDrag(e, cfg) {
+    if (e.button !== 0 || !cfg || !cfg.item) return;
+    e.stopPropagation();
+    e.preventDefault();
+
+    const { item, wrapper, rotator, interType, wProp = 'width', hProp = 'height', minW = 24, minH = 24, handleKind, onSync, onFinish } = cfg;
+    window.ttActiveInteraction = { type: interType, id: item.id };
+
+    const scale = window.tabletopCamera?.scale || 1;
+    const startMouseX = e.clientX;
+    const startMouseY = e.clientY;
+    const origX = Number(item.x) || 0;
+    const origY = Number(item.y) || 0;
+    const origW = Math.max(minW, Number(item[wProp]) || minW);
+    const origH = Math.max(minH, Number(item[hProp]) || minH);
+    const rad = (Number(item.rotation) || 0) * Math.PI / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    const centerWorld = { x: origX + origW / 2, y: origY + origH / 2 };
+    let lastSent = 0;
+
+    function onMove(mv) {
+        if (handleKind === 'rotate') {
+            const worldPt = clientToWorldCoords(mv.clientX, mv.clientY);
+            const angleDeg = Math.atan2(worldPt.y - centerWorld.y, worldPt.x - centerWorld.x) * 180 / Math.PI + 90;
+            item.rotation = Math.round(((angleDeg % 360) + 360) % 360);
+            if (rotator) rotator.style.transform = `rotate(${item.rotation}deg)`;
+        } else {
+            const dxWorld = (mv.clientX - startMouseX) / scale;
+            const dyWorld = (mv.clientY - startMouseY) / scale;
+            const dxLocal = dxWorld * cosR + dyWorld * sinR;
+            const dyLocal = -dxWorld * sinR + dyWorld * cosR;
+            let nextX = origX;
+            let nextY = origY;
+            let nextW = origW;
+            let nextH = origH;
+
+            if (handleKind.includes('e')) nextW = Math.max(minW, Math.round(origW + dxLocal));
+            if (handleKind.includes('s')) nextH = Math.max(minH, Math.round(origH + dyLocal));
+            if (handleKind.includes('w')) {
+                nextW = Math.max(minW, Math.round(origW - dxLocal));
+                nextX = Math.round(origX + (origW - nextW));
+            }
+            if (handleKind.includes('n')) {
+                nextH = Math.max(minH, Math.round(origH - dyLocal));
+                nextY = Math.round(origY + (origH - nextH));
+            }
+            item.x = nextX;
+            item.y = nextY;
+            item[wProp] = nextW;
+            item[hProp] = nextH;
+            if (wrapper) {
+                wrapper.style.left = `${item.x}px`;
+                wrapper.style.top = `${item.y}px`;
+                wrapper.style.width = `${item[wProp]}px`;
+                wrapper.style.height = `${item[hProp]}px`;
+            }
+        }
+        if (onSync) {
+            const now = Date.now();
+            if (now - lastSent > 70) {
+                lastSent = now;
+                onSync(item);
+            }
+        }
+    }
+
+    function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        window.ttActiveInteraction = null;
+        if (onFinish) onFinish(item);
+    }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+}
+
 function buildSingleShapeWrapperHtml(rawShape, gridPx) {
     const a = normalizeShapeObj(rawShape, gridPx);
     const isSel = String(window.selectedShapeId) === String(a.id);
@@ -1589,16 +2215,7 @@ function buildSingleShapeWrapperHtml(rawShape, gridPx) {
              title="${escapeHtmlText(a.label || a.shape)} (Clique e arraste para mover • Cantos redimensionam • Alças de borda alongam • ↻ rotaciona)">
             <div class="tt-aoe-rotator" style="transform: rotate(${a.rotation}deg);">
                 <svg class="tt-aoe-svg" viewBox="0 0 100 100" preserveAspectRatio="none">${renderShapeSvgMarkup(a)}</svg>
-                <div class="tt-shape-rotate-stem"></div>
-                <div class="tt-shape-rotate-handle" onmousedown="startTransformAoeShape(event, ${safeId}, 'rotate')" title="Girar forma">↻</div>
-                <div class="tt-shape-handle h-nw" onmousedown="startTransformAoeShape(event, ${safeId}, 'nw')" title="Redimensionar"></div>
-                <div class="tt-shape-handle h-ne" onmousedown="startTransformAoeShape(event, ${safeId}, 'ne')" title="Redimensionar"></div>
-                <div class="tt-shape-handle h-sw" onmousedown="startTransformAoeShape(event, ${safeId}, 'sw')" title="Redimensionar"></div>
-                <div class="tt-shape-handle h-se" onmousedown="startTransformAoeShape(event, ${safeId}, 'se')" title="Redimensionar"></div>
-                <div class="tt-shape-handle h-n" onmousedown="startTransformAoeShape(event, ${safeId}, 'n')" title="Alongar verticalmente"></div>
-                <div class="tt-shape-handle h-s" onmousedown="startTransformAoeShape(event, ${safeId}, 's')" title="Alongar verticalmente"></div>
-                <div class="tt-shape-handle h-e" onmousedown="startTransformAoeShape(event, ${safeId}, 'e')" title="Alongar horizontalmente"></div>
-                <div class="tt-shape-handle h-w" onmousedown="startTransformAoeShape(event, ${safeId}, 'w')" title="Alongar horizontalmente"></div>
+                ${_renderBoxTransformHandlesHtml('startTransformAoeShape', safeId)}
             </div>
             <span class="tt-aoe-label" style="border-color:${escapeHtmlText(a.color)};">
                 <span>${escapeHtmlText(a.label || a.shape)}</span>
@@ -1632,8 +2249,8 @@ function addAoeTemplateToTabletop(shape = 'circle', sizeSquares = 4, color = '#e
         ownerId: activePlayerId
     };
     tabletopState.aoeTemplates.push(tpl);
+    clearAllTabletopSelections('shape');
     window.selectedShapeId = tpl.id;
-    window.selectedTabletopTokenId = null;
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastShapeDelta) {
         CompendioNetAdapter.broadcastShapeDelta('upsert', tpl);
@@ -1690,7 +2307,7 @@ function removeAoeTemplate(aoeId, ev) {
 }
 
 function startDragAoeTemplate(e, aoeId) {
-    if (e.button === 2 || e.altKey || window.tabletopToolMode === 'ruler' || window.tabletopToolMode === 'ping') return;
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'fog', 'text', 'brush'].includes(window.tabletopToolMode)) return;
     if (e.button !== 0) return;
     e.stopPropagation();
     clearMyPersistentRuler(true);
@@ -1700,8 +2317,8 @@ function startDragAoeTemplate(e, aoeId) {
     const { gx } = getTabletopGridMetrics();
     Object.assign(tpl, normalizeShapeObj(tpl, gx));
 
+    clearAllTabletopSelections('shape');
     window.selectedShapeId = tpl.id;
-    window.selectedTabletopTokenId = null;
     updateTabletopSelectionUI();
 
     const el = e.currentTarget;
@@ -1746,75 +2363,842 @@ function startDragAoeTemplate(e, aoeId) {
 }
 
 function startTransformAoeShape(e, aoeId, handleKind) {
-    if (e.button !== 0) return;
-    e.stopPropagation();
-    e.preventDefault();
     ensureTabletopExtendedState();
     const tpl = tabletopState.aoeTemplates.find(a => String(a.id) === String(aoeId));
     if (!tpl) return;
     const { gx } = getTabletopGridMetrics();
     Object.assign(tpl, normalizeShapeObj(tpl, gx));
-
+    clearAllTabletopSelections('shape');
     window.selectedShapeId = tpl.id;
-    window.ttActiveInteraction = { type: 'shape', id: tpl.id };
-
     const wrapper = e.currentTarget.closest('.tt-aoe-wrapper');
-    const rotator = wrapper?.querySelector('.tt-aoe-rotator');
+    _startBoxTransformDrag(e, {
+        item: tpl,
+        wrapper,
+        rotator: wrapper?.querySelector('.tt-aoe-rotator'),
+        interType: 'shape',
+        handleKind,
+        onSync: (it) => {
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastShapeDelta) {
+                CompendioNetAdapter.broadcastShapeDelta('upsert', it);
+            }
+        },
+        onFinish: (it) => {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastShapeDelta) {
+                CompendioNetAdapter.broadcastShapeDelta('upsert', it);
+            }
+            updateTabletopSelectionUI();
+        }
+    });
+}
+
+/* ------------------ CAIXAS DE TEXTO NO TABLETOP ------------------ */
+const VTT_TEXT_FONTS = [
+    { label: 'Serif Clássica', value: 'Georgia, serif' },
+    { label: 'Cinzel / Medieval', value: '"Palatino Linotype", "Book Antiqua", Georgia, serif' },
+    { label: 'Sans Limpa', value: 'Verdana, sans-serif' },
+    { label: 'Trebuchet', value: '"Trebuchet MS", sans-serif' },
+    { label: 'Monospace', value: '"Courier New", monospace' }
+];
+
+function normalizeTextBoxObj(raw) {
+    if (!raw || typeof raw !== 'object') return raw;
+    return Object.assign({}, raw, {
+        x: Math.round(Number(raw.x) || 0),
+        y: Math.round(Number(raw.y) || 0),
+        width: Math.max(60, Math.round(Number(raw.width) || 220)),
+        height: Math.max(36, Math.round(Number(raw.height) || 74)),
+        rotation: Number(raw.rotation) || 0,
+        text: raw.text !== undefined ? String(raw.text) : 'Texto',
+        fontFamily: raw.fontFamily || 'Georgia, serif',
+        fontSize: Math.max(10, Math.min(120, Number(raw.fontSize) || 22)),
+        color: raw.color || '#f2cf83',
+        bgColor: raw.bgColor || 'rgba(14, 15, 20, 0.72)',
+        bold: Boolean(raw.bold),
+        italic: Boolean(raw.italic),
+        align: raw.align || 'center',
+        hiddenFromPlayers: Boolean(raw.hiddenFromPlayers),
+        ownerId: raw.ownerId || ''
+    });
+}
+
+function canEditVttAnnotation(obj, activePl = null) {
+    if (!obj) return false;
+    const p = activePl || (typeof getActivePlayer === 'function' ? getActivePlayer() : null);
+    if (_isVttEffectiveGm(p)) return true;
+    if (!p || p.isUnauthenticated || !p.id) return false;
+    if (obj.hiddenFromPlayers) return false;
+    return !obj.ownerId || obj.ownerId === p.id;
+}
+
+function buildSingleTextBoxWrapperHtml(rawTb, isGm) {
+    const tb = normalizeTextBoxObj(rawTb);
+    if (!isGm && tb.hiddenFromPlayers) return '';
+    const isSel = String(window.selectedTextBoxId) === String(tb.id);
+    const isEditing = String(window.editingTextBoxId) === String(tb.id);
+    const safeId = `'${String(tb.id).replace(/'/g, "\\'")}'`;
+    const styleBg = tb.bgColor === 'transparent' ? 'transparent' : (tb.bgColor || 'rgba(14, 15, 20, 0.72)');
+    const textHtml = escapeHtmlText(tb.text || '').replace(/\n/g, '<br>');
+    const textStyle = `font-family:${escapeHtmlText(tb.fontFamily)}; font-size:${tb.fontSize}px; color:${escapeHtmlText(tb.color)}; font-weight:${tb.bold ? '700' : '400'}; font-style:${tb.italic ? 'italic' : 'normal'}; text-align:${escapeHtmlText(tb.align)};`;
+
+    return `
+        <div class="tt-textbox-wrapper ${isSel ? 'is-selected' : ''} ${tb.hiddenFromPlayers ? 'is-hidden-overlay' : ''}"
+             data-textbox-id="${escapeHtmlText(tb.id)}"
+             style="left:${tb.x}px; top:${tb.y}px; width:${tb.width}px; height:${tb.height}px;"
+             onmousedown="startDragTextBox(event, ${safeId})"
+             ondblclick="startInlineEditTextBox(event, ${safeId})"
+             title="Caixa de Texto (Clique p/ selecionar/arrastar • Duplo-clique p/ editar)">
+            <div class="tt-aoe-rotator" style="transform: rotate(${tb.rotation}deg);">
+                <div class="tt-textbox-surface" style="background:${escapeHtmlText(styleBg)}; ${textStyle}">
+                    ${(isGm && tb.hiddenFromPlayers) ? `<span class="tt-overlay-hidden-pill" title="Oculto dos jogadores">🙈</span>` : ''}
+                    ${isEditing
+                        ? `<textarea id="tt-tb-inline-editor" class="tt-textbox-inline-editor" style="${textStyle}" onmousedown="event.stopPropagation()" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); this.blur(); } else if(event.key==='Escape'){ window.editingTextBoxId=null; window.ttActiveInteraction=null; renderTabletopModule(); }" onblur="commitInlineTextBoxEdit(${safeId}, this.value)">${escapeHtmlText(tb.text || '')}</textarea>`
+                        : `<div class="tt-textbox-content">${textHtml || '<span style="opacity:0.45;">(Vazio)</span>'}</div>`}
+                </div>
+                ${isEditing ? '' : _renderBoxTransformHandlesHtml('startTransformTextBox', safeId)}
+            </div>
+        </div>
+    `;
+}
+
+function addTextBoxToTabletop(wx = null, wy = null, customOpts = {}) {
+    ensureTabletopExtendedState();
+    const draft = Object.assign({}, window.textBoxDraftConfig || {}, customOpts || {});
+    const center = getTabletopCameraCenterWorld();
+    const w = Math.max(80, Math.round(Number(draft.width) || 220));
+    const h = Math.max(40, Math.round(Number(draft.height) || 74));
+    const posX = wx !== null ? Math.round(wx - w / 2) : Math.max(12, Math.round(center.x - w / 2));
+    const posY = wy !== null ? Math.round(wy - h / 2) : Math.max(12, Math.round(center.y - h / 2));
+
+    const tb = normalizeTextBoxObj({
+        id: 'txt-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+        x: Math.max(4, posX),
+        y: Math.max(4, posY),
+        width: w,
+        height: h,
+        rotation: Number(draft.rotation) || 0,
+        text: draft.text !== undefined ? draft.text : 'Nova Nota',
+        fontFamily: draft.fontFamily || 'Georgia, serif',
+        fontSize: Number(draft.fontSize) || 22,
+        color: draft.color || '#f2cf83',
+        bgColor: draft.bgColor || 'rgba(14, 15, 20, 0.72)',
+        bold: Boolean(draft.bold),
+        italic: Boolean(draft.italic),
+        align: draft.align || 'center',
+        hiddenFromPlayers: Boolean(_isVttEffectiveGm() && draft.hiddenFromPlayers),
+        ownerId: activePlayerId || ''
+    });
+
+    tabletopState.textBoxes.push(tb);
+    clearAllTabletopSelections('textbox');
+    window.selectedTextBoxId = tb.id;
+    if (window.tabletopToolMode === 'text') window.tabletopToolMode = 'move';
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+        CompendioNetAdapter.broadcastTextBoxDelta('upsert', tb);
+    }
+    renderTabletopModule();
+    return tb;
+}
+
+function updateTabletopTextBoxDom(tbId) {
+    const raw = tabletopState?.textBoxes?.find(t => String(t.id) === String(tbId));
+    const el = document.querySelector(`.tt-textbox-wrapper[data-textbox-id="${CSS?.escape ? CSS.escape(String(tbId)) : tbId}"]`);
+    if (!raw || !el) return false;
+    const isGm = _isVttEffectiveGm();
+    if (!isGm && raw.hiddenFromPlayers) {
+        el.remove();
+        return true;
+    }
+    const tb = normalizeTextBoxObj(raw);
+    el.style.left = `${tb.x}px`;
+    el.style.top = `${tb.y}px`;
+    el.style.width = `${tb.width}px`;
+    el.style.height = `${tb.height}px`;
+    el.classList.toggle('is-hidden-overlay', Boolean(tb.hiddenFromPlayers));
+    const rotEl = el.querySelector('.tt-aoe-rotator');
+    if (rotEl) rotEl.style.transform = `rotate(${tb.rotation}deg)`;
+    const surf = el.querySelector('.tt-textbox-surface');
+    if (surf) {
+        surf.style.background = tb.bgColor === 'transparent' ? 'transparent' : tb.bgColor;
+        surf.style.fontFamily = tb.fontFamily;
+        surf.style.fontSize = `${tb.fontSize}px`;
+        surf.style.color = tb.color;
+        surf.style.fontWeight = tb.bold ? '700' : '400';
+        surf.style.fontStyle = tb.italic ? 'italic' : 'normal';
+        surf.style.textAlign = tb.align;
+    }
+    const contentEl = el.querySelector('.tt-textbox-content');
+    if (contentEl) {
+        contentEl.innerHTML = escapeHtmlText(tb.text || '').replace(/\n/g, '<br>') || '<span style="opacity:0.45;">(Vazio)</span>';
+        contentEl.style.fontFamily = tb.fontFamily;
+        contentEl.style.fontSize = `${tb.fontSize}px`;
+        contentEl.style.color = tb.color;
+        contentEl.style.fontWeight = tb.bold ? '700' : '400';
+        contentEl.style.fontStyle = tb.italic ? 'italic' : 'normal';
+        contentEl.style.textAlign = tb.align;
+    }
+    return true;
+}
+
+function updateTextBoxField(tbId, field, value) {
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    if (!tb || !canEditVttAnnotation(tb)) return;
+    if (field === 'hiddenFromPlayers' && !_isVttEffectiveGm()) return;
+    tb[field] = value;
+    if (['fontFamily', 'fontSize', 'color', 'bgColor', 'bold', 'italic', 'align'].includes(field) && window.textBoxDraftConfig) {
+        window.textBoxDraftConfig[field] = value;
+    }
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+        CompendioNetAdapter.broadcastTextBoxDelta('upsert', tb);
+    }
+    if (!updateTabletopTextBoxDom(tb.id)) renderTabletopModule();
+    else updateTabletopSelectionUI();
+}
+
+function removeTextBox(tbId, ev) {
+    if (ev) ev.stopPropagation();
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    if (tb && !canEditVttAnnotation(tb)) {
+        showToast('🔒 Sem permissão para remover este texto.');
+        return;
+    }
+    tabletopState.textBoxes = tabletopState.textBoxes.filter(t => String(t.id) !== String(tbId));
+    if (String(window.selectedTextBoxId) === String(tbId)) window.selectedTextBoxId = null;
+    if (String(window.editingTextBoxId) === String(tbId)) window.editingTextBoxId = null;
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+        CompendioNetAdapter.broadcastTextBoxDelta('delete', tbId);
+    }
+    renderTabletopModule();
+}
+
+function startInlineEditTextBox(e, tbId) {
+    if (e) e.stopPropagation();
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    if (!tb || !canEditVttAnnotation(tb)) return;
+    clearAllTabletopSelections('textbox');
+    window.selectedTextBoxId = tb.id;
+    window.editingTextBoxId = tb.id;
+    window.ttActiveInteraction = { type: 'textbox', id: tb.id };
+    renderTabletopModule();
+    setTimeout(() => {
+        const ed = document.getElementById('tt-tb-inline-editor');
+        if (ed) {
+            ed.focus();
+            ed.select();
+        }
+    }, 10);
+}
+
+function commitInlineTextBoxEdit(tbId, newValue) {
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    window.editingTextBoxId = null;
+    window.ttActiveInteraction = null;
+    if (tb && canEditVttAnnotation(tb)) {
+        tb.text = String(newValue ?? '');
+        saveLocalPersistence();
+        if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+            CompendioNetAdapter.broadcastTextBoxDelta('upsert', tb);
+        }
+    }
+    if (activeModule === 'tabletop') renderTabletopModule();
+}
+
+function startDragTextBox(e, tbId) {
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'fog', 'text', 'brush'].includes(window.tabletopToolMode)) return;
+    if (e.button !== 0 || String(window.editingTextBoxId) === String(tbId)) return;
+    e.stopPropagation();
+    clearMyPersistentRuler(true);
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    if (!tb) return;
+    Object.assign(tb, normalizeTextBoxObj(tb));
+
+    clearAllTabletopSelections('textbox');
+    window.selectedTextBoxId = tb.id;
+    updateTabletopSelectionUI();
+
+    if (!canEditVttAnnotation(tb)) return;
+    const el = e.currentTarget;
     const scale = window.tabletopCamera?.scale || 1;
-    const startMouseX = e.clientX;
-    const startMouseY = e.clientY;
-    const origX = tpl.x;
-    const origY = tpl.y;
-    const origW = tpl.width;
-    const origH = tpl.height;
-    const rad = (Number(tpl.rotation) || 0) * Math.PI / 180;
-    const cosR = Math.cos(rad);
-    const sinR = Math.sin(rad);
-    const centerWorld = { x: origX + origW / 2, y: origY + origH / 2 };
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = tb.x;
+    const origY = tb.y;
+    let moved = false;
     let lastSent = 0;
+    window.ttActiveInteraction = { type: 'textbox', id: tb.id };
 
     function onMove(mv) {
-        if (handleKind === 'rotate') {
-            const worldPt = clientToWorldCoords(mv.clientX, mv.clientY);
-            const angleDeg = Math.atan2(worldPt.y - centerWorld.y, worldPt.x - centerWorld.x) * 180 / Math.PI + 90;
-            tpl.rotation = Math.round(((angleDeg % 360) + 360) % 360);
-            if (rotator) rotator.style.transform = `rotate(${tpl.rotation}deg)`;
-        } else {
-            const dxWorld = (mv.clientX - startMouseX) / scale;
-            const dyWorld = (mv.clientY - startMouseY) / scale;
-            // Projeta movimento nos eixos locais (rotacionados) da forma para alongar/redimensionar naturalmente
-            const dxLocal = dxWorld * cosR + dyWorld * sinR;
-            const dyLocal = -dxWorld * sinR + dyWorld * cosR;
-            let nextX = origX;
-            let nextY = origY;
-            let nextW = origW;
-            let nextH = origH;
-
-            if (handleKind.includes('e')) nextW = Math.max(24, Math.round(origW + dxLocal));
-            if (handleKind.includes('s')) nextH = Math.max(24, Math.round(origH + dyLocal));
-            if (handleKind.includes('w')) {
-                nextW = Math.max(24, Math.round(origW - dxLocal));
-                nextX = Math.round(origX + (origW - nextW));
-            }
-            if (handleKind.includes('n')) {
-                nextH = Math.max(24, Math.round(origH - dyLocal));
-                nextY = Math.round(origY + (origH - nextH));
-            }
-            tpl.x = nextX;
-            tpl.y = nextY;
-            tpl.width = nextW;
-            tpl.height = nextH;
-            if (wrapper) {
-                wrapper.style.left = `${tpl.x}px`;
-                wrapper.style.top = `${tpl.y}px`;
-                wrapper.style.width = `${tpl.width}px`;
-                wrapper.style.height = `${tpl.height}px`;
-            }
-        }
+        const dx = (mv.clientX - startX) / scale;
+        const dy = (mv.clientY - startY) / scale;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+        tb.x = Math.round(origX + dx);
+        tb.y = Math.round(origY + dy);
+        el.style.left = `${tb.x}px`;
+        el.style.top = `${tb.y}px`;
         const now = Date.now();
-        if (now - lastSent > 70 && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastShapeDelta) {
+        if (moved && now - lastSent > 70 && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
             lastSent = now;
-            CompendioNetAdapter.broadcastShapeDelta('upsert', tpl);
+            CompendioNetAdapter.broadcastTextBoxDelta('upsert', tb);
+        }
+    }
+    function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        window.ttActiveInteraction = null;
+        if (moved) {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+                CompendioNetAdapter.broadcastTextBoxDelta('upsert', tb);
+            }
+            updateTabletopSelectionUI();
+        }
+    }
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+}
+
+function startTransformTextBox(e, tbId, handleKind) {
+    ensureTabletopExtendedState();
+    const tb = tabletopState.textBoxes.find(t => String(t.id) === String(tbId));
+    if (!tb || !canEditVttAnnotation(tb)) return;
+    Object.assign(tb, normalizeTextBoxObj(tb));
+    clearAllTabletopSelections('textbox');
+    window.selectedTextBoxId = tb.id;
+    const wrapper = e.currentTarget.closest('.tt-textbox-wrapper');
+    _startBoxTransformDrag(e, {
+        item: tb,
+        wrapper,
+        rotator: wrapper?.querySelector('.tt-aoe-rotator'),
+        interType: 'textbox',
+        minW: 60,
+        minH: 36,
+        handleKind,
+        onSync: (it) => {
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+                CompendioNetAdapter.broadcastTextBoxDelta('upsert', it);
+            }
+        },
+        onFinish: (it) => {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTextBoxDelta) {
+                CompendioNetAdapter.broadcastTextBoxDelta('upsert', it);
+            }
+            updateTabletopSelectionUI();
+        }
+    });
+}
+
+/* ------------------ PINCEL / DESENHO LIVRE NO TABLETOP ------------------ */
+function normalizeDrawingObj(raw) {
+    if (!raw || typeof raw !== 'object') return raw;
+    const pts = Array.isArray(raw.points)
+        ? raw.points.filter(p => p && isFinite(p.x) && isFinite(p.y)).map(p => ({ x: Number(p.x), y: Number(p.y) }))
+        : [{ x: 0.1, y: 0.5 }, { x: 0.9, y: 0.5 }];
+    return Object.assign({}, raw, {
+        x: Math.round(Number(raw.x) || 0),
+        y: Math.round(Number(raw.y) || 0),
+        width: Math.max(16, Math.round(Number(raw.width) || 60)),
+        height: Math.max(16, Math.round(Number(raw.height) || 60)),
+        rotation: Number(raw.rotation) || 0,
+        color: raw.color || '#ff5252',
+        strokeWidth: Math.max(2, Math.min(48, Number(raw.strokeWidth) || 6)),
+        opacity: Math.max(0.15, Math.min(1, Number(raw.opacity) || 0.92)),
+        points: pts.length >= 2 ? pts : [{ x: 0.5, y: 0.5 }, { x: 0.51, y: 0.51 }],
+        hiddenFromPlayers: Boolean(raw.hiddenFromPlayers),
+        ownerId: raw.ownerId || ''
+    });
+}
+
+function buildSmoothSvgPathFromNormPoints(points, vw = 100, vh = 100) {
+    if (!Array.isArray(points) || points.length === 0) return '';
+    const scaled = points.map(p => ({ x: (Number(p.x) || 0) * vw, y: (Number(p.y) || 0) * vh }));
+    if (scaled.length === 1) return `M ${scaled[0].x.toFixed(2)} ${scaled[0].y.toFixed(2)} l 0.1 0.1`;
+    let d = `M ${scaled[0].x.toFixed(2)} ${scaled[0].y.toFixed(2)}`;
+    for (let i = 1; i < scaled.length - 1; i++) {
+        const mx = ((scaled[i].x + scaled[i + 1].x) / 2).toFixed(2);
+        const my = ((scaled[i].y + scaled[i + 1].y) / 2).toFixed(2);
+        d += ` Q ${scaled[i].x.toFixed(2)} ${scaled[i].y.toFixed(2)} ${mx} ${my}`;
+    }
+    const last = scaled[scaled.length - 1];
+    d += ` L ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+    return d;
+}
+
+function buildSingleDrawingWrapperHtml(rawDr, isGm) {
+    const dr = normalizeDrawingObj(rawDr);
+    if (!isGm && dr.hiddenFromPlayers) return '';
+    const isSel = String(window.selectedDrawingId) === String(dr.id);
+    const safeId = `'${String(dr.id).replace(/'/g, "\\'")}'`;
+    const pathD = buildSmoothSvgPathFromNormPoints(dr.points, 100, 100);
+    const hitStrokeW = Math.max(16, dr.strokeWidth + 10);
+
+    return `
+        <div class="tt-drawing-wrapper ${isSel ? 'is-selected' : ''} ${dr.hiddenFromPlayers ? 'is-hidden-overlay' : ''}"
+             data-drawing-id="${escapeHtmlText(dr.id)}"
+             style="left:${dr.x}px; top:${dr.y}px; width:${dr.width}px; height:${dr.height}px;"
+             onmousedown="startDragDrawing(event, ${safeId})"
+             title="Traço de Pincel (Clique p/ selecionar • Arraste p/ mover)">
+            <div class="tt-aoe-rotator" style="transform: rotate(${dr.rotation}deg);">
+                <svg class="tt-drawing-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="${pathD}" fill="none" stroke="transparent" stroke-width="${hitStrokeW}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" class="tt-drawing-hitpath"/>
+                    <path d="${pathD}" fill="none" stroke="${escapeHtmlText(dr.color)}" stroke-width="${dr.strokeWidth}" stroke-opacity="${dr.opacity}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" class="tt-drawing-vispath"/>
+                </svg>
+                ${(isGm && dr.hiddenFromPlayers) ? `<span class="tt-overlay-hidden-pill" title="Oculto dos jogadores">🙈</span>` : ''}
+                ${_renderBoxTransformHandlesHtml('startTransformDrawing', safeId)}
+            </div>
+        </div>
+    `;
+}
+
+function updateTabletopDrawingDom(drId) {
+    const raw = tabletopState?.drawings?.find(d => String(d.id) === String(drId));
+    const el = document.querySelector(`.tt-drawing-wrapper[data-drawing-id="${CSS?.escape ? CSS.escape(String(drId)) : drId}"]`);
+    if (!raw || !el) return false;
+    const isGm = _isVttEffectiveGm();
+    if (!isGm && raw.hiddenFromPlayers) {
+        el.remove();
+        return true;
+    }
+    const dr = normalizeDrawingObj(raw);
+    el.style.left = `${dr.x}px`;
+    el.style.top = `${dr.y}px`;
+    el.style.width = `${dr.width}px`;
+    el.style.height = `${dr.height}px`;
+    el.classList.toggle('is-hidden-overlay', Boolean(dr.hiddenFromPlayers));
+    const rotEl = el.querySelector('.tt-aoe-rotator');
+    if (rotEl) rotEl.style.transform = `rotate(${dr.rotation}deg)`;
+    const vis = el.querySelector('.tt-drawing-vispath');
+    if (vis) {
+        const dStr = buildSmoothSvgPathFromNormPoints(dr.points, 100, 100);
+        vis.setAttribute('d', dStr);
+        vis.setAttribute('stroke', dr.color);
+        vis.setAttribute('stroke-width', String(dr.strokeWidth));
+        vis.setAttribute('stroke-opacity', String(dr.opacity));
+        const hit = el.querySelector('.tt-drawing-hitpath');
+        if (hit) hit.setAttribute('d', dStr);
+    }
+    return true;
+}
+
+function updateDrawingField(drId, field, value) {
+    ensureTabletopExtendedState();
+    const dr = tabletopState.drawings.find(d => String(d.id) === String(drId));
+    if (!dr || !canEditVttAnnotation(dr)) return;
+    if (field === 'hiddenFromPlayers' && !_isVttEffectiveGm()) return;
+    dr[field] = value;
+    if (['color', 'strokeWidth', 'opacity'].includes(field) && window.brushDraftConfig) {
+        window.brushDraftConfig[field] = value;
+    }
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+        CompendioNetAdapter.broadcastDrawingDelta('upsert', dr);
+    }
+    if (!updateTabletopDrawingDom(dr.id)) renderTabletopModule();
+    else updateTabletopSelectionUI();
+}
+
+function removeDrawing(drId, ev) {
+    if (ev) ev.stopPropagation();
+    ensureTabletopExtendedState();
+    const dr = tabletopState.drawings.find(d => String(d.id) === String(drId));
+    if (dr && !canEditVttAnnotation(dr)) {
+        showToast('🔒 Sem permissão para remover este traço.');
+        return;
+    }
+    tabletopState.drawings = tabletopState.drawings.filter(d => String(d.id) !== String(drId));
+    if (String(window.selectedDrawingId) === String(drId)) window.selectedDrawingId = null;
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+        CompendioNetAdapter.broadcastDrawingDelta('delete', drId);
+    }
+    renderTabletopModule();
+}
+
+function undoLastTabletopDrawing() {
+    ensureTabletopExtendedState();
+    const p = getActivePlayer();
+    const isGm = _isVttEffectiveGm(p);
+    for (let i = tabletopState.drawings.length - 1; i >= 0; i--) {
+        const d = tabletopState.drawings[i];
+        if (isGm || !d.ownerId || (p && d.ownerId === p.id)) {
+            removeDrawing(d.id);
+            return true;
+        }
+    }
+    showToast('ℹ️ Nenhum traço recente para desfazer.');
+    return false;
+}
+
+function startDragDrawing(e, drId) {
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'fog', 'text', 'brush'].includes(window.tabletopToolMode)) return;
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    clearMyPersistentRuler(true);
+    ensureTabletopExtendedState();
+    const dr = tabletopState.drawings.find(d => String(d.id) === String(drId));
+    if (!dr) return;
+    Object.assign(dr, normalizeDrawingObj(dr));
+
+    clearAllTabletopSelections('drawing');
+    window.selectedDrawingId = dr.id;
+    updateTabletopSelectionUI();
+
+    if (!canEditVttAnnotation(dr)) return;
+    const el = e.currentTarget;
+    const scale = window.tabletopCamera?.scale || 1;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = dr.x;
+    const origY = dr.y;
+    let moved = false;
+    let lastSent = 0;
+    window.ttActiveInteraction = { type: 'drawing', id: dr.id };
+
+    function onMove(mv) {
+        const dx = (mv.clientX - startX) / scale;
+        const dy = (mv.clientY - startY) / scale;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+        dr.x = Math.round(origX + dx);
+        dr.y = Math.round(origY + dy);
+        el.style.left = `${dr.x}px`;
+        el.style.top = `${dr.y}px`;
+        const now = Date.now();
+        if (moved && now - lastSent > 70 && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+            lastSent = now;
+            CompendioNetAdapter.broadcastDrawingDelta('upsert', dr);
+        }
+    }
+    function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        window.ttActiveInteraction = null;
+        if (moved) {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+                CompendioNetAdapter.broadcastDrawingDelta('upsert', dr);
+            }
+            updateTabletopSelectionUI();
+        }
+    }
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+}
+
+function startTransformDrawing(e, drId, handleKind) {
+    ensureTabletopExtendedState();
+    const dr = tabletopState.drawings.find(d => String(d.id) === String(drId));
+    if (!dr || !canEditVttAnnotation(dr)) return;
+    Object.assign(dr, normalizeDrawingObj(dr));
+    clearAllTabletopSelections('drawing');
+    window.selectedDrawingId = dr.id;
+    const wrapper = e.currentTarget.closest('.tt-drawing-wrapper');
+    _startBoxTransformDrag(e, {
+        item: dr,
+        wrapper,
+        rotator: wrapper?.querySelector('.tt-aoe-rotator'),
+        interType: 'drawing',
+        minW: 16,
+        minH: 16,
+        handleKind,
+        onSync: (it) => {
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+                CompendioNetAdapter.broadcastDrawingDelta('upsert', it);
+            }
+        },
+        onFinish: (it) => {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+                CompendioNetAdapter.broadcastDrawingDelta('upsert', it);
+            }
+            updateTabletopSelectionUI();
+        }
+    });
+}
+
+/* ------------------ NÉVOA DE GUERRA AVANÇADA (POLÍGONO, SELECIONAR+REMOVER, RESIZE, ROTAÇÃO, +/- PONTOS) ------------------ */
+function normalizeFogObj(raw) {
+    if (!raw || typeof raw !== 'object') return raw;
+    const hasPolyPts = Array.isArray(raw.points) && raw.points.length >= 3;
+    const shape = (raw.shape === 'polygon' || hasPolyPts) ? 'polygon' : 'rect';
+    const w = Math.max(16, Math.round(Number(raw.w ?? raw.width) || 80));
+    const h = Math.max(16, Math.round(Number(raw.h ?? raw.height) || 80));
+    const points = shape === 'polygon'
+        ? (hasPolyPts ? raw.points.map(p => ({ x: Number(p.x) || 0, y: Number(p.y) || 0 })) : [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }])
+        : null;
+    return Object.assign({}, raw, {
+        shape,
+        x: Math.round(Number(raw.x) || 0),
+        y: Math.round(Number(raw.y) || 0),
+        w,
+        h,
+        rotation: Number(raw.rotation) || 0,
+        points
+    });
+}
+
+function _fogPolygonSvgPointsAttr(points) {
+    return (points || []).map(p => `${((Number(p.x) || 0) * 100).toFixed(2)},${((Number(p.y) || 0) * 100).toFixed(2)}`).join(' ');
+}
+
+function buildSingleFogRegionHtml(rawFog, isGm) {
+    const f = normalizeFogObj(rawFog);
+    const safeId = `'${String(f.id).replace(/'/g, "\\'")}'`;
+    const isSel = isGm && String(window.selectedFogId) === String(f.id);
+    const fill = isGm ? 'rgba(8, 10, 16, 0.56)' : '#07080d';
+    const stroke = isGm ? (isSel ? '#ffd54f' : '#d8b467') : 'none';
+    const strokeW = isGm ? (isSel ? '2.5' : '1.6') : '0';
+    const dash = isGm ? (isSel ? '6,3' : '5,4') : '0';
+
+    const shapeMarkup = f.shape === 'polygon' && Array.isArray(f.points)
+        ? `<polygon points="${_fogPolygonSvgPointsAttr(f.points)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-dasharray="${dash}" vector-effect="non-scaling-stroke" style="pointer-events:${isGm ? 'visiblePainted' : 'none'};"/>`
+        : `<rect x="0" y="0" width="100" height="100" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-dasharray="${dash}" vector-effect="non-scaling-stroke" style="pointer-events:${isGm ? 'visiblePainted' : 'none'};"/>`;
+
+    if (!isGm) {
+        return `
+            <div class="tt-fog-wrapper tt-fog-player"
+                 data-fog-id="${escapeHtmlText(f.id)}"
+                 style="left:${f.x}px; top:${f.y}px; width:${f.w}px; height:${f.h}px; pointer-events:none;">
+                <div class="tt-aoe-rotator" style="transform: rotate(${f.rotation}deg);">
+                    <svg class="tt-fog-svg" viewBox="0 0 100 100" preserveAspectRatio="none">${shapeMarkup}</svg>
+                </div>
+            </div>
+        `;
+    }
+
+    const vertexHandlesHtml = (f.shape === 'polygon' && Array.isArray(f.points))
+        ? f.points.map((pt, idx) => {
+            const isActiveV = Number(window.selectedFogVertexIdx) === idx;
+            return `<div class="tt-fog-vertex-handle ${isActiveV ? 'is-active' : ''}" style="left:${(pt.x * 100).toFixed(2)}%; top:${(pt.y * 100).toFixed(2)}%;" onmousedown="startDragFogVertex(event, ${safeId}, ${idx})" title="Ponto ${idx + 1} (Arraste para ajustar polígono)"></div>`;
+        }).join('')
+        : '';
+
+    const ptsLabel = f.shape === 'polygon' && Array.isArray(f.points) ? `⬟ ${f.points.length} pts` : '▭ Ret.';
+    return `
+        <div class="tt-fog-wrapper ${isSel ? 'is-selected' : ''}"
+             data-fog-id="${escapeHtmlText(f.id)}"
+             style="left:${f.x}px; top:${f.y}px; width:${f.w}px; height:${f.h}px;"
+             onmousedown="startDragFogRegion(event, ${safeId})"
+             title="Névoa de Guerra (Clique p/ selecionar • Arraste p/ mover • Use alças p/ redimensionar/rotacionar/editar pontos)">
+            <div class="tt-aoe-rotator" style="transform: rotate(${f.rotation}deg);">
+                <svg class="tt-fog-svg" viewBox="0 0 100 100" preserveAspectRatio="none">${shapeMarkup}</svg>
+                ${_renderBoxTransformHandlesHtml('startTransformFogRegion', safeId)}
+                ${vertexHandlesHtml}
+            </div>
+            <span class="tt-fog-badge">${ptsLabel}</span>
+        </div>
+    `;
+}
+
+function updateTabletopFogDom(fogId) {
+    const raw = tabletopState?.fogRegions?.find(f => String(f.id) === String(fogId));
+    const el = document.querySelector(`.tt-fog-wrapper[data-fog-id="${CSS?.escape ? CSS.escape(String(fogId)) : fogId}"]`);
+    if (!raw || !el) return false;
+    const f = normalizeFogObj(raw);
+    const isGm = _isVttEffectiveGm();
+    el.style.left = `${f.x}px`;
+    el.style.top = `${f.y}px`;
+    el.style.width = `${f.w}px`;
+    el.style.height = `${f.h}px`;
+    const rotEl = el.querySelector('.tt-aoe-rotator');
+    if (rotEl) rotEl.style.transform = `rotate(${f.rotation}deg)`;
+    const svg = el.querySelector('.tt-fog-svg');
+    if (svg) {
+        const poly = svg.querySelector('polygon');
+        if (f.shape === 'polygon' && poly && Array.isArray(f.points)) {
+            poly.setAttribute('points', _fogPolygonSvgPointsAttr(f.points));
+        } else if (f.shape === 'polygon') {
+            return false; // precisa re-render para trocar rect -> polygon e montar vértices
+        }
+    }
+    if (isGm && f.shape === 'polygon' && Array.isArray(f.points)) {
+        const vEls = el.querySelectorAll('.tt-fog-vertex-handle');
+        if (vEls.length === f.points.length) {
+            f.points.forEach((pt, idx) => {
+                vEls[idx].style.left = `${(pt.x * 100).toFixed(2)}%`;
+                vEls[idx].style.top = `${(pt.y * 100).toFixed(2)}%`;
+            });
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+function startDragFogRegion(e, fogId) {
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'text', 'brush'].includes(window.tabletopToolMode)) return;
+    // Se estiver no modo desenho de Névoa (Retângulo ou Polígono), deixa clique iniciar novo desenho no stage
+    if (window.tabletopToolMode === 'fog') return;
+    if (e.button !== 0 || !_isVttEffectiveGm()) return;
+    e.stopPropagation();
+    clearMyPersistentRuler(true);
+    ensureTabletopExtendedState();
+    const fog = tabletopState.fogRegions.find(f => String(f.id) === String(fogId));
+    if (!fog) return;
+    Object.assign(fog, normalizeFogObj(fog));
+
+    if (String(window.selectedFogId) !== String(fog.id)) {
+        clearAllTabletopSelections('fog');
+        window.selectedFogId = fog.id;
+        window.selectedFogVertexIdx = null;
+        updateTabletopSelectionUI();
+        return;
+    }
+
+    const el = e.currentTarget;
+    const scale = window.tabletopCamera?.scale || 1;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const origX = fog.x;
+    const origY = fog.y;
+    let moved = false;
+    let lastSent = 0;
+    window.ttActiveInteraction = { type: 'fog', id: fog.id };
+
+    function onMove(mv) {
+        const dx = (mv.clientX - startX) / scale;
+        const dy = (mv.clientY - startY) / scale;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+        fog.x = Math.round(origX + dx);
+        fog.y = Math.round(origY + dy);
+        el.style.left = `${fog.x}px`;
+        el.style.top = `${fog.y}px`;
+        const now = Date.now();
+        if (moved && now - lastSent > 70 && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+            lastSent = now;
+            CompendioNetAdapter.broadcastFogDelta('upsert', fog);
+        }
+    }
+    function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        window.ttActiveInteraction = null;
+        if (moved) {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+                CompendioNetAdapter.broadcastFogDelta('upsert', fog);
+            }
+            updateTabletopSelectionUI();
+        }
+    }
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+}
+
+function startTransformFogRegion(e, fogId, handleKind) {
+    if (!_isVttEffectiveGm()) return;
+    ensureTabletopExtendedState();
+    const fog = tabletopState.fogRegions.find(f => String(f.id) === String(fogId));
+    if (!fog) return;
+    Object.assign(fog, normalizeFogObj(fog));
+    clearAllTabletopSelections('fog');
+    window.selectedFogId = fog.id;
+    const wrapper = e.currentTarget.closest('.tt-fog-wrapper');
+    _startBoxTransformDrag(e, {
+        item: fog,
+        wrapper,
+        rotator: wrapper?.querySelector('.tt-aoe-rotator'),
+        interType: 'fog',
+        wProp: 'w',
+        hProp: 'h',
+        minW: 16,
+        minH: 16,
+        handleKind,
+        onSync: (it) => {
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+                CompendioNetAdapter.broadcastFogDelta('upsert', it);
+            }
+        },
+        onFinish: (it) => {
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+                CompendioNetAdapter.broadcastFogDelta('upsert', it);
+            }
+            updateTabletopSelectionUI();
+        }
+    });
+}
+
+function startDragFogVertex(e, fogId, ptIdx) {
+    if (e.button !== 0 || !_isVttEffectiveGm()) return;
+    e.stopPropagation();
+    e.preventDefault();
+    ensureTabletopExtendedState();
+    const fog = tabletopState.fogRegions.find(f => String(f.id) === String(fogId));
+    if (!fog) return;
+    Object.assign(fog, normalizeFogObj(fog));
+    if (fog.shape !== 'polygon' || !Array.isArray(fog.points) || !fog.points[ptIdx]) return;
+
+    clearAllTabletopSelections('fog');
+    window.selectedFogId = fog.id;
+    window.selectedFogVertexIdx = ptIdx;
+    window.ttActiveInteraction = { type: 'fog', id: fog.id };
+
+    const rad = (Number(fog.rotation) || 0) * Math.PI / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    const oldCx = fog.x + fog.w / 2;
+    const oldCy = fog.y + fog.h / 2;
+
+    // Captura posições mundiais iniciais de todos os vértices para mantê-los imóveis enquanto 1 é arrastado
+    const worldPts = fog.points.map(pt => {
+        const lx = (pt.x - 0.5) * fog.w;
+        const ly = (pt.y - 0.5) * fog.h;
+        return {
+            x: oldCx + lx * cosR - ly * sinR,
+            y: oldCy + lx * sinR + ly * cosR
+        };
+    });
+    let lastSent = 0;
+
+    function recomputeBoundsFromWorldPts() {
+        const localPts = worldPts.map(wp => {
+            const dx = wp.x - oldCx;
+            const dy = wp.y - oldCy;
+            return {
+                u: dx * cosR + dy * sinR,
+                v: -dx * sinR + dy * cosR
+            };
+        });
+        let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+        localPts.forEach(lp => {
+            if (lp.u < minU) minU = lp.u;
+            if (lp.u > maxU) maxU = lp.u;
+            if (lp.v < minV) minV = lp.v;
+            if (lp.v > maxV) maxV = lp.v;
+        });
+        const spanU = Math.max(16, maxU - minU);
+        const spanV = Math.max(16, maxV - minV);
+        const dcx = (minU + maxU) / 2;
+        const dcy = (minV + maxV) / 2;
+        const newCx = oldCx + dcx * cosR - dcy * sinR;
+        const newCy = oldCy + dcx * sinR + dcy * cosR;
+        fog.w = Math.round(spanU);
+        fog.h = Math.round(spanV);
+        fog.x = Math.round(newCx - fog.w / 2);
+        fog.y = Math.round(newCy - fog.h / 2);
+        fog.points = localPts.map(lp => ({
+            x: Math.max(0, Math.min(1, (lp.u - minU) / spanU)),
+            y: Math.max(0, Math.min(1, (lp.v - minV) / spanV))
+        }));
+    }
+
+    function onMove(mv) {
+        const pt = clientToWorldCoords(mv.clientX, mv.clientY);
+        worldPts[ptIdx] = { x: pt.x, y: pt.y };
+        recomputeBoundsFromWorldPts();
+        updateTabletopFogDom(fog.id);
+        const now = Date.now();
+        if (now - lastSent > 70 && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+            lastSent = now;
+            CompendioNetAdapter.broadcastFogDelta('upsert', fog);
         }
     }
 
@@ -1823,16 +3207,170 @@ function startTransformAoeShape(e, aoeId, handleKind) {
         window.removeEventListener('mouseup', onUp);
         window.ttActiveInteraction = null;
         saveLocalPersistence();
-        if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastShapeDelta) {
-            CompendioNetAdapter.broadcastShapeDelta('upsert', tpl);
+        if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+            CompendioNetAdapter.broadcastFogDelta('upsert', fog);
         }
-        updateTabletopSelectionUI();
+        renderTabletopModule();
     }
+
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
 }
 
-/* ------------------ NÉVOA DE GUERRA & PING ------------------ */
+function adjustFogRegionPoints(fogId, delta) {
+    if (!_isVttEffectiveGm()) return false;
+    ensureTabletopExtendedState();
+    const fog = tabletopState.fogRegions.find(f => String(f.id) === String(fogId));
+    if (!fog) return false;
+    Object.assign(fog, normalizeFogObj(fog));
+    if (fog.shape !== 'polygon' || !Array.isArray(fog.points)) {
+        fog.shape = 'polygon';
+        fog.points = [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }];
+    }
+
+    if (delta > 0) {
+        for (let step = 0; step < delta; step++) {
+            // Encontra a maior aresta em pixels do mundo e insere ponto médio nela
+            let bestEdgeIdx = 0;
+            let bestLen = -1;
+            const n = fog.points.length;
+            for (let i = 0; i < n; i++) {
+                const a = fog.points[i];
+                const b = fog.points[(i + 1) % n];
+                const len = Math.hypot((b.x - a.x) * fog.w, (b.y - a.y) * fog.h);
+                if (len > bestLen) {
+                    bestLen = len;
+                    bestEdgeIdx = i;
+                }
+            }
+            const pA = fog.points[bestEdgeIdx];
+            const pB = fog.points[(bestEdgeIdx + 1) % n];
+            const mid = { x: (pA.x + pB.x) / 2, y: (pA.y + pB.y) / 2 };
+            fog.points.splice(bestEdgeIdx + 1, 0, mid);
+            window.selectedFogVertexIdx = bestEdgeIdx + 1;
+        }
+    } else if (delta < 0) {
+        const steps = Math.abs(delta);
+        for (let step = 0; step < steps; step++) {
+            if (fog.points.length <= 3) {
+                showToast('⚠️ O polígono de Névoa precisa de pelo menos 3 pontos.');
+                break;
+            }
+            const rmIdx = (window.selectedFogVertexIdx !== null && window.selectedFogVertexIdx >= 0 && window.selectedFogVertexIdx < fog.points.length)
+                ? window.selectedFogVertexIdx
+                : (fog.points.length - 1);
+            fog.points.splice(rmIdx, 1);
+            window.selectedFogVertexIdx = Math.min(rmIdx, fog.points.length - 1);
+        }
+    }
+
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+        CompendioNetAdapter.broadcastFogDelta('upsert', fog);
+    }
+    renderTabletopModule();
+    return true;
+}
+
+function updateFogField(fogId, field, value) {
+    if (!_isVttEffectiveGm()) return;
+    ensureTabletopExtendedState();
+    const fog = tabletopState.fogRegions.find(f => String(f.id) === String(fogId));
+    if (!fog) return;
+    Object.assign(fog, normalizeFogObj(fog));
+    fog[field] = value;
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+        CompendioNetAdapter.broadcastFogDelta('upsert', fog);
+    }
+    if (!updateTabletopFogDom(fog.id)) renderTabletopModule();
+}
+
+function setFogDrawShape(shapeMode) {
+    if (!_isVttEffectiveGm()) return;
+    window.fogDrawShape = shapeMode === 'polygon' ? 'polygon' : 'rect';
+    window.fogPolygonDraft = [];
+    window.tabletopToolMode = 'fog';
+    if (activeModule === 'tabletop') renderTabletopModule();
+}
+
+function updateFogPolygonDraftPreview(cursorWorld = null) {
+    const svg = document.getElementById('tt-fog-poly-draft-svg');
+    const pts = window.fogPolygonDraft || [];
+    if (!svg) return;
+    if (pts.length === 0) {
+        svg.innerHTML = '';
+        return;
+    }
+    const all = cursorWorld ? [...pts, cursorWorld] : pts;
+    const polyAttr = all.map(p => `${Math.round(p.x)},${Math.round(p.y)}`).join(' ');
+    const circles = pts.map((p, idx) =>
+        `<circle cx="${Math.round(p.x)}" cy="${Math.round(p.y)}" r="${idx === 0 && pts.length >= 3 ? 8 : 5}" fill="${idx === 0 && pts.length >= 3 ? '#8df596' : '#ffd54f'}" stroke="#0d0e13" stroke-width="2"/>`
+    ).join('');
+    svg.innerHTML = `
+        <polyline points="${polyAttr}" fill="rgba(10,12,18,0.45)" stroke="#ffd54f" stroke-width="2.5" stroke-dasharray="7,4"/>
+        ${circles}
+    `;
+}
+
+function cancelFogPolygonDraft() {
+    window.fogPolygonDraft = [];
+    const svg = document.getElementById('tt-fog-poly-draft-svg');
+    if (svg) svg.innerHTML = '';
+    if (activeModule === 'tabletop') renderTabletopModule();
+}
+
+function commitFogPolygonDraft() {
+    if (!_isVttEffectiveGm()) return null;
+    ensureTabletopExtendedState();
+    const pts = window.fogPolygonDraft || [];
+    if (pts.length < 3) {
+        showToast('⚠️ Marque pelo menos 3 pontos para fechar o polígono de Névoa.');
+        return null;
+    }
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    pts.forEach(p => {
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+    });
+    const w = Math.max(20, Math.round(maxX - minX));
+    const h = Math.max(20, Math.round(maxY - minY));
+    const normPts = pts.map(p => ({
+        x: (p.x - minX) / w,
+        y: (p.y - minY) / h
+    }));
+    const fogObj = normalizeFogObj({
+        id: 'fog-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
+        shape: 'polygon',
+        x: Math.round(minX),
+        y: Math.round(minY),
+        w,
+        h,
+        rotation: 0,
+        points: normPts
+    });
+
+    tabletopState.fogEnabled = true;
+    tabletopState.fogRegions.push(fogObj);
+    window.fogPolygonDraft = [];
+    clearAllTabletopSelections('fog');
+    window.selectedFogId = fogObj.id;
+    window.tabletopToolMode = 'move';
+    saveLocalPersistence();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
+        CompendioNetAdapter.broadcastFogDelta('toggle', true);
+        CompendioNetAdapter.broadcastFogDelta('upsert', fogObj);
+    } else if (typeof CompendioNetAdapter !== 'undefined') {
+        CompendioNetAdapter.broadcastTabletop();
+    }
+    renderTabletopModule();
+    showToast(`🌫️ Polígono de Névoa criado (${normPts.length} pontos)! Use ✋ Mover para redimensionar, girar, +/- pontos ou remover.`);
+    return fogObj;
+}
+
+/* ------------------ NÉVOA DE GUERRA BASE & PING ------------------ */
 function toggleTabletopFogBase() {
     const p = getActivePlayer();
     if (!_isVttEffectiveGm(p)) return;
@@ -1854,8 +3392,10 @@ function addDefaultFogCoverAll() {
     ensureTabletopExtendedState();
     const { w, h } = getTabletopStageDimensions();
     tabletopState.fogEnabled = true;
-    const fogObj = { id: 'fog-' + Date.now(), x: 0, y: 0, w, h };
+    const fogObj = normalizeFogObj({ id: 'fog-' + Date.now(), shape: 'rect', x: 0, y: 0, w, h, rotation: 0 });
     tabletopState.fogRegions.push(fogObj);
+    clearAllTabletopSelections('fog');
+    window.selectedFogId = fogObj.id;
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
         CompendioNetAdapter.broadcastFogDelta('toggle', true);
@@ -1864,7 +3404,7 @@ function addDefaultFogCoverAll() {
         CompendioNetAdapter.broadcastTabletop();
     }
     renderTabletopModule();
-    showToast('🌫️ Mapa coberto com Névoa! Clique em um bloco para revelar.');
+    showToast('🌫️ Mapa coberto com Névoa! Selecione a névoa no mapa para editar ou remover.');
 }
 
 function removeFogRegion(fogId, ev) {
@@ -1872,7 +3412,12 @@ function removeFogRegion(fogId, ev) {
     const p = getActivePlayer();
     if (!_isVttEffectiveGm(p)) return;
     ensureTabletopExtendedState();
-    tabletopState.fogRegions = tabletopState.fogRegions.filter(f => f.id !== fogId);
+    tabletopState.fogRegions = tabletopState.fogRegions.filter(f => String(f.id) !== String(fogId));
+    tabletopState.fogRects = [];
+    if (String(window.selectedFogId) === String(fogId)) {
+        window.selectedFogId = null;
+        window.selectedFogVertexIdx = null;
+    }
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
         CompendioNetAdapter.broadcastFogDelta('delete', fogId);
@@ -1884,17 +3429,25 @@ function removeFogRegion(fogId, ev) {
 
 function clearAllTabletopTacticalOverlays() {
     if (!_isVttEffectiveGm()) {
-        showToast('🔒 Apenas o Mestre pode limpar as formas táticas e névoa da mesa.');
+        showToast('🔒 Apenas o Mestre pode limpar formas táticas, textos, traços e névoa da mesa.');
         return;
     }
     ensureTabletopExtendedState();
     tabletopState.aoeTemplates = [];
     tabletopState.fogRegions = [];
-    window.selectedShapeId = null;
+    tabletopState.fogRects = [];
+    tabletopState.textBoxes = [];
+    tabletopState.drawings = [];
+    clearAllTabletopSelections();
+    window.fogPolygonDraft = [];
     saveLocalPersistence();
-    CompendioNetAdapter.broadcastTabletop();
+    if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletopSceneSync) {
+        CompendioNetAdapter.broadcastTabletopSceneSync(buildSceneSyncPayloadFromActive());
+    } else if (typeof CompendioNetAdapter !== 'undefined') {
+        CompendioNetAdapter.broadcastTabletop();
+    }
     renderTabletopModule();
-    showToast('🧹 Formas AoE e regiões de Névoa limpas.');
+    showToast('🧹 Formas AoE, Textos, Pincel e Névoa da cena atual limpos.');
 }
 
 function triggerTabletopPingAt(x, y, senderName = null, broadcast = true, pingColor = null) {
@@ -2068,10 +3621,121 @@ function onTabletopStageMouseDown(e) {
         return;
     }
 
-    // 4. Modo Névoa de Guerra (GM arrasta retângulo)
+    // 4. Modo Caixa de Texto (clique insere caixa de texto e seleciona)
+    if (window.tabletopToolMode === 'text' && e.button === 0) {
+        e.preventDefault();
+        const created = addTextBoxToTabletop(startX, startY);
+        if (created) startInlineEditTextBox(null, created.id);
+        return;
+    }
+
+    // 5. Modo Pincel / Desenho Livre (arraste grava traço suave no mapa)
+    if (window.tabletopToolMode === 'brush' && e.button === 0) {
+        e.preventDefault();
+        ensureTabletopExtendedState();
+        const cfg = window.brushDraftConfig || { color: '#ff5252', strokeWidth: 6, opacity: 0.92 };
+        const scale = window.tabletopCamera?.scale || 1;
+        const pts = [{ x: startX, y: startY }];
+        const svgOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgOverlay.id = 'tt-brush-draft-svg';
+        svgOverlay.style.cssText = 'position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:48;';
+        const previewPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        previewPath.setAttribute('fill', 'none');
+        previewPath.setAttribute('stroke', cfg.color || '#ff5252');
+        previewPath.setAttribute('stroke-width', String(Number(cfg.strokeWidth) || 6));
+        previewPath.setAttribute('stroke-opacity', String(Number(cfg.opacity) || 0.92));
+        previewPath.setAttribute('stroke-linecap', 'round');
+        previewPath.setAttribute('stroke-linejoin', 'round');
+        svgOverlay.appendChild(previewPath);
+        stage.appendChild(svgOverlay);
+
+        window.ttActiveInteraction = { type: 'brush-draw' };
+
+        function updatePreview() {
+            let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+            for (let i = 1; i < pts.length; i++) d += ` L ${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)}`;
+            previewPath.setAttribute('d', d);
+        }
+        updatePreview();
+
+        function onBrushMove(mv) {
+            const pt = clientToWorldCoords(mv.clientX, mv.clientY);
+            const last = pts[pts.length - 1];
+            const minStep = Math.max(2.5, 4 / (scale || 1));
+            if (Math.hypot(pt.x - last.x, pt.y - last.y) >= minStep) {
+                pts.push({ x: pt.x, y: pt.y });
+                updatePreview();
+            }
+        }
+
+        function onBrushUp() {
+            window.removeEventListener('mousemove', onBrushMove);
+            window.removeEventListener('mouseup', onBrushUp);
+            svgOverlay.remove();
+            window.ttActiveInteraction = null;
+            if (pts.length === 1) {
+                pts.push({ x: pts[0].x + 2, y: pts[0].y + 2 });
+            }
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            pts.forEach(p => {
+                if (p.x < minX) minX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y > maxY) maxY = p.y;
+            });
+            const strokeW = Math.max(2, Number(cfg.strokeWidth) || 6);
+            const pad = Math.round(strokeW * 0.75 + 6);
+            minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+            const w = Math.max(20, Math.round(maxX - minX));
+            const h = Math.max(20, Math.round(maxY - minY));
+            const normPts = pts.map(p => ({ x: (p.x - minX) / w, y: (p.y - minY) / h }));
+            const drObj = normalizeDrawingObj({
+                id: 'drw-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 1000),
+                x: Math.round(minX),
+                y: Math.round(minY),
+                width: w,
+                height: h,
+                rotation: 0,
+                color: cfg.color || '#ff5252',
+                strokeWidth: strokeW,
+                opacity: Number(cfg.opacity) || 0.92,
+                points: normPts,
+                hiddenFromPlayers: false,
+                ownerId: activePlayerId || ''
+            });
+            tabletopState.drawings.push(drObj);
+            clearAllTabletopSelections('drawing');
+            window.selectedDrawingId = drObj.id;
+            saveLocalPersistence();
+            if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastDrawingDelta) {
+                CompendioNetAdapter.broadcastDrawingDelta('upsert', drObj);
+            }
+            renderTabletopModule();
+        }
+        window.addEventListener('mousemove', onBrushMove);
+        window.addEventListener('mouseup', onBrushUp);
+        return;
+    }
+
+    // 6. Modo Névoa de Guerra (GM: Retângulo arrastando OU Polígono ponto-a-ponto)
     if (isGm && window.tabletopToolMode === 'fog' && e.button === 0) {
         e.preventDefault();
         ensureTabletopExtendedState();
+        if (window.fogDrawShape === 'polygon') {
+            const pts = Array.isArray(window.fogPolygonDraft) ? window.fogPolygonDraft : (window.fogPolygonDraft = []);
+            const scale = window.tabletopCamera?.scale || 1;
+            const snapRadius = 15 / (scale || 1);
+            if (pts.length >= 3 && Math.hypot(startX - pts[0].x, startY - pts[0].y) <= snapRadius) {
+                commitFogPolygonDraft();
+                return;
+            }
+            pts.push({ x: Math.round(startX), y: Math.round(startY) });
+            const cntEl = document.getElementById('tt-fog-poly-count');
+            if (cntEl) cntEl.textContent = `${pts.length} ponto(s)`;
+            updateFogPolygonDraftPreview({ x: startX, y: startY });
+            return;
+        }
+
         tabletopState.fogEnabled = true;
         window.ttActiveInteraction = { type: 'fog' };
         const draftBox = document.createElement('div');
@@ -2098,14 +3762,18 @@ function onTabletopStageMouseDown(e) {
             const rw = Math.abs(lastPt.x - startX);
             const rh = Math.abs(lastPt.y - startY);
             if (rw > 20 && rh > 20) {
-                const fogObj = {
+                const fogObj = normalizeFogObj({
                     id: 'fog-' + Date.now() + '-' + Math.floor(Math.random() * 100),
+                    shape: 'rect',
                     x: Math.min(startX, lastPt.x),
                     y: Math.min(startY, lastPt.y),
                     w: rw,
-                    h: rh
-                };
+                    h: rh,
+                    rotation: 0
+                });
                 tabletopState.fogRegions.push(fogObj);
+                clearAllTabletopSelections('fog');
+                window.selectedFogId = fogObj.id;
                 saveLocalPersistence();
                 if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastFogDelta) {
                     CompendioNetAdapter.broadcastFogDelta('toggle', true);
@@ -2121,7 +3789,7 @@ function onTabletopStageMouseDown(e) {
         return;
     }
 
-    // 5. Modo Mover Câmera (Google Maps Pan) — qualquer clique/arrasto no mapa livre
+    // 7. Modo Mover Câmera (Google Maps Pan) — qualquer clique/arrasto no mapa livre
     if (e.button === 0) {
         e.preventDefault();
         const vp = document.getElementById('tabletop-viewport');
@@ -2148,9 +3816,8 @@ function onTabletopStageMouseDown(e) {
             window.removeEventListener('mouseup', onPanUp);
             if (vp) vp.classList.remove('is-panning');
             window.ttActiveInteraction = null;
-            if (!panned && (selectedTabletopTokenId || window.selectedShapeId)) {
-                selectedTabletopTokenId = null;
-                window.selectedShapeId = null;
+            if (!panned && (selectedTabletopTokenId || window.selectedShapeId || window.selectedTextBoxId || window.selectedDrawingId || window.selectedFogId)) {
+                clearAllTabletopSelections();
                 updateTabletopSelectionUI();
             }
         }
@@ -3419,6 +5086,69 @@ function buildSelectedControlBarHtml(isGm) {
             </div>
         `;
     }
+
+    const rawTb = window.selectedTextBoxId ? (tabletopState.textBoxes || []).find(t => String(t.id) === String(window.selectedTextBoxId)) : null;
+    if (rawTb && (isGm || !rawTb.hiddenFromPlayers)) {
+        const tb = normalizeTextBoxObj(rawTb);
+        const tId = `'${String(tb.id).replace(/'/g, "\\'")}'`;
+        const canEdit = canEditVttAnnotation(tb);
+        const fontOpts = VTT_TEXT_FONTS.map(f => `<option value="${escapeHtmlText(f.value)}" ${tb.fontFamily === f.value ? 'selected' : ''}>${escapeHtmlText(f.label)}</option>`).join('');
+        const isTransparentBg = tb.bgColor === 'transparent';
+        return `
+            <div style="display:flex; align-items:center; gap:5px; background:#18191f; padding:4px 8px; border-radius:5px; border:1px solid #d8b467; flex-wrap:wrap;">
+                <strong style="color:#f2cf83; font-size:12px;">🔤 Texto</strong>
+                ${canEdit ? `
+                    <input type="text" class="form-control" style="width:140px; padding:2px 6px; font-size:11px;" value="${escapeHtmlText(tb.text)}" oninput="updateTextBoxField(${tId}, 'text', this.value)" title="Conteúdo do texto (ou duplo-clique no mapa)">
+                    <select class="form-control" style="width:auto; padding:2px 4px; font-size:11px;" onchange="updateTextBoxField(${tId}, 'fontFamily', this.value)" title="Fonte">${fontOpts}</select>
+                    <label style="font-size:11px; color:#ccc;">Tam:<input type="number" class="card-hp-input" style="width:44px;" min="10" max="120" value="${tb.fontSize}" onchange="updateTextBoxField(${tId}, 'fontSize', Math.max(10, Math.min(120, Number(this.value)||20)))"></label>
+                    <input type="color" value="${escapeHtmlText(tb.color)}" style="width:24px; height:22px; padding:0; border:none; background:none; cursor:pointer;" onchange="updateTextBoxField(${tId}, 'color', this.value)" title="Cor do texto">
+                    <button type="button" class="btn-mini ${tb.bold ? 'is-active' : ''}" onclick="updateTextBoxField(${tId}, 'bold', ${!tb.bold})" title="Negrito"><strong>B</strong></button>
+                    <button type="button" class="btn-mini ${!isTransparentBg ? 'is-active' : ''}" onclick="updateTextBoxField(${tId}, 'bgColor', '${isTransparentBg ? 'rgba(14, 15, 20, 0.72)' : 'transparent'}')" title="Alternar fundo escuro/transparente">🖼️ Fundo</button>
+                    <label style="font-size:11px; color:#ccc;">°:<input type="number" class="card-hp-input" style="width:42px;" value="${tb.rotation}" onchange="updateTextBoxField(${tId}, 'rotation', Number(this.value)||0)"></label>
+                    ${isGm ? `<button type="button" class="btn-mini ${tb.hiddenFromPlayers ? 'is-active' : ''}" onclick="updateTextBoxField(${tId}, 'hiddenFromPlayers', ${!tb.hiddenFromPlayers})" title="Ocultar ou mostrar texto aos jogadores">${tb.hiddenFromPlayers ? '🙈 Oculto' : '👁️ Visível'}</button>` : ''}
+                    <button type="button" class="btn-mini danger" onclick="removeTextBox(${tId}, event)" title="Remover Texto">🗑️</button>
+                ` : '<span style="font-size:11px; color:#9da3b8;">Somente leitura</span>'}
+            </div>
+        `;
+    }
+
+    const rawDr = window.selectedDrawingId ? (tabletopState.drawings || []).find(d => String(d.id) === String(window.selectedDrawingId)) : null;
+    if (rawDr && (isGm || !rawDr.hiddenFromPlayers)) {
+        const dr = normalizeDrawingObj(rawDr);
+        const dId = `'${String(dr.id).replace(/'/g, "\\'")}'`;
+        const canEdit = canEditVttAnnotation(dr);
+        return `
+            <div style="display:flex; align-items:center; gap:6px; background:#18191f; padding:4px 8px; border-radius:5px; border:1px solid #d8b467; flex-wrap:wrap;">
+                <strong style="color:#f2cf83; font-size:12px;">🖌️ Traço</strong>
+                ${canEdit ? `
+                    <input type="color" value="${escapeHtmlText(dr.color)}" style="width:24px; height:22px; padding:0; border:none; background:none; cursor:pointer;" onchange="updateDrawingField(${dId}, 'color', this.value)" title="Cor do traço">
+                    <label style="font-size:11px; color:#ccc;">Esp:<input type="number" class="card-hp-input" style="width:42px;" min="2" max="48" value="${dr.strokeWidth}" onchange="updateDrawingField(${dId}, 'strokeWidth', Math.max(2, Math.min(48, Number(this.value)||6)))"></label>
+                    <label style="font-size:11px; color:#ccc;">Opac%:<input type="number" class="card-hp-input" style="width:46px;" min="15" max="100" value="${Math.round(dr.opacity * 100)}" onchange="updateDrawingField(${dId}, 'opacity', Math.max(0.15, Math.min(1, (Number(this.value)||92)/100)))"></label>
+                    <label style="font-size:11px; color:#ccc;">°:<input type="number" class="card-hp-input" style="width:44px;" value="${dr.rotation}" onchange="updateDrawingField(${dId}, 'rotation', Number(this.value)||0)"></label>
+                    ${isGm ? `<button type="button" class="btn-mini ${dr.hiddenFromPlayers ? 'is-active' : ''}" onclick="updateDrawingField(${dId}, 'hiddenFromPlayers', ${!dr.hiddenFromPlayers})" title="Ocultar ou mostrar traço aos jogadores">${dr.hiddenFromPlayers ? '🙈 Oculto' : '👁️ Visível'}</button>` : ''}
+                    <button type="button" class="btn-mini danger" onclick="removeDrawing(${dId}, event)" title="Remover Traço">🗑️</button>
+                ` : '<span style="font-size:11px; color:#9da3b8;">Somente leitura</span>'}
+            </div>
+        `;
+    }
+
+    const rawFog = (isGm && window.selectedFogId) ? (tabletopState.fogRegions || []).find(f => String(f.id) === String(window.selectedFogId)) : null;
+    if (rawFog) {
+        const fg = normalizeFogObj(rawFog);
+        const fId = `'${String(fg.id).replace(/'/g, "\\'")}'`;
+        const ptCount = fg.shape === 'polygon' && Array.isArray(fg.points) ? fg.points.length : 4;
+        return `
+            <div style="display:flex; align-items:center; gap:5px; background:#18191f; padding:4px 8px; border-radius:5px; border:1px solid #d8b467; flex-wrap:wrap;">
+                <strong style="color:#f2cf83; font-size:12px;">🌫️ Névoa (${ptCount} pts)</strong>
+                <button type="button" class="btn-mini" onclick="adjustFogRegionPoints(${fId}, 1)" title="Incrementar +1 vértice na maior aresta">➕ Ponto</button>
+                <button type="button" class="btn-mini" onclick="adjustFogRegionPoints(${fId}, -1)" title="Decrementar -1 vértice (mín. 3)">➖ Ponto</button>
+                <label style="font-size:11px; color:#ccc;">L:<input type="number" class="card-hp-input" style="width:48px;" min="16" value="${fg.w}" onchange="updateFogField(${fId}, 'w', Math.max(16, Number(this.value)||60))"></label>
+                <label style="font-size:11px; color:#ccc;">A:<input type="number" class="card-hp-input" style="width:48px;" min="16" value="${fg.h}" onchange="updateFogField(${fId}, 'h', Math.max(16, Number(this.value)||60))"></label>
+                <label style="font-size:11px; color:#ccc;">°:<input type="number" class="card-hp-input" style="width:44px;" value="${fg.rotation}" onchange="updateFogField(${fId}, 'rotation', Number(this.value)||0)"></label>
+                <button type="button" class="btn-mini danger" onclick="removeFogRegion(${fId}, event)" title="Remover esta área de Névoa">🗑️ Remover Fog</button>
+            </div>
+        `;
+    }
     return '';
 }
 
@@ -3560,18 +5290,11 @@ function renderTabletopModule() {
     const stageBgStyle = resolvedMapBg ? `background-image: url('${resolvedMapBg.replace(/'/g, "\\'")}');` : '';
 
     const aoeHtml = (tabletopState.aoeTemplates || []).map(a => buildSingleShapeWrapperHtml(a, gmMetrics.gx)).join('');
+    const drawingsHtml = (tabletopState.drawings || []).map(d => buildSingleDrawingWrapperHtml(d, isGm)).join('');
+    const textBoxesHtml = (tabletopState.textBoxes || []).map(t => buildSingleTextBoxWrapperHtml(t, isGm)).join('');
 
     const fogHtml = tabletopState.fogEnabled
-        ? (tabletopState.fogRegions || []).map(f => {
-            const bg = isGm ? 'rgba(8, 10, 16, 0.52)' : '#07080d';
-            const border = isGm ? '2px dashed #d8b467' : 'none';
-            const clickAction = isGm ? `onclick="removeFogRegion('${f.id}', event)" title="Clique para revelar esta sala/área aos jogadores"` : '';
-            return `
-                <div class="tt-fog-region" style="left:${f.x}px; top:${f.y}px; width:${f.w}px; height:${f.h}px; background:${bg}; border:${border}; cursor:${isGm ? 'pointer' : 'default'};" ${clickAction}>
-                    ${isGm ? `<span style="font-size:11px; color:#f2cf83; background:rgba(0,0,0,0.7); padding:2px 6px; border-radius:4px;">🌫️ Névoa (Clique p/ Revelar)</span>` : ''}
-                </div>
-            `;
-        }).join('')
+        ? (tabletopState.fogRegions || []).map(f => buildSingleFogRegionHtml(f, isGm)).join('')
         : '';
 
     const tokensHtml = visibleTokens.map(t => {
@@ -3623,38 +5346,102 @@ function renderTabletopModule() {
     const initiativeHudHtml = typeof renderDynamicInitiativeTrackerHtml === 'function' ? renderDynamicInitiativeTrackerHtml() : '';
     const zoomPct = Math.round((window.tabletopCamera?.scale || 1) * 100);
 
-    const calibrateBarHtml = (isGm && window.tabletopToolMode === 'calibrate') ? `
-        <div class="tt-calibrate-bar">
-            <strong style="color:#ffd54f;">📐 Modo de Gradificação:</strong>
-            <span>Arraste sobre <strong>1 quadrado</strong> do mapa ou ajuste fino:</span>
-            <span id="tt-cal-readout" style="font-family:monospace; color:#8df596;">${gmMetrics.gx}×${gmMetrics.gy}px (off ${gmMetrics.ox},${gmMetrics.oy})</span>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ divFactor: 2 })" title="Dividir tamanho medido por 2 (se mediu 2x2)">÷2</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ divFactor: 3 })" title="Dividir tamanho medido por 3 (se mediu 3x3)">÷3</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ squareLock: true })">Quad. Único</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ gxDelta: -1, bothAxes: true })">-1px</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ gxDelta: 1, bothAxes: true })">+1px</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oxDelta: -2 })">◀ OffX</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oxDelta: 2 })">OffX ▶</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oyDelta: -2 })">▲ OffY</button>
-            <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oyDelta: 2 })">OffY ▼</button>
-            <button type="button" class="btn-save-primary" style="padding:3px 9px; font-size:11px;" onclick="setTabletopToolMode('move')">✓ Concluir</button>
-        </div>
-    ` : '';
+    const instancesList = Object.values(tabletopState.mapInstances || {}).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    const instanceOptions = instancesList.map(inst =>
+        `<option value="${escapeHtmlText(inst.id)}" ${inst.id === tabletopState.activeMapInstanceId ? 'selected' : ''}>🎬 ${escapeHtmlText(inst.name)}</option>`
+    ).join('');
+    const curFogSaved = Boolean(tabletopState.savedMapFogs?.[getTabletopMapFogKey(tabletopState.mapPath)]);
+
+    let contextSubBarHtml = '';
+    if (isGm && window.tabletopToolMode === 'calibrate') {
+        contextSubBarHtml = `
+            <div class="tt-calibrate-bar">
+                <strong style="color:#ffd54f;">📐 Modo de Gradificação:</strong>
+                <span>Arraste sobre <strong>1 quadrado</strong> do mapa ou ajuste fino:</span>
+                <span id="tt-cal-readout" style="font-family:monospace; color:#8df596;">${gmMetrics.gx}×${gmMetrics.gy}px (off ${gmMetrics.ox},${gmMetrics.oy})</span>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ divFactor: 2 })" title="Dividir tamanho medido por 2 (se mediu 2x2)">÷2</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ divFactor: 3 })" title="Dividir tamanho medido por 3 (se mediu 3x3)">÷3</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ squareLock: true })">Quad. Único</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ gxDelta: -1, bothAxes: true })">-1px</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ gxDelta: 1, bothAxes: true })">+1px</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oxDelta: -2 })">◀ OffX</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oxDelta: 2 })">OffX ▶</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oyDelta: -2 })">▲ OffY</button>
+                <button type="button" class="btn-mini" onclick="nudgeTabletopCalibration({ oyDelta: 2 })">OffY ▼</button>
+                <button type="button" class="btn-save-primary" style="padding:3px 9px; font-size:11px;" onclick="setTabletopToolMode('move')">✓ Concluir</button>
+            </div>
+        `;
+    } else if (isGm && window.tabletopToolMode === 'fog') {
+        const draftPts = (window.fogPolygonDraft || []).length;
+        contextSubBarHtml = `
+            <div class="tt-calibrate-bar">
+                <strong style="color:#ffd54f;">🌫️ Modo Névoa:</strong>
+                <button type="button" class="vis-pill ${window.fogDrawShape !== 'polygon' ? 'active-studied' : ''}" onclick="setFogDrawShape('rect')" title="Arraste para criar bloco retangular">▭ Retângulo</button>
+                <button type="button" class="vis-pill ${window.fogDrawShape === 'polygon' ? 'active-studied' : ''}" onclick="setFogDrawShape('polygon')" title="Clique ponto a ponto no mapa para desenhar polígono">⬟ Polígono</button>
+                ${window.fogDrawShape === 'polygon' ? `
+                    <span id="tt-fog-poly-count" style="font-size:11px; color:#8df596;">${draftPts} ponto(s)</span>
+                    <button type="button" class="btn-save-primary" style="padding:3px 8px; font-size:11px;" onclick="commitFogPolygonDraft()">✓ Fechar Polígono</button>
+                    <button type="button" class="btn-mini" onclick="cancelFogPolygonDraft()">✕ Limpar Pontos</button>
+                ` : '<span style="font-size:11px; color:#c8cde0;">Arraste para desenhar retângulo. Use ✋ Mover para selecionar, redimensionar, girar, +/- pontos ou remover.</span>'}
+                <button type="button" class="btn-mini ${tabletopState.fogEnabled ? 'is-active' : ''}" onclick="toggleTabletopFogBase()">${tabletopState.fogEnabled ? '🌫️ Névoa ON' : '☀️ Névoa OFF'}</button>
+                <button type="button" class="btn-mini" onclick="saveCurrentFogToMapPreset()" title="Salvar todas as áreas de névoa atuais associadas a este mapa base">🌫️💾 Salvar Fog no Mapa</button>
+                ${curFogSaved ? `<button type="button" class="btn-mini" onclick="loadSavedFogFromMapPreset()" title="Restaurar névoa salva para este mapa">🌫️📥 Carregar Fog Salva</button>` : ''}
+                <button type="button" class="btn-save-primary" style="padding:3px 9px; font-size:11px;" onclick="setTabletopToolMode('move')">✋ Selecionar/Editar</button>
+            </div>
+        `;
+    } else if (window.tabletopToolMode === 'text') {
+        const tbDraft = window.textBoxDraftConfig || {};
+        const fontOpts = VTT_TEXT_FONTS.map(f => `<option value="${escapeHtmlText(f.value)}" ${tbDraft.fontFamily === f.value ? 'selected' : ''}>${escapeHtmlText(f.label)}</option>`).join('');
+        contextSubBarHtml = `
+            <div class="tt-calibrate-bar">
+                <strong style="color:#ffd54f;">🔤 Caixa de Texto:</strong>
+                <span style="font-size:11px; color:#c8cde0;">Clique no mapa para posicionar texto:</span>
+                <select class="form-control" style="width:auto; padding:2px 6px; font-size:11px;" onchange="window.textBoxDraftConfig.fontFamily=this.value">${fontOpts}</select>
+                <label style="font-size:11px;">Tam:<input type="number" class="card-hp-input" style="width:44px;" min="10" max="120" value="${Number(tbDraft.fontSize) || 22}" onchange="window.textBoxDraftConfig.fontSize=Math.max(10,Math.min(120,Number(this.value)||22))"></label>
+                <input type="color" value="${escapeHtmlText(tbDraft.color || '#f2cf83')}" style="width:24px; height:22px; padding:0; border:none; background:none;" onchange="window.textBoxDraftConfig.color=this.value" title="Cor padrão do texto">
+                ${isGm ? `<label style="font-size:11px; cursor:pointer;"><input type="checkbox" ${tbDraft.hiddenFromPlayers ? 'checked' : ''} onchange="window.textBoxDraftConfig.hiddenFromPlayers=this.checked"> 🙈 Oculto GM</label>` : ''}
+                <button type="button" class="btn-save-primary" style="padding:3px 9px; font-size:11px;" onclick="setTabletopToolMode('move')">✓ Concluir</button>
+            </div>
+        `;
+    } else if (window.tabletopToolMode === 'brush') {
+        const brDraft = window.brushDraftConfig || {};
+        contextSubBarHtml = `
+            <div class="tt-calibrate-bar">
+                <strong style="color:#ffd54f;">🖌️ Pincel Livre:</strong>
+                <span style="font-size:11px; color:#c8cde0;">Arraste no mapa para desenhar:</span>
+                <input type="color" value="${escapeHtmlText(brDraft.color || '#ff5252')}" style="width:24px; height:22px; padding:0; border:none; background:none;" onchange="window.brushDraftConfig.color=this.value" title="Cor do pincel">
+                <label style="font-size:11px;">Espessura:<input type="number" class="card-hp-input" style="width:44px;" min="2" max="48" value="${Number(brDraft.strokeWidth) || 6}" onchange="window.brushDraftConfig.strokeWidth=Math.max(2,Math.min(48,Number(this.value)||6))"></label>
+                <label style="font-size:11px;">Opac%:<input type="number" class="card-hp-input" style="width:46px;" min="15" max="100" value="${Math.round((Number(brDraft.opacity) || 0.92) * 100)}" onchange="window.brushDraftConfig.opacity=Math.max(0.15,Math.min(1,(Number(this.value)||92)/100))"></label>
+                <button type="button" class="btn-mini" onclick="undoLastTabletopDrawing()" title="Desfazer último traço">↩️ Desfazer</button>
+                <button type="button" class="btn-save-primary" style="padding:3px 9px; font-size:11px;" onclick="setTabletopToolMode('move')">✋ Selecionar</button>
+            </div>
+        `;
+    }
 
     const displayArea = document.getElementById('dynamic-display-area');
     displayArea.innerHTML = `
         <div class="tabletop-wrap">
             <div class="tabletop-toolbar">
                 <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;" id="tt-toolbar-tools-root">
-                    ${isGm ? `<select class="form-control" style="width:auto; min-width:155px; padding:4px 8px;" onchange="onTabletopMapChange(this.value)">${mapOptions}</select>` : ''}
+                    ${isGm ? `
+                        <div style="display:flex; gap:3px; align-items:center; background:#18191f; padding:2px 4px; border-radius:5px; border:1px solid #3c3e4a;">
+                            <select id="tt-map-instance-select" class="form-control" style="width:auto; min-width:125px; max-width:175px; padding:3px 6px; font-size:11px;" onchange="switchToMapInstance(this.value)" title="Trocar instância/cena salva (preserva tokens, fog, textos e pincel de cada cena)">${instanceOptions}</select>
+                            <button type="button" class="btn-mini" onclick="saveCurrentMapInstanceState({notify:true})" title="Salvar estado da instância atual">💾</button>
+                            <button type="button" class="btn-mini" onclick="openMapInstancesModal()" title="Criar nova instância, gerenciar cenas e névoas salvas por mapa">🎬 Cenas</button>
+                            <select class="form-control" style="width:auto; min-width:130px; max-width:180px; padding:3px 6px; font-size:11px;" onchange="onTabletopMapChange(this.value)" title="Selecionar mapa base (salva a instância atual e carrega/cria instância do mapa escolhido)">${mapOptions}</select>
+                            <button type="button" class="btn-mini ${curFogSaved ? 'is-active' : ''}" onclick="saveCurrentFogToMapPreset()" title="Salvar Névoa de Guerra atual neste mapa">🌫️💾</button>
+                        </div>
+                    ` : ''}
                     <button type="button" id="tt-btn-drawer-toggle" class="btn-mini ${window.ttDrawerOpen ? 'is-active' : ''}" style="flex:0 0 auto; border-color:#d8b467;" onclick="toggleTokenDrawer()" title="Abrir gaveta scrollável de PJs, Monstros, NPCs, Itens, Ouro e Baús">📦 Gaveta (${visibleTokens.length})</button>
                     <button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="addActiveCharacterToTabletop()">🛡️ + Meu PJ</button>
 
                     <!-- Ferramentas Táticas de VTT -->
                     <div style="display:flex; gap:3px; background:#18191f; padding:3px; border-radius:5px; border:1px solid #3c3e4a; flex-wrap:wrap;">
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'move' ? 'active-studied' : ''}" onclick="setTabletopToolMode('move')" title="Selecionar/Mover Tokens ou Arrastar Câmera do Mapa">✋ Mover</button>
+                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'move' ? 'active-studied' : ''}" onclick="setTabletopToolMode('move')" title="Selecionar/Mover Tokens, Formas, Textos, Pincel ou Fog, ou Arrastar Câmera do Mapa">✋ Mover</button>
                         <button type="button" class="vis-pill ${window.tabletopToolMode === 'ruler' ? 'active-studied' : ''}" onclick="setTabletopToolMode('ruler')" title="Régua Persistente (dura até seu próximo clique)">📏 Régua</button>
                         <button type="button" class="vis-pill ${window.tabletopToolMode === 'ping' ? 'active-sighted' : ''}" onclick="setTabletopToolMode('ping')" title="Sinalizar Ponto 1 vez no mapa e voltar ao normal">📍 Ping</button>
+                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'text' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='text'?'move':'text')" title="Inserir Caixa de Texto no mapa (fonte, tamanho, cor, rotacionar e visibilidade)">🔤 Texto</button>
+                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'brush' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='brush'?'move':'brush')" title="Desenhar livremente no mapa com Pincel (redimensionar, girar e visibilidade)">🖌️ Pincel</button>
                         <select class="form-control" style="width:auto; padding:2px 6px; font-size:11px;" onchange="if(this.value){const [sh,sz,col,lbl]=this.value.split('|'); addAoeTemplateToTabletop(sh,Number(sz),col,lbl); this.value='';}" title="Inserir Forma SVG Interativa (mover, redimensionar, alongar, rotacionar)">
                             <option value="">📐 + Forma (AoE)...</option>
                             <option value="circle|4|#e65100|Esfera 6m (Bola de Fogo)">🔥 Círculo / Esfera 6m</option>
@@ -3665,7 +5452,7 @@ function renderTabletopModule() {
                         </select>
                         ${isGm ? `
                             <button type="button" class="vis-pill ${window.tabletopToolMode === 'calibrate' ? 'active-sighted' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='calibrate'?'move':'calibrate')" title="Medir 1 quadrado do mapa para calibrar a grade">📐 Gradificar</button>
-                            <button type="button" class="vis-pill ${window.tabletopToolMode === 'fog' ? 'active-hidden' : ''}" onclick="setTabletopToolMode('fog')" title="Arraste no mapa para desenhar Névoa de Guerra">🌫️ Névoa</button>
+                            <button type="button" class="vis-pill ${window.tabletopToolMode === 'fog' ? 'active-hidden' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='fog'?'move':'fog')" title="Desenhar Névoa de Guerra (Retângulo ou Polígono)">🌫️ Névoa</button>
                             <button type="button" class="vis-pill" onclick="addDefaultFogCoverAll()" title="Cobrir mapa com Névoa">🌑 Cobrir</button>
                         ` : ''}
                     </div>
@@ -3683,12 +5470,12 @@ function renderTabletopModule() {
                     <span id="tt-online-count-badge" style="font-size:11px; color:#8df596; background:#162419; border:1px solid #3c6e43; padding:3px 7px; border-radius:4px; cursor:pointer;" onclick="openMultiplayerRoomModal('room')" title="Jogadores sincronizados em tempo real">
                         📡 ${onlineCount}/${maxP} Online | 👤 ${escapeHtmlText(playerShownName)}
                     </span>
-                    ${isGm ? `<button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="clearAllTabletopTacticalOverlays()" title="Limpar Formas e Névoa">🧹 AoE/Névoa</button>` : ''}
+                    ${isGm ? `<button type="button" class="btn-mini" style="flex:0 0 auto;" onclick="clearAllTabletopTacticalOverlays()" title="Limpar Formas, Textos, Pincel e Névoa">🧹 Overlays</button>` : ''}
                     ${isGm ? `<button type="button" class="btn-mini danger" style="flex:0 0 auto;" onclick="clearTabletopTokens()" title="Limpar todos os tokens da mesa">🗑️</button>` : ''}
                 </div>
             </div>
 
-            ${calibrateBarHtml}
+            ${contextSubBarHtml}
             <div id="tt-connected-players-root">${renderTabletopConnectedPlayersBarHtml()}</div>
 
             <div class="tabletop-stage-shell">
@@ -3699,12 +5486,16 @@ function renderTabletopModule() {
                      oncontextmenu="return false;">
                     <div class="tabletop-stage" id="tabletop-stage"
                          style="width:${stageW}px; height:${stageH}px; ${stageBgStyle}"
-                         onmousedown="onTabletopStageMouseDown(event)">
+                         onmousedown="onTabletopStageMouseDown(event)"
+                         ondblclick="if(window.tabletopToolMode==='fog' && window.fogDrawShape==='polygon' && (window.fogPolygonDraft||[]).length>=3){ event.preventDefault(); commitFogPolygonDraft(); }">
                         <div id="tabletop-grid-overlay" class="tabletop-grid-overlay ${gmMetrics.enabled ? '' : 'is-hidden'}"
                              style="background-size:${gmMetrics.gx}px ${gmMetrics.gy}px; background-position:${gmMetrics.ox}px ${gmMetrics.oy}px;"></div>
                         ${aoeHtml}
+                        ${drawingsHtml}
                         ${tokensHtml}
+                        ${textBoxesHtml}
                         ${fogHtml}
+                        <svg id="tt-fog-poly-draft-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:47;"></svg>
                         <svg id="tabletop-ruler-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;"></svg>
                         <div id="tt-ruler-labels-layer" style="position:absolute; inset:0; pointer-events:none; z-index:45;"></div>
                         <div id="tt-remote-cursors-layer" class="tt-remote-cursors-layer"></div>
@@ -3729,9 +5520,12 @@ function renderTabletopModule() {
     }
     renderTabletopRulersLayer();
     renderRemoteCursorsLayer();
+    if (window.tabletopToolMode === 'fog' && window.fogDrawShape === 'polygon' && Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
+        updateFogPolygonDraftPreview();
+    }
 }
 
-// Atalhos globais seguros no Tabletop (Esc cancela régua/ferramenta • Delete remove forma selecionada)
+// Atalhos globais seguros no Tabletop (Esc cancela régua/ferramenta • Enter fecha polígono • Delete remove seleção)
 if (typeof document !== 'undefined' && typeof document.addEventListener === 'function' && !window._ttGlobalKeysBound) {
     window._ttGlobalKeysBound = true;
     document.addEventListener('keydown', (ev) => {
@@ -3740,10 +5534,28 @@ if (typeof document !== 'undefined' && typeof document.addEventListener === 'fun
         if (activeTag && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) return;
         if (ev.key === 'Escape') {
             clearMyPersistentRuler(true);
-            if (window.tabletopToolMode !== 'move') setTabletopToolMode('move');
-        } else if ((ev.key === 'Delete' || ev.key === 'Backspace') && window.selectedShapeId) {
+            if (Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
+                cancelFogPolygonDraft();
+            } else if (window.tabletopToolMode !== 'move') {
+                setTabletopToolMode('move');
+            }
+        } else if (ev.key === 'Enter' && window.tabletopToolMode === 'fog' && window.fogDrawShape === 'polygon' && (window.fogPolygonDraft || []).length >= 3) {
             ev.preventDefault();
-            removeAoeTemplate(window.selectedShapeId, ev);
+            commitFogPolygonDraft();
+        } else if (ev.key === 'Delete' || ev.key === 'Backspace') {
+            if (window.selectedShapeId) {
+                ev.preventDefault();
+                removeAoeTemplate(window.selectedShapeId, ev);
+            } else if (window.selectedTextBoxId) {
+                ev.preventDefault();
+                removeTextBox(window.selectedTextBoxId, ev);
+            } else if (window.selectedDrawingId) {
+                ev.preventDefault();
+                removeDrawing(window.selectedDrawingId, ev);
+            } else if (window.selectedFogId && _isVttEffectiveGm()) {
+                ev.preventDefault();
+                removeFogRegion(window.selectedFogId, ev);
+            }
         }
     });
 }
