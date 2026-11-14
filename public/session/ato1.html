@@ -1,0 +1,175 @@
+<link rel="stylesheet" href="./session/casa-varhen/session.css">
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Ato I</div>
+        <h1>A Ilusão de Poder</h1>
+        <p class="part-subtitle">Começar com uma sensação de vitória e terminar com a certeza de que algo os observa entre árvores sem estrelas.</p>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'ato1-flow')">Cenas 1 e 2 · Chegada &amp; Balde</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato1-mendigo')">Cenas 3 e 4 · Mendigo &amp; Mata</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato1-tools')">Guia do Mestre &amp; Desfechos</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato1-maps')">Mapas &amp; Controle</button>
+    </div>
+
+    <div class="tab-content ato1-flow active">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <h2>Cena 1 — A Chegada (Logo Após o Portal de Sigil)</h2>
+                <div class="cv-read-aloud">
+                    Uma floresta fria e nevoenta envolve vocês. Não há uma única estrela visível — apenas um céu negro manchado por nebulosas roxas e doentias. A vegetação parece morta, mas seus galhos continuam crescendo em silêncio. Kael não atravessou com o grupo.
+                </div>
+                <p>No chão lamacento, vocês encontram o <strong>balde de Kael</strong> caído de lado, parcialmente enterrado, cercado por uma poça espessa de sangue ainda úmido misturado a um piche negro e viscoso.</p>
+                <div class="part-callout danger">
+                    <strong>Reação do piche:</strong> Se alguém tocar a substância negra, ela reage formando pequenos filamentos lentos que tentam subir pela pele, quase como raízes famintas.
+                </div>
+
+                <h3>Pistas na Clareira</h3>
+                <div class="cv-dc-list">
+                    <span class="cv-dc-pill"><strong>Investigação CD 12:</strong> O sangue é de Kael.</span>
+                    <span class="cv-dc-pill"><strong>Medicina CD 14:</strong> Ferimento grave, mas não necessariamente fatal.</span>
+                    <span class="cv-dc-pill"><strong>Percepção CD 15:</strong> Marcas de arrasto somem abruptamente no meio da floresta.</span>
+                    <span class="cv-dc-pill"><strong>Arcanismo CD 16:</strong> O piche é energia extraplanar pura, não matéria comum.</span>
+                    <span class="cv-dc-pill"><strong>Natureza CD 17:</strong> As árvores estão crescendo em direção ao sangue, atraídas por ele.</span>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>O Balde Abandonado de Kael</h2>
+                <div class="cv-portrait-card">
+                    <img src="./npc/kael/bucket-head.png" alt="Kael, o Homem Balde" class="cv-portrait-img">
+                    <div>
+                        <p>O balde não apresenta nenhum dano estrutural significativo, mas ainda irradia resquícios da energia e da personalidade de Kael.</p>
+                        <p><strong>Inscrição recém-surgida no interior do metal:</strong></p>
+                        <div class="cv-bucket-voice">"USUÁRIO AUSENTE. PROCURANDO SUBSTITUTO."</div>
+                    </div>
+                </div>
+                <div class="part-callout">
+                    <strong>Se alguém colocar o balde na cabeça:</strong> Não transforme em possessão. O objeto emite uma pequena voz metálica idêntica à do Homem Balde:<br>
+                    <em>"Solicitação de assistência recebida. Usuário atual não localizado."</em><br>
+                    Isso preserva o humor de Kael mesmo em pleno horror cósmico.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Cena 2 — O Combate Inicial (Falsa Segurança)</h2>
+                <p>Antes de dar respostas, lance contra o grupo uma pequena horda de criaturas nativas da dimensão (<strong>ND elevado, ~CR 17</strong>). Mantenha o combate ágil: o intuito é permitir que os PJs brilhem, executem suas manobras mais impressionantes e gastem habilidades sem consequências permanentes.</p>
+                <p>Assim que o combate termina, os corpos não permanecem no solo — eles se dissolvem lentamente em matéria negra borbulhante.</p>
+                <div class="cv-read-aloud">
+                    Uma última criatura, reduzida à metade e desfazendo-se em piche escuro, ergue o que resta da face e murmura antes de se dissolver por completo:<br>
+                    <strong>"ELE JÁ ESTÁ ACORDADO."</strong>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato1-mendigo">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 3 — O Mendigo Lobisomem Pugilista</h2>
+                <p>Durante a exploração, surge um homem aparentemente miserável, descalço, sujo, faminto e vestindo farrapos. Apesar disso, é um <strong>lobisomem pugilista veterano</strong> célebre na região por sua capacidade absurda de combate — e a única pessoa por perto que não demonstra nenhum medo.</p>
+                <h3>Interpretação &amp; Diálogos Prontos</h3>
+                <ul>
+                    <li>Fala informalmente, faz piadas, conhece a região, mas desconversa sobre Astel e não quer lutar contra os PJs.</li>
+                    <li><em>"Ah, o sujeito do balde? Conheço. Ou conhecia. O problema é que agora tem alguma coisa usando ele como roupa."</em></li>
+                    <li><em>"Vocês são os amigos do sujeito do balde? Ah. Que azar."</em></li>
+                    <li><em>"Não é a primeira vez que vejo alguém perder a cabeça por aqui. Literalmente."</em></li>
+                    <li><em>"Se ouvirem um sino, corram. Se ouvirem dois, corram mais rápido."</em></li>
+                    <li><em>"Eu não entro naquela mansão nem se me pagarem. E olha que estou precisando de dinheiro."</em></li>
+                </ul>
+                <div class="part-callout">
+                    <strong>Interação opcional (sem combate):</strong> Ele desafia o mais forte do grupo para uma <strong>queda de braço</strong> (teste oposto de <em>Atletismo</em>). Se vencer, pede uma refeição; se perder, finge que deixou ganhar. Pode escoltar o grupo até a Vila Varhen.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Cena 4 — Caminhada pela Floresta (20 minutos)</h2>
+                <p>Durante o trajeto de ~20 minutos de jogo, faça uma rolagem a cada 10 minutos para construir expectativa sem transformar cada encontro em batalha:</p>
+                <div class="part-roll"><span>Presságio na Estrada (a cada 10 min)</span><code>1d6</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d6</th><th>Sinal na Floresta</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>Um grito humano ou lupino cortando a neblina ao longe.</td></tr>
+                        <tr><td>2</td><td>Uma árvore retorcida com marcas profundas de garras recentes.</td></tr>
+                        <tr><td>3</td><td>Uma silhueta imóvel observando o grupo entre os troncos mortos.</td></tr>
+                        <tr><td>4</td><td>Um pequeno bando de licantropos atravessando a estrada em silêncio.</td></tr>
+                        <tr><td>5</td><td>Um fragmento de matéria negra pulsando lentamente no barro.</td></tr>
+                        <tr><td>6</td><td>Silêncio absoluto: todos os sons do mundo desaparecem por segundos.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Tabela Extra — Acontecimentos na Mata (quando a mesa acalmar)</h3>
+                <div class="part-roll"><span>Interrupção Atmosférica</span><code>1d8</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d8</th><th>Acontecimento</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>Um cadáver de lobisomem pendurado em um galho, ainda respirando.</td></tr>
+                        <tr><td>2</td><td>Uma criatura corre paralelamente ao grupo escondida pela névoa.</td></tr>
+                        <tr><td>3</td><td>O tronco de uma árvore exibe o rosto de alguém conhecido do grupo.</td></tr>
+                        <tr><td>4</td><td>Um personagem ouve exatamente a voz de Kael pedindo ajuda no escuro.</td></tr>
+                        <tr><td>5</td><td>O mendigo chuta a lama e encontra uma moeda antiga da Casa Varhen.</td></tr>
+                        <tr><td>6</td><td>O chão sob as botas pulsa uma vez, como um coração gigante.</td></tr>
+                        <tr><td>7</td><td>Uma chuva fina de cinzas quentes cai durante alguns segundos.</td></tr>
+                        <tr><td>8</td><td>Todos veem uma única estrela brilhando no céu — que some ao piscarem.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato1-tools">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Direção do Mestre no Ato I</h2>
+                <p><strong>Versão curta:</strong> caso esteja rodando a sessão condensada, faça o combate inicial em 1–2 rodadas, entregue o balde na clareira e junte a chegada do mendigo diretamente à entrada da vila.</p>
+                <p><strong>Dica de ritmo:</strong> Role dados atrás do escudo durante a caminhada só para olhar um jogador nos olhos e continuar narrando. O desconforto nasce de não saberem o que os observa.</p>
+                <div class="part-callout cosmic">
+                    <strong>Ponte emocional:</strong> Mantenha o balde relevante — os PJs vão querer salvá-lo quando descobrirem o que restou de Kael dentro do Arauto.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Desfechos &amp; Consequências para o Ato II</h2>
+                <ul>
+                    <li><strong>Balde levado:</strong> torna-se peça-chave nas reações do Arauto na mansão e na negociação final com Astel.</li>
+                    <li><strong>Balde abandonado:</strong> o piche cresce sobre ele e atrai batedores de Hadar mais cedo na estrada.</li>
+                    <li><strong>Guia aceito:</strong> chegada tranquila até as paliçadas e guarda da Vila Varhen.</li>
+                    <li><strong>Guia recusado:</strong> o grupo se atrasa pela névoa e chega à vila com menos tempo antes do sino tocar.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato1-maps">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Zonas &amp; Referências de Mapa</h2>
+                <ul>
+                    <li><strong>Zona 1 — Clareira da Chegada:</strong> lama, árvores inclinadas para o sangue de Kael e piche reativo.</li>
+                    <li><strong>Zona 2 — Trilha das Garras:</strong> estrada fria sob céu sem estrelas onde surge o mendigo pugilista.</li>
+                    <li><strong>Zona 3 — Portões da Vila Varhen:</strong> transição para tochas e patrulha da Matilha da Lua Velada.</li>
+                </ul>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'kael', 'kael')">🪣 Abrir Ficha de Kael</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">➡️ Ir para o Ato II</button>
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+</div>

@@ -1,10 +1,212 @@
 <link rel="stylesheet" href="./session/casa-varhen/session.css">
 <div class="item-detail active session-part">
-    <header class="part-header"><div class="part-kicker">Casa Varhen · Prólogo</div><h1>A noite começa</h1><p class="part-subtitle">Uma pista impossível, uma estrada silenciosa e a promessa de que a vila não é segura.</p></header>
-    <div class="tabs-header"><button class="tab-btn active" onclick="openTab(this, 'prologo-flow')">Fluxo</button><button class="tab-btn" onclick="openTab(this, 'prologo-quests')">Quests</button><button class="tab-btn" onclick="openTab(this, 'prologo-encounters')">Encontros</button><button class="tab-btn" onclick="openTab(this, 'prologo-map')">Mapa</button><button class="tab-btn" onclick="openTab(this, 'prologo-more')">Mais</button></div>
-    <div class="tab-content prologo-flow active"><div class="part-grid"><section class="part-panel wide"><h2>História e objetivos</h2><p>Os personagens chegam à região sob uma noite sem estrelas. A Casa Varhen chama atenção antes mesmo de ser vista: um sino distante, corvos que voam contra o vento e uma trilha de icor negro.</p><p><strong>Objetivo:</strong> seguir a pista até a Vila Varhen e descobrir o que aconteceu com Kael.</p><div class="part-callout"><strong>Ritmo:</strong> comece com estranheza, não com explicações. Cada resposta deve abrir uma pergunta maior.</div></section><section class="part-panel"><h2>Cenas</h2><ol><li>A estrada bloqueada.</li><li>O elmo de Kael na clareira.</li><li>O guia lobisomem surge.</li><li>A vila aparece ao anoitecer.</li></ol></section><section class="part-panel"><h2>Rolagens</h2><div class="part-roll"><span>Presságio</span><code>1d6</code></div><div class="part-roll"><span>Rastros do icor</span><code>1d20</code></div></section></div></div>
-    <div class="tab-content prologo-quests"><div class="part-grid"><section class="part-panel"><h2>Quests</h2><h3>O elmo rachado</h3><p>Investigar o elmo de balde de Kael e decidir se ele será levado ou deixado na clareira.</p><h3>Antes da noite</h3><p>Acompanhar o lobisomem até a Vila Varhen.</p></section><section class="part-panel"><h2>Resultados</h2><ul><li>Elmo levado: serve como pista recorrente.</li><li>Elmo deixado: o icor atrai uma ameaça.</li><li>Guia aceito: chegada segura.</li><li>Guia recusado: chegada com custo.</li></ul></section></div></div>
-    <div class="tab-content prologo-encounters"><div class="part-grid"><section class="part-panel wide"><h2>Encontros</h2><p><strong>Abertura:</strong> hordas de criaturas CR 17. O propósito é apresentar a força absurda do grupo e revelar que recursos não são consumidos.</p><p><strong>Guia:</strong> o lobisomem mendigo pugilista finaliza uma criatura e interrompe o combate antes que ele perca a graça.</p></section></div></div>
-    <div class="tab-content prologo-map"><div class="part-grid"><section class="part-panel"><h2>Mapa</h2><p>Use a floresta como três zonas: clareira destruída, trilha do icor e portão da vila.</p></section><section class="part-panel"><h2>Pontos de interesse</h2><ul><li>Clareira do elmo.</li><li>Árvore marcada por garras.</li><li>Estrada para Varhen.</li></ul></section></div></div>
-    <div class="tab-content prologo-more"><div class="part-grid"><section class="part-panel"><h2>Notas do mestre</h2><p>Role dados falsos durante a caminhada para instalar paranoia. O objetivo não é punir os jogadores, mas criar a sensação de que algo os observa.</p></section><section class="part-panel"><h2>Mercado</h2><p>A vila ainda não foi alcançada. Qualquer compra deve ser feita com o guia ou adiada para o Ato 2.</p></section></div></div>
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Documento de Mestre</div>
+        <h1>Prólogo &amp; Guia do Mestre</h1>
+        <p class="part-subtitle">Depois de escaparem de Sigil através de um portal instável, os aventureiros despertam na Dimensão Fraturada de Hadar.</p>
+        <div class="cv-meta-badges">
+            <span class="cv-badge">⚔️ D&amp;D 5e · Nível 14</span>
+            <span class="cv-badge">⏱️ Duração: 6–9 horas (ou condensada)</span>
+            <span class="cv-badge void">👁️ Terror Cósmico &amp; Survival Horror</span>
+            <span class="cv-badge crimson">🌋 Fantasia Gótica &amp; Batalha Colossal</span>
+        </div>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'prologo-flow')">Visão Geral &amp; Premissa</button>
+        <button class="tab-btn" onclick="openTab(this, 'prologo-tracker')">Controle da Mesa (0/15)</button>
+        <button class="tab-btn" onclick="openTab(this, 'prologo-magic')">Supressão Mágica</button>
+        <button class="tab-btn" onclick="openTab(this, 'prologo-audio')">Áudio &amp; Recomendações</button>
+        <button class="tab-btn" onclick="openTab(this, 'prologo-checklist')">Checklist &amp; Atalhos</button>
+    </div>
+
+    <div class="tab-content prologo-flow active">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <h2>Premissa da Aventura</h2>
+                <p>Depois de escaparem de <strong>Sigil</strong> através de um portal instável, com a ajuda de <strong>Tasha</strong>, <strong>Mordenkainen</strong> e uma <strong>misteriosa mulher de cabelos prateados</strong>, os aventureiros chegam a uma dimensão desconhecida.</p>
+                <p>O lugar é uma manifestação fraturada da realidade, dominada pela presença de <strong>Hadar</strong>. No centro desse território existe uma cidade-estado isolada, construída ao redor da antiga propriedade da <strong>Casa Varhen</strong>.</p>
+                <p><strong>Kael, o Homem Balde</strong>, começa a sofrer uma transformação irreversível. Sua maldição, herdada de uma linhagem que mantém contato com Hadar há milênios, finalmente desperta por completo. Enquanto os demais aventureiros chegam à região, Kael desaparece: sua consciência está sendo consumida pela manifestação de uma entidade muito mais antiga do que ele — o <strong>Arauto da Aniquilação</strong>.</p>
+                <p>Os aventureiros precisam descobrir o que aconteceu, sobreviver à região e encontrar o primogênito da Casa Varhen, <strong>Astel Vhalzar Varhen</strong>. Mas existe algo muito mais antigo adormecido naquela dimensão.</p>
+                <div class="part-callout">
+                    <strong>Personagens envolvidos:</strong> Alexander Anderson, Jester, Elijah, Kael Varhen (o Homem Balde), Lyra Bloodseeker, Astel Vhalzar Varhen, Connor Smith e o Arauto da Aniquilação.<br>
+                    <strong>Local:</strong> Dimensão Fraturada de Hadar — Vila Varhen e Mansão Varhen.<br>
+                    <strong>Sessão mais curta:</strong> O Ato I pode ser condensado e a mansão pode exigir apenas <strong>três emblemas obrigatórios</strong>, deixando o quarto como recompensa opcional.
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <h2>Estrutura dos Cinco Atos</h2>
+                <table class="part-table">
+                    <thead>
+                        <tr><th>Ato</th><th>Título</th><th>Foco Principal</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ato I</strong></td><td>A ilusão de poder</td><td>Combate inicial fácil (falsa segurança), floresta, balde abandonado de Kael e encontro com o mendigo lobisomem pugilista.</td></tr>
+                        <tr><td><strong>Ato II</strong></td><td>O sino e o carniceiro</td><td>Vila Varhen, Lyra Bloodseeker, explicação simbiótica de Hadar e a primeira aparição aterrorizante do Arauto.</td></tr>
+                        <tr><td><strong>Ato III</strong></td><td>O labirinto do Arauto</td><td>Mansão Varhen em estilo survival horror (RPD), puzzles dos quatro emblemas, salas seguras, recursos e perseguição dinâmica.</td></tr>
+                        <tr><td><strong>Ato IV</strong></td><td>O primogênito</td><td>Refúgio de Astel Vhalzar Varhen, revelações sobre Kael e Zaltherion, escolha moral, Fragmento do Cajado de Vecna e Bênção de Hadar.</td></tr>
+                        <tr><td><strong>Ato V</strong></td><td>A batalha kaiju</td><td>O Tarrasque desperta da montanha, o Arauto muda de alvo ("FOME") e todos colaboram para escapar pelo portal antes do colapso.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="part-panel">
+                <h2>Os Cinco Pilares Indispensáveis</h2>
+                <ul>
+                    <li><strong>O balde abandonado</strong> precisa ser uma pista emocional, não somente um objeto.</li>
+                    <li><strong>Lyra Bloodseeker</strong> precisa ter personalidade e autoridade suficientes para ser lembrada.</li>
+                    <li><strong>O Arauto</strong> precisa ser assustador sem retirar a agência dos jogadores.</li>
+                    <li><strong>Astel Vhalzar Varhen</strong> precisa oferecer uma escolha moral real.</li>
+                    <li><strong>O Tarrasque</strong> precisa representar uma mudança completa de escala.</li>
+                </ul>
+            </section>
+
+            <section class="part-panel">
+                <h2>Regra de Ouro sobre Astel</h2>
+                <p>Astel tem milênios de história: foi clérigo de Lathander, pactuou com Hadar, criou Zaltherion e controla a dimensão fraturada. <strong>Não revele todos os seus segredos nesta sessão.</strong></p>
+                <div class="part-callout cosmic">
+                    <strong>Três certezas que os PJs devem levar ao sair:</strong>
+                    <ol>
+                        <li>Astel é extremamente poderoso.</li>
+                        <li>Ele não é necessariamente maligno.</li>
+                        <li>Ele sabe muito mais sobre Kael e a Casa Varhen do que está disposto a contar.</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content prologo-tracker">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content prologo-magic">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Supressão Mágica (Regra Ambiental)</h2>
+                <p>Dentro da Mansão Varhen, a magia torna-se menos previsível:</p>
+                <ul>
+                    <li>Magias baseadas em luz natural ou artificial sofrem efeitos distorcidos.</li>
+                    <li>Magias de teletransporte deslocam os alvos para pontos ligeiramente diferentes.</li>
+                    <li>Magias de adivinhação revelam imagens fragmentadas.</li>
+                    <li>Magias de invocação podem atrair criaturas não chamadas.</li>
+                    <li>A cada conjuração de magia de 3º nível ou superior, role 1d20: em resultado <strong>1</strong>, ocorre uma manifestação inesperada.</li>
+                </ul>
+                <div class="part-callout">
+                    <strong>Ajuste recomendado (3 intensidades):</strong> Para evitar frustrar conjuradores de nível 14 (como Alexander e Jester), aplique a tabela como <em>rastro e distorção</em>, nunca anulando sistematicamente as magias.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Intensidade por Local &amp; Complicações</h2>
+                <table class="part-table">
+                    <thead><tr><th>Local</th><th>Intensidade da Supressão</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Vila Varhen</strong></td><td>Magia funciona normalmente.</td></tr>
+                        <tr><td><strong>Mansão Varhen</strong></td><td>Magia deixa rastros (atrai atenção do Arauto) e sofre distorções leves.</td></tr>
+                        <tr><td><strong>Refúgio de Astel</strong></td><td>Magia funciona normalmente, mas a presença cósmica de Hadar é intensa.</td></tr>
+                    </tbody>
+                </table>
+                <h3>Tabela Rápida — Complicações de Magia</h3>
+                <table class="part-table">
+                    <thead><tr><th>1d6</th><th>Resultado na Conjuração</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>A magia funciona normalmente.</td></tr>
+                        <tr><td>2</td><td>Produz efeito visual ou sonoro cósmico distorcido.</td></tr>
+                        <tr><td>3</td><td>O conjurador ouve um sussurro direto de Hadar.</td></tr>
+                        <tr><td>4</td><td>Deixa rastro cósmico temporário (+1 no Medidor se repetir na sala).</td></tr>
+                        <tr><td>5</td><td>O ponto de efeito ou chegada desliza alguns metros.</td></tr>
+                        <tr><td>6</td><td>Uma manifestação menor sombria surge próxima ao conjurador.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content prologo-audio">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Direção de Áudio e Atmosfera</h2>
+                <p>Evite música épica durante a exploração da mansão. O medo vem da expectativa e do contraste.</p>
+                <table class="part-table">
+                    <thead><tr><th>Ato / Ambiente</th><th>Direção Sonora Recomendada</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Ato I · Floresta</strong></td><td>Vento frio, sons distantes de animais, terror cósmico ambiente e silêncios súbitos.</td></tr>
+                        <tr><td><strong>Ato II · Vila</strong></td><td>Música medieval baixa, burburinho de comércio — rompido por um <strong>sino grave e metálico</strong>.</td></tr>
+                        <tr><td><strong>Ato III · Mansão</strong></td><td>Survival horror, piano lento, madeira rangendo, passos no andar de cima, aço arrastando.</td></tr>
+                        <tr><td><strong>Ato IV · Astel</strong></td><td>Celestial sombria, coros muito baixos, cordas suaves e <strong>silêncio absoluto</strong> nas falas-chave.</td></tr>
+                        <tr><td><strong>Ato V · Tarrasque</strong></td><td>Música épica colossal, rugidos sísmicos, desabamentos e impactos titânicos.</td></tr>
+                    </tbody>
+                </table>
+                <div class="part-callout cosmic">
+                    <strong>Assinatura do Arauto:</strong> O tema sonoro do Arauto começa como um som metálico semelhante ao próprio balde de Kael batendo — porém distorcido e desacelerado.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>7 Recomendações Finais do Mestre</h2>
+                <ol>
+                    <li><strong>Não transforme a mansão em corredor linear:</strong> deixe os PJs explorarem, recuarem e criarem rotas.</li>
+                    <li><strong>Dosagem do Arauto:</strong> não apareça toda hora; o som de sua espada arrastando assusta mais que repetições.</li>
+                    <li><strong>Puzzles fluidos:</strong> nunca trave a sessão por 40 minutos — dê pistas graduais e aceite soluções criativas.</li>
+                    <li><strong>Astel ambíguo:</strong> não o force como vilão; a conversa moral vale tanto quanto um eventual combate.</li>
+                    <li><strong>Agência na batalha kaiju:</strong> mesmo entre colossos, os PJs precisam executar ações decisivas no cenário.</li>
+                    <li><strong>Não encerre o destino de Kael de vez:</strong> o Arauto pode seguir existindo como sequela viva da maldição.</li>
+                    <li><strong>Preserve o humor do Homem Balde:</strong> o contraste cômico com o terror cósmico torna a mesa memorável.</li>
+                </ol>
+                <div class="part-callout danger">
+                    <strong>Último segredo (gancho futuro):</strong> Talvez o Tarrasque não esteja apenas despertando por acaso — talvez ele estivesse guardando ou contendo algo que Astel enterrou sob a dimensão há milênios.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content prologo-checklist">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Checklist de Mapas &amp; Materiais</h2>
+                <ul>
+                    <li><strong>Mapas:</strong> Floresta e clareira inicial; Vila Varhen; Praça do sino; Alçapão e túnel subterrâneo; Mansão Varhen (1º e 2º andar); Salas seguras; Refúgio de Astel; Campo da batalha kaiju.</li>
+                    <li><strong>Materiais de apoio:</strong> Fichas de Lyra, Astel, Arauto e Tarrasque; Medidor de Perseguição (0–6); Medidor de Destruição (1–5); Tabelas rápidas de som/eventos; Trilha sonora e efeitos de sino.</li>
+                    <li><strong>Itens &amp; Recompensas:</strong> Quatro Emblemas, Fragmento do Cajado de Vecna, 3 Fragmentos de Hadar (Alexander, Elijah, Jester), Poções/Pergaminhos e Itens da Matilha da Lua Velada.</li>
+                </ul>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-village/Varhen_Village.png')">🗺️ Vila Varhen no VTT</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/FULL_Varhen_Mansion_LowerFloor.png')">🏰 Mansão 1º Andar (GM)</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/FULL_Varhen_Mansion_UpperFloor.png')">🏰 Mansão 2º Andar (GM)</button>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Atalhos do Compêndio (NPCs &amp; Ameaças)</h2>
+                <p>Abra rapidamente as fichas já cadastradas no seu Compêndio:</p>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('monsters', 'data', 'herald')">👁️ Arauto da Aniquilação</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('monsters', 'data', 'tarrasque')">🦖 Tarrasque</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', '', 'astel-vhalzar-varhen')">🕯️ Astel Vhalzar Varhen</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', '', 'lyra-bloodseeker')">🐺 Lyra Bloodseeker</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'kael', 'kael')">🪣 Kael Varhen</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'connor', 'connor')">🤖 Connor Smith</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'zaltherion', 'zaltherion')">⚡ Zaltherion</button>
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('monsters', 'data', 'loup-garou')">🌕 Loup Garou</button>
+                </div>
+            </section>
+        </div>
+    </div>
 </div>

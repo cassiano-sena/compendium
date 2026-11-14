@@ -1,2 +1,138 @@
 <link rel="stylesheet" href="./session/casa-varhen/session.css">
-<div class="item-detail active session-part"><header class="part-header"><div class="part-kicker">Casa Varhen · Epílogo</div><h1>A batalha kaiju</h1><p class="part-subtitle">A mansão racha. A montanha se levanta. Finalmente, todos podem gastar poder sem medida.</p></header><div class="tabs-header"><button class="tab-btn active" onclick="openTab(this, 'epilogo-flow')">Fluxo</button><button class="tab-btn" onclick="openTab(this, 'epilogo-endings')">Desfechos</button><button class="tab-btn" onclick="openTab(this, 'epilogo-tools')">Ferramentas do mestre</button><button class="tab-btn" onclick="openTab(this, 'epilogo-npcs')">NPCs</button><button class="tab-btn" onclick="openTab(this, 'epilogo-quests')">Quests</button><button class="tab-btn" onclick="openTab(this, 'epilogo-markets')">Itens</button><button class="tab-btn" onclick="openTab(this, 'epilogo-encounters')">Encontros</button><button class="tab-btn" onclick="openTab(this, 'epilogo-maps')">Mapas</button></div><div class="tab-content epilogo-flow active"><div class="part-grid"><section class="part-panel wide"><h2>História e objetivos</h2><p>A passagem leva ao refúgio de Astel. Ele entrega o fragmento do cajado de Vecna e oferece a Bênção de Hadar. Então a montanha próxima racha: era um Tarrasque adormecido.</p><p>O Arauto muda de alvo e o grupo luta ao lado de Astel, Lyra e Kael contra a criatura. Astel abre o portal de fuga ao final.</p></section><section class="part-panel"><h2>Ritmo</h2><ol><li>Oferta de Astel.</li><li>Tremor colossal.</li><li>Despertar do Tarrasque.</li><li>Aliança impossível.</li><li>Portal e fuga.</li></ol></section><section class="part-panel"><h2>Rolagem final</h2><div class="part-roll"><span>O que atravessa o portal?</span><code>1d20</code></div></section></div></div><div class="tab-content epilogo-endings"><div class="part-grid"><section class="part-panel"><h2>Desfechos</h2><ul><li><strong>Sucesso:</strong> grupo escapa com fragmento e bênção.</li><li><strong>Custo:</strong> alguém leva uma sequela de Hadar.</li><li><strong>Pacto:</strong> poder permanente e dívida futura.</li><li><strong>Falha controlada:</strong> portal instável para destino inesperado.</li></ul></section></div></div><div class="tab-content epilogo-tools"><div class="part-grid"><section class="part-panel"><h2>Ferramentas do mestre</h2><p>Não faça uma simulação tática minuciosa. Dê alvos grandes, magias de nível 7 a 9 por turno e consequências visíveis.</p><div class="part-callout"><strong>Imagem final:</strong> o portal se fecha enquanto vila, mansão, Arauto e Tarrasque colapsam ao fundo.</div></section></div></div><div class="tab-content epilogo-npcs"><div class="part-grid"><section class="part-panel"><h2>NPCs</h2><p><strong>Astel:</strong> abre o portal e controla a fuga.</p><p><strong>Lyra:</strong> protege os sobreviventes.</p><p><strong>Arauto:</strong> luta contra o Tarrasque, sem deixar de parecer uma ameaça.</p></section></div></div><div class="tab-content epilogo-quests"><div class="part-grid"><section class="part-panel"><h2>Quests</h2><h3>O pacto de Hadar</h3><p>Aceitar ou recusar a bênção de Astel.</p><h3>Sobreviver ao impossível</h3><p>Contribuir para a batalha e alcançar o portal.</p></section></div></div><div class="tab-content epilogo-markets"><div class="part-grid"><section class="part-panel"><h2>Itens</h2><p><strong>Fragmento do cajado de Vecna:</strong> relíquia central do desfecho.</p><p><strong>Bênção de Hadar:</strong> buff permanente ou item, conforme o tom da campanha.</p></section></div></div><div class="tab-content epilogo-encounters"><div class="part-grid"><section class="part-panel wide"><h2>Encontros</h2><p><strong>Batalha final:</strong> grupo + Astel + Lyra + Arauto contra o Tarrasque. Use dano ambiental, mudanças de escala e objetivos momentâneos em vez de uma contagem rígida de rodadas.</p></section></div></div><div class="tab-content epilogo-maps"><div class="part-grid"><section class="part-panel"><h2>Mapas</h2><p>Refúgio de Astel, montanha partida, campo da batalha e portal de fuga.</p></section></div></div></div>
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Ato V &amp; Epílogo</div>
+        <h1>A Batalha Kaiju</h1>
+        <p class="part-subtitle">A montanha próxima racha e se ergue. O Arauto mira um novo alvo — e os aventureiros lutam em escala colossal até o portal final.</p>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'epilogo-flow')">O Despertar &amp; 3 Fases</button>
+        <button class="tab-btn" onclick="openTab(this, 'epilogo-actions')">Objetivos, Ações &amp; Destruição</button>
+        <button class="tab-btn" onclick="openTab(this, 'epilogo-endings')">Desfechos A–D &amp; Frase Final</button>
+        <button class="tab-btn" onclick="openTab(this, 'epilogo-maps')">Controle Rápido &amp; Fichas</button>
+    </div>
+
+    <div class="tab-content epilogo-flow active">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 1 &amp; 2 — O Tarrasque e a Fome do Arauto</h2>
+                <div class="cv-portrait-card">
+                    <img src="./monster/data/tarrasque/tarrasque.png" alt="Tarrasque" class="cv-portrait-img">
+                    <div>
+                        <p>Astel fecha o livro: <em>"Ah. Isso é inconveniente."</em> Ele caminha até a janela — a sombra gigantesca no horizonte não é uma montanha: é o casco de um <strong>Tarrasque</strong> despertando. Seu rugido explode todas as janelas da mansão.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('monsters', 'data', 'tarrasque')">🦖 Ficha Oficial do Tarrasque</button>
+                    </div>
+                </div>
+                <div class="cv-read-aloud">
+                    O Arauto interrompe a perseguição aos heróis, ergue a cabeça sem olhos para a montanha viva, abre os seis tentáculos enquanto sua espada astral cresce absurdamente e ruge uma única palavra:<br>
+                    <strong>"FOME."</strong>
+                </div>
+                <p><strong>Direção do choque entre titãs:</strong> Use a ficha oficial do Tarrasque sem enfraquecê-lo, mas resolva o duelo Tarrasque &times; Arauto por narração e testes de evento (o Arauto corta o pescoço, é arremessado na montanha, é engolido e rasga de dentro para fora enquanto o Tarrasque explode em força bruta).</p>
+            </section>
+
+            <section class="part-panel">
+                <h2>Cena 3 — Organização da Batalha em 3 Fases</h2>
+                <table class="part-table">
+                    <thead><tr><th>Fase</th><th>Nome</th><th>Objetivo dos Aventureiros</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Fase 1</strong></td><td>O Despertar</td><td>Escapar dos desabamentos iniciais da mansão e assumir posição tática segura no campo aberto.</td></tr>
+                        <tr><td><strong>Fase 2</strong></td><td>O Confronto dos Titãs</td><td>Enquanto Arauto e Tarrasque colidem como duas forças da natureza, cumprir objetivos de cenário e usar golpes máximos.</td></tr>
+                        <tr><td><strong>Fase 3</strong></td><td>O Colapso</td><td>Proteger a abertura do portal instável de Astel enquanto a dimensão inteira se desfaz, e atravessar a tempo.</td></tr>
+                    </tbody>
+                </table>
+                <div class="part-callout danger">
+                    <strong>Escala cinematográfica:</strong> Não reduza o clímax a rolagens repetitivas de ataque contra CA 25. Dê alvos temporários, brechas de fraqueza e ações heroicas memoráveis antes do portal fechar.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content epilogo-actions">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Objetivos de Cenário &amp; Medidor de Destruição</h2>
+                <table class="part-table">
+                    <thead><tr><th>Objetivo Temporário</th><th>Recompensa Tática</th></tr></thead>
+                    <tbody>
+                        <tr><td>Distrair o Tarrasque</td><td>Lyra consegue resgatar sobreviventes da vila.</td></tr>
+                        <tr><td>Atacar região vulnerável</td><td>O Tarrasque perde 1 reação lendária neste ciclo.</td></tr>
+                        <tr><td>Ajudar o Arauto</td><td>O Arauto prende o Tarrasque por 1 rodada inteira.</td></tr>
+                        <tr><td>Proteger Astel</td><td>O portal de fuga abre mais rapidamente.</td></tr>
+                        <tr><td>Destruir fragmento de Hadar</td><td>Reduz imediatamente a corrupção ambiental no setor.</td></tr>
+                        <tr><td>Salvar grupo de lobisomens</td><td>A Matilha acompanha e apoia os aventureiros até a saída.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Estágios de Destruição da Dimensão (1–5)</h3>
+                <ol>
+                    <li><strong>Estágio 1:</strong> A montanha começa a rachar sob o casco colossal.</li>
+                    <li><strong>Estágio 2:</strong> A Vila Varhen sofre os primeiros impactos de estilhaços.</li>
+                    <li><strong>Estágio 3:</strong> A Mansão Varhen começa a ruir em blocos inteiros.</li>
+                    <li><strong>Estágio 4:</strong> O céu e o espaço fraturado perdem estabilidade física.</li>
+                    <li><strong>Estágio 5:</strong> Colapso total — o portal de Astel é a única saída segura.</li>
+                </ol>
+            </section>
+
+            <section class="part-panel">
+                <h2>Ações Especiais por Personagem na Cena</h2>
+                <ul>
+                    <li><strong>Alexander Anderson:</strong> canaliza uma manifestação colossal de luz (com risco ou potência do fragmento <em>Chiaroscuro</em>) contra o Tarrasque.</li>
+                    <li><strong>Elijah:</strong> aproveita uma fenda nas escamas entre golpes do Arauto para desferir uma sequência devastadora de ataques físicos.</li>
+                    <li><strong>Jester:</strong> manipula a probabilidade de um desabamento ou golpe impossível em momento crítico.</li>
+                    <li><strong>Lyra Bloodseeker:</strong> segura enxames de crias menores e escolta os sobreviventes feridos rumo ao círculo do portal.</li>
+                    <li><strong>Astel Vhalzar Varhen:</strong> dobra a gravidade local, contém o colapso do terreno e tece o portal de retorno para o mundo de <em>Eve of Ruin</em>.</li>
+                    <li><strong>Arauto da Aniquilação:</strong> investe com espada astral gigante e seis tentáculos contra a garganta e carapaça do Tarrasque.</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content epilogo-endings">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <h2>Desfechos Possíveis da Sessão (A–D)</h2>
+                <table class="part-table">
+                    <thead><tr><th>Desfecho</th><th>O que Acontece na Mesa</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Desfecho A — Fuga bem-sucedida</strong></td><td>O grupo atravessa levando o Fragmento do Cajado de Vecna e as Bênçãos. Astel preserva parte da dimensão; Lyra e membros da matilha acompanham os PJs ou protegem os remanescentes enquanto Arauto e Tarrasque continuam lutando.</td></tr>
+                        <tr><td><strong>Desfecho B — Astel permanece para trás</strong></td><td>Astel ancora a dimensão para garantir a passagem segura e fica para trás em seu domínio: <em>"Talvez nos encontremos novamente. Espero que, na próxima vez, tragam algo interessante."</em></td></tr>
+                        <tr><td><strong>Desfecho C — A dimensão colapsa</strong></td><td>Atravessam no último segundo, mas algo passa junto pelo portal instável (role 1d20 ou escolha: um fragmento de Hadar, uma criatura simbiótica ou um estilhaço vivo do Arauto).</td></tr>
+                        <tr><td><strong>Desfecho D — O Arauto alcança o portal</strong></td><td>Uma mão, um tentáculo ou ponta da espada astral atravessa o portal antes de fechar — deixando claro que a maldição de Kael ainda persegue o grupo.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="part-panel wide">
+                <h2>Frase Final da Aventura (Leitura ao Fechar o Portal)</h2>
+                <div class="cv-read-aloud">
+                    Quando os personagens atravessarem o portal, a última visão atrás deles é a dimensão ruindo em trevas. O Tarrasque e o Arauto seguem atracados em batalha titânica; Astel observa seu domínio desabar em silêncio; Lyra reúne os sobreviventes e o céu negro se fecha. No último instante antes do portal desaparecer por completo, uma voz metálica ecoa do outro lado:<br><br>
+                    <strong>"USUÁRIO LOCALIZADO."</strong><br>
+                    O portal se fecha.
+                </div>
+                <div class="part-callout cosmic">
+                    <strong>Última surpresa (para futuras aventuras):</strong> Talvez o Tarrasque não estivesse apenas dormindo — talvez estivesse guardando ou contendo algo ainda pior que Astel manteve enterrado sob a Casa Varhen por milênios.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content epilogo-maps">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+</div>

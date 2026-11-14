@@ -1,2 +1,162 @@
 <link rel="stylesheet" href="./session/casa-varhen/session.css">
-<div class="item-detail active session-part"><header class="part-header"><div class="part-kicker">Casa Varhen · Ato 2</div><h1>O sino e o carniceiro</h1><p class="part-subtitle">A vila sorri até o sino tocar. Depois disso, toda porta vira uma barricada.</p></header><div class="tabs-header"><button class="tab-btn active" onclick="openTab(this, 'ato2-flow')">Fluxo</button><button class="tab-btn" onclick="openTab(this, 'ato2-endings')">Desfechos</button><button class="tab-btn" onclick="openTab(this, 'ato2-tools')">Ferramentas do mestre</button><button class="tab-btn" onclick="openTab(this, 'ato2-npcs')">NPCs</button><button class="tab-btn" onclick="openTab(this, 'ato2-quests')">Quests</button><button class="tab-btn" onclick="openTab(this, 'ato2-markets')">Mercados</button><button class="tab-btn" onclick="openTab(this, 'ato2-encounters')">Encontros</button><button class="tab-btn" onclick="openTab(this, 'ato2-maps')">Mapas</button></div><div class="tab-content ato2-flow active"><div class="part-grid"><section class="part-panel wide"><h2>História e objetivos</h2><p>A Vila Varhen parece pacífica: mutantes, cultistas de Hadar, homens-urso e lobisomens convivem sob um ar bizarro. O sino macabro rompe a rotina. O céu racha e o Arauto cai como um meteoro.</p><p><strong>Objetivos:</strong> sobreviver à chegada do Arauto, entender a ameaça e aceitar o resgate de Lyra até a mansão.</p></section><section class="part-panel"><h2>Batidas da cena</h2><ol><li>Sino ao longe.</li><li>Pânico coletivo.</li><li>Queda do Arauto.</li><li>Morte de um NPC formidável.</li><li>Alçapão de Lyra.</li></ol></section><section class="part-panel"><h2>Rolagens</h2><div class="part-roll"><span>Reação da vila</span><code>1d6</code></div><div class="part-roll"><span>Impacto do Arauto</span><code>1d20</code></div></section></div></div><div class="tab-content ato2-endings"><div class="part-grid"><section class="part-panel"><h2>Desfechos</h2><ul><li>O grupo entra no alçapão antes do impacto.</li><li>O grupo tenta lutar e é forçado a fugir.</li><li>Um aliado fica para trás para abrir a rota.</li></ul></section></div></div><div class="tab-content ato2-tools"><div class="part-grid"><section class="part-panel"><h2>Ferramentas do mestre</h2><p>Mostre o poder do Arauto com ambiente e não com uma longa redução de pontos de vida. Uma colisão deve destruir cenário e confiança.</p><div class="part-callout"><strong>Informação vital:</strong> ele é imortal, caça magia e luz, e a mansão guarda a única rota até Astel.</div></section></div></div><div class="tab-content ato2-npcs"><div class="part-grid"><section class="part-panel"><h2>NPCs</h2><h3>Lyra Bloodseeker</h3><p>Líder dos lobisomens. Puxa os personagens para o alçapão e entrega a exposição necessária.</p><h3>Aldeão formidável</h3><p>Use sua morte para estabelecer a escala da ameaça sem transformar a cena em execução gratuita.</p></section></div></div><div class="tab-content ato2-quests"><div class="part-grid"><section class="part-panel"><h2>Quests</h2><h3>O abrigo de Lyra</h3><p>Alcançar o alçapão antes que o Arauto feche a praça.</p><h3>A rota da mansão</h3><p>Obter a informação e seguir para os enigmas da Casa Varhen.</p></section></div></div><div class="tab-content ato2-markets"><div class="part-grid"><section class="part-panel"><h2>Mercados</h2><p>Com o sino tocando, comércio vira sobrevivência: poções, chaves, mapas incompletos e favores podem ser obtidos antes do alçapão.</p></section></div></div><div class="tab-content ato2-encounters"><div class="part-grid"><section class="part-panel wide"><h2>Encontros</h2><p><strong>O Arauto:</strong> perseguidor CR 30, praticamente invulnerável a dano convencional. Ataques quebram paredes, escadas e chão.</p></section></div></div><div class="tab-content ato2-maps"><div class="part-grid"><section class="part-panel"><h2>Mapas</h2><p>Praça do sino, rua central, casas barricadas e alçapão dos lobisomens.</p></section></div></div></div>
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Ato II</div>
+        <h1>O Sino e o Carniceiro</h1>
+        <p class="part-subtitle">Apresentar uma comunidade estranha, porém segura e funcional — e despedaçar essa segurança em poucos minutos.</p>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'ato2-flow')">Cena 1 &amp; 3 · Vila &amp; Hadar</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato2-npcs')">Cena 2 · Lyra &amp; Itens da Matilha</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato2-arauto')">Cenas 4–6 · O Sino, Arauto &amp; Fuga</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato2-maps')">Mapa da Vila &amp; Controle</button>
+    </div>
+
+    <div class="tab-content ato2-flow active">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 1 — A Vila Varhen Antes do Sino (10–20 min)</h2>
+                <p>A vila é estranha, mas organizada e habitada: lobisomens, homens-urso, mutantes e infectados convivem normalmente sob a proteção da <strong>Matilha da Lua Velada</strong> (mercenários licantropos aliados à Casa Varhen). Mostre NPCs negociando, guardas treinando e oficinas trabalhando.</p>
+                <table class="part-table">
+                    <thead><tr><th>Estabelecimento</th><th>O que os PJs Encontram</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Taverna do Último Uivo</strong></td><td>Informações e boatos recentes da matilha.</td></tr>
+                        <tr><td><strong>Oficina de Prata</strong></td><td>Armas, munições prateadas e equipamento contra licantropos.</td></tr>
+                        <tr><td><strong>Mercado de Ossos</strong></td><td>Poções, reagentes e itens mágicos usados.</td></tr>
+                        <tr><td><strong>Capela Abandonada</strong></td><td>Antigos símbolos solares de Lathander, parcialmente corrompidos.</td></tr>
+                        <tr><td><strong>Quartel da Matilha</strong></td><td>Registros de patrulha e reputação de Lyra Bloodseeker.</td></tr>
+                        <tr><td><strong>Hospital dos Hospedeiros</strong></td><td>Moradores infectados por fragmentos simbióticos de Hadar.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="part-panel">
+                <h2>Rumores na Vila &amp; Cena 3 — Explicação de Hadar</h2>
+                <h3>Rumores que Circulam pelas Ruas</h3>
+                <ul>
+                    <li><em>"O velho da mansão não envelhece."</em></li>
+                    <li><em>"Aquela criatura que caiu aqui não é o primeiro Arauto."</em></li>
+                    <li><em>"A família Varhen não morre. Ela apenas muda de forma."</em></li>
+                    <li><em>"A matilha tem um acordo com o primogênito."</em></li>
+                    <li><em>"Hadar não é um deus. É uma fome."</em></li>
+                    <li><em>"O Homem Balde foi visto conversando sozinho com uma parede."</em></li>
+                </ul>
+
+                <h3>A Maldição da Linhagem Varhen</h3>
+                <p>Diferente de vampirismo ou loucura, a maldição de Kael é um <strong>Fragmento físico de Hadar</strong> simbiótico: concede poder enquanto substitui corpo e mente. Toda infecção gera três resultados:</p>
+                <ol>
+                    <li>O hospedeiro controla a manifestação e sobrevive.</li>
+                    <li>O hospedeiro perde sua identidade e vira uma <strong>Cria das Estrelas</strong>.</li>
+                    <li>O hospedeiro colapsa em uma <strong>massa simbiótica</strong> faminta por novos corpos.</li>
+                </ol>
+                <div class="part-callout cosmic">
+                    <strong>Por que Kael é diferente?</strong> Sua linhagem carrega uma corrupção milenar e infinitamente mais antiga: ela o transformou no <strong>Arauto da Aniquilação</strong>.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato2-npcs">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 2 — Lyra Bloodseeker</h2>
+                <div class="cv-portrait-card">
+                    <img src="./npc/lyra/lyra-bloodseeker.png" alt="Lyra Bloodseeker" class="cv-portrait-img">
+                    <div>
+                        <p>Mulher ruiva, forte, intimidadora e líder suprema da Matilha da Lua Velada. Não é hostil aos aventureiros, mas sabe exatamente quem são.</p>
+                        <div class="cv-read-aloud">"Vocês chegaram numa hora péssima. Aquele homem que estão procurando... não é mais exatamente um homem."</div>
+                    </div>
+                </div>
+                <p>Ela explica o acordo entre a Matilha e a Casa Varhen, confirma que Kael foi levado à mansão pela própria maldição e avisa por que força bruta é suicídio:</p>
+                <div class="cv-read-aloud">"Eu sou responsável por essa matilha. Não posso jogar centenas de vidas fora porque três aventureiros decidiram que conseguem matar uma estrela."</div>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', '', 'lyra-bloodseeker')">🐺 Ficha de Lyra</button>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Itens Especiais da Matilha da Lua Velada</h2>
+                <div class="cv-reward-card">
+                    <h4>Medalhão da Lua Velada (Item maravilhoso, incomum)</h4>
+                    <p>Uma vez por descanso longo, concede vantagem em um teste de Percepção ou Sobrevivência e detecta licantropos próximos.</p>
+                </div>
+                <div class="cv-reward-card">
+                    <h4>Garras da Matilha (Item maravilhoso, raro)</h4>
+                    <p>Concede +1 nas jogadas de ataque e dano desarmado. Uma vez por descanso longo, adiciona 2d6 de dano cortante a um ataque desarmado.</p>
+                </div>
+                <div class="cv-reward-card">
+                    <h4>Manto do Alfa (Item maravilhoso, raro)</h4>
+                    <p>Uma vez por descanso longo, emite um uivo sobrenatural: aliados a até 9 m recebem vantagem na próxima salvaguarda contra medo.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato2-arauto">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 4 &amp; 5 — O Sino e a Primeira Aparição</h2>
+                <ol>
+                    <li><strong>O Sinal:</strong> Durante a conversa, um sino grave e metálico soa ao longe. Todos os moradores param no lugar; portas se fecham, pessoas correm. Lyra solta um seco: <em>"Merda."</em></li>
+                    <li><strong>A Destruição:</strong> Uma fenda rasga as nuvens e algo cai como um meteoro. Uma casa inteira desaparece na cratera. Um defensor formidável da vila tenta enfrentar o vulto e é obliterado em instantes.</li>
+                    <li><strong>A Revelação:</strong> Sem olhos no rosto, pele pálida coberta de manchas roxas e negras, mandíbula triangular, seis tentáculos abrindo atrás dos ombros e uma imensa espada astral fundida ao braço.</li>
+                </ol>
+                <div class="cv-portrait-card">
+                    <img src="./monster/data/herald/hadar_butcher.png" alt="Arauto da Aniquilação" class="cv-portrait-img">
+                    <div>
+                        <div class="cv-read-aloud">"ONDE ESTÁ... A MINHA OUTRA METADE?"<br>...<br>"ENCONTREI."</div>
+                        <div class="cv-actions-row">
+                            <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('monsters', 'data', 'herald')">👁️ Statblock do Arauto</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Cena 6 — A Fuga &amp; Reações em Combate</h2>
+                <p><strong>Não peça iniciativa imediatamente.</strong> Deixe os jogadores agirem primeiro — e responda narrativamente para provar que o Arauto não pode ser vencido agora:</p>
+                <ul>
+                    <li>Magia causa dano, mas a carne negra fecha a ferida diante deles.</li>
+                    <li><em>Muralha de Força</em> detém o avanço por segundos antes de entortar sob pressão cósmica.</li>
+                    <li>Um golpe poderoso decepa um tentáculo — outro cresce instantaneamente.</li>
+                    <li>Controle mental falha (a mente já não é humana).</li>
+                    <li>Um impacto extremo consegue fazê-lo recuar alguns metros, mostrando que os PJs não são totalmente impotentes.</li>
+                </ul>
+                <div class="part-callout danger">
+                    <strong>Regra crítica:</strong> Lyra abre um alçapão escondido rumo aos túneis até a Mansão Varhen. A rota de fuga <strong>nunca</strong> deve depender de uma única rolagem — o grupo pode ganhar tempo ou salvar cidadãos, mas precisa conseguir fugir para a mansão.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato2-maps">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Mapa — Vila Varhen</h2>
+                <div class="cv-map-card">
+                    <img src="./map/varhen-village/Varhen_Village.png" alt="Mapa da Vila Varhen" class="cv-map-thumb">
+                    <div class="cv-actions-row">
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-village/Varhen_Village.png')">🗺️ Carregar Vila no Tabletop</button>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">➡️ Ir para o Ato III</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+</div>

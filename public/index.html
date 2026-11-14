@@ -4130,6 +4130,9 @@
 
                 if (loadSeq !== window._compendiumLoadSeq) return;
                 displayArea.innerHTML = htmlFinal;
+                if (typeof CompendioVarhenTracker !== 'undefined' && CompendioVarhenTracker.hydrate) {
+                    CompendioVarhenTracker.hydrate(displayArea);
+                }
 
                 if (window.innerWidth <= 768) {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -6706,6 +6709,7 @@
     <script src="js/profiles-lobby.js"></script>
     <script src="js/dice-engine.js"></script>
     <script src="js/dice-3d-tray.js"></script>
+    <script src="js/session-tracker.js"></script>
     <script src="js/combat-sync.js"></script>
     <script src="js/character-vtt.js"></script>
     <script src="js/compendium-import-sync.js"></script>
