@@ -1,0 +1,20 @@
+{
+  "name": "Frasco de Escuridão Absoluta",
+  "source": "Casa Varhen",
+  "type": "Frasco Alquímico (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #034 — II. Consumíveis e Poções (Item 14/20 da categoria).",
+    "Cria uma esfera de escuridão mágica de 6 m por 1 minuto.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #14 (II. Consumíveis e Poções) · Catálogo Global #34/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

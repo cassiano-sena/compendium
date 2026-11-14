@@ -1,0 +1,20 @@
+{
+  "name": "Emblema da Autoridade",
+  "source": "Casa Varhen",
+  "type": "Chave de Enigma (Mágico)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #184 — X. Tesouros de Exploração, Segredos e Chaves (Item 4/20 da categoria).",
+    "Quarto emblema, com um trono e uma estrela.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Mágico",
+        "Locais Sugeridos: Escritório do Primogênito (2º Andar) / Salas secretas (181–200)",
+        "Tabela de Rolagem: 1d20 #4 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #184/220",
+        "Dificuldades (Nível 14): Enigma: Selo de Sangue Varhen / CD 17"
+      ]
+    }
+  ]
+}

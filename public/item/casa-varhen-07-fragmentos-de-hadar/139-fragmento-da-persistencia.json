@@ -1,0 +1,21 @@
+{
+  "name": "Fragmento da Persistência",
+  "source": "Casa Varhen",
+  "type": "Fragmento de Hadar (P)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #139 — VII. Fragmentos de Hadar (Item 19/20 da categoria).",
+    "Vantagem contra a morte e efeitos de redução de PV máximos.",
+    "Drawback / Consequência: não consegue descansar em locais consagrados.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #19 (VII. Fragmentos de Hadar) · Catálogo Global #139/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15 · Resistir/Controlar Drawback CD 16"
+      ]
+    }
+  ]
+}

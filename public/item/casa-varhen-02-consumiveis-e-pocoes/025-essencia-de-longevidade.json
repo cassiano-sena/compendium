@@ -1,0 +1,20 @@
+{
+  "name": "Essência de Longevidade",
+  "source": "Casa Varhen",
+  "type": "Poção / Essência (Consumível — Cn)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #025 — II. Consumíveis e Poções (Item 5/20 da categoria).",
+    "Remove um nível de exaustão e encerra uma doença.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #5 (II. Consumíveis e Poções) · Catálogo Global #25/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

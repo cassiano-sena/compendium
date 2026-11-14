@@ -1,0 +1,20 @@
+{
+  "name": "Óculos de Leitura de Astel",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #003 — I. Relíquias Mundanas da Casa Varhen (Item 3/20 da categoria).",
+    "Óculos extremamente caros, mas com lentes completamente normais.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #3 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #3/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

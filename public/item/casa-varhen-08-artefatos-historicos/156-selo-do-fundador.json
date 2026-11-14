@@ -1,0 +1,20 @@
+{
+  "name": "Selo do Fundador",
+  "source": "Casa Varhen",
+  "type": "Selo Ancestral (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #156 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 16/20 da categoria).",
+    "Concede controle sobre criaturas simbióticas menores de Hadar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #16 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #156/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

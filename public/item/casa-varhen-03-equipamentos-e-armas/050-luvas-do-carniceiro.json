@@ -1,0 +1,20 @@
+{
+  "name": "Luvas do Carniceiro",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #050 — III. Equipamentos e Armas da Casa Varhen (Item 10/20 da categoria).",
+    "Ataques desarmados causam {@dice 1d8} de dano cortante. Uma vez por turno, podem causar +{@dice 1d8} de dano necrótico.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #10 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #50/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

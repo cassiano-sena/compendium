@@ -1,0 +1,21 @@
+{
+  "name": "Pele de Piche",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #104 — VI. Bênçãos Permanentes — Com Drawbacks (Item 4/20 da categoria).",
+    "Resistência a dano de fogo e necrótico.",
+    "Drawback / Consequência: vulnerabilidade a dano radiante.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #4 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #104/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15 · Resistir/Controlar Drawback CD 16"
+      ]
+    }
+  ]
+}

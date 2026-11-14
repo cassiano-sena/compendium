@@ -1,0 +1,20 @@
+{
+  "name": "Regeneração Menor",
+  "source": "Casa Varhen",
+  "type": "Bênção Permanente (P)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #088 — V. Bênçãos Permanentes — Sem Drawbacks (Item 8/20 da categoria).",
+    "Recupera 2 PV no início de cada turno, desde que tenha pelo menos 1 PV.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140) · Refúgio da Matilha (81–100)",
+        "Tabela de Rolagem: 1d20 #8 (V. Bênçãos Permanentes — Sem Drawbacks) · Catálogo Global #88/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

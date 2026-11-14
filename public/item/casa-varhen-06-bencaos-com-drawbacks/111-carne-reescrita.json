@@ -1,0 +1,21 @@
+{
+  "name": "Carne Reescrita",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #111 — VI. Bênçãos Permanentes — Com Drawbacks (Item 11/20 da categoria).",
+    "Recupera 10 PV ao iniciar um combate.",
+    "Drawback / Consequência: a aparência se torna progressivamente monstruosa.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #11 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #111/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

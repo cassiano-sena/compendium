@@ -1,0 +1,20 @@
+{
+  "name": "Coração do Patriarca",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #143 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 3/20 da categoria).",
+    "Permite resistir uma vez à morte por descanso longo. O usuário retorna com uma marca de Hadar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #3 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #143/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

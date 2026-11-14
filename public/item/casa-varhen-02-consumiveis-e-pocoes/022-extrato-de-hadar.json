@@ -1,0 +1,20 @@
+{
+  "name": "Extrato de Hadar",
+  "source": "Casa Varhen",
+  "type": "Poção / Extrato (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #022 — II. Consumíveis e Poções (Item 2/20 da categoria).",
+    "Durante 1 minuto, ataques causam +{@dice 2d6} de dano de força. Ao terminar, o usuário recebe 1 nível de exaustão.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #2 (II. Consumíveis e Poções) · Catálogo Global #22/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

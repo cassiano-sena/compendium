@@ -1,0 +1,20 @@
+{
+  "name": "Soro Antissimbiótico",
+  "source": "Casa Varhen",
+  "type": "Soro Alquímico (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #027 — II. Consumíveis e Poções (Item 7/20 da categoria).",
+    "Concede vantagem em uma salvaguarda contra uma maldição ou efeito de possessão.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #7 (II. Consumíveis e Poções) · Catálogo Global #27/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

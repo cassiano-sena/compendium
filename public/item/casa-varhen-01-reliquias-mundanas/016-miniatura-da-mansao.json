@@ -1,0 +1,20 @@
+{
+  "name": "Miniatura da Mansão",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #016 — I. Relíquias Mundanas da Casa Varhen (Item 16/20 da categoria).",
+    "Réplica perfeita do Santuário da Fome. Uma das janelas está iluminada mesmo quando a mansão está escura.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #16 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #16/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

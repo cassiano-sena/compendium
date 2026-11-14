@@ -1,0 +1,20 @@
+{
+  "name": "Machado do Carrasco",
+  "source": "Casa Varhen",
+  "type": "Weapon (greataxe) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #049 — III. Equipamentos e Armas da Casa Varhen (Item 9/20 da categoria).",
+    "Machado grande +2. Causa dano adicional contra criaturas com menos da metade dos PV.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #9 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #49/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

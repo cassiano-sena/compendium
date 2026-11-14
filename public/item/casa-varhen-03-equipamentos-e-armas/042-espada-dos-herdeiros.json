@@ -1,0 +1,20 @@
+{
+  "name": "Espada dos Herdeiros",
+  "source": "Casa Varhen",
+  "type": "Weapon (longsword) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #042 — III. Equipamentos e Armas da Casa Varhen (Item 2/20 da categoria).",
+    "Espada longa +2. Causa +{@dice 1d6} de dano radiante contra criaturas que traíram um juramento, a critério do mestre.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #2 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #42/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

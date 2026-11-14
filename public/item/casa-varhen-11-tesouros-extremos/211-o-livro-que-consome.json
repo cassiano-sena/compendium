@@ -1,0 +1,20 @@
+{
+  "name": "O Livro que Consome",
+  "source": "Casa Varhen",
+  "type": "Tomo Senciente (Artefato — Eq)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #211 — XI. Tesouros Extremos e Recompensas de Campanha (Item 11/20 da categoria).",
+    "Pode devorar um livro e absorver seu conteúdo, permitindo ao portador consultar suas informações mentalmente. Livros mágicos podem reagir de forma imprevisível.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Eq",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #11 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #211/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

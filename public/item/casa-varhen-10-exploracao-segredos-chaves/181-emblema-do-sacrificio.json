@@ -1,0 +1,20 @@
+{
+  "name": "Emblema do Sacrifício",
+  "source": "Casa Varhen",
+  "type": "Chave de Enigma (Mágico)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #181 — X. Tesouros de Exploração, Segredos e Chaves (Item 1/20 da categoria).",
+    "Primeiro dos quatro emblemas necessários para abrir a porta do salão de Astel.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Mágico",
+        "Locais Sugeridos: Sala dos Troféus (1º Andar) / Salas secretas (181–200)",
+        "Tabela de Rolagem: 1d20 #1 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #181/220",
+        "Dificuldades (Nível 14): Enigma: Sacrificar memória / objeto ou Sangue / Arcanismo CD 16"
+      ]
+    }
+  ]
+}

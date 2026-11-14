@@ -1,0 +1,20 @@
+{
+  "name": "Piche de Hadar",
+  "source": "Casa Varhen",
+  "type": "Substância Alquímica (Consumível — Cn)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #029 — II. Consumíveis e Poções (Item 9/20 da categoria).",
+    "Cobre uma área de 3 m. Criaturas que entram ficam com deslocamento reduzido à metade até o final do próximo turno.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #9 (II. Consumíveis e Poções) · Catálogo Global #29/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

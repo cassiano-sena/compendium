@@ -1,0 +1,20 @@
+{
+  "name": "Anel dos Sete Pactos",
+  "source": "Casa Varhen",
+  "type": "Ring (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #144 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 4/20 da categoria).",
+    "Armazena até sete contratos mágicos. Cada contrato pode impor uma condição voluntária a um participante.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #4 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #144/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

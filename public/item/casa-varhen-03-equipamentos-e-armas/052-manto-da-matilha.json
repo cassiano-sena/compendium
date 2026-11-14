@@ -1,0 +1,20 @@
+{
+  "name": "Manto da Matilha",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #052 — III. Equipamentos e Armas da Casa Varhen (Item 12/20 da categoria).",
+    "Concede vantagem em testes de Furtividade em florestas e ambientes naturais.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #12 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #52/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

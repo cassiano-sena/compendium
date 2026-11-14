@@ -1,0 +1,20 @@
+{
+  "name": "Coração de Zaltherion",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #158 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 18/20 da categoria).",
+    "Concede imunidade à condição Amedrontado e vantagem contra efeitos de controle mental. O portador não pode ser obrigado a quebrar um juramento feito voluntariamente.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #18 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #158/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

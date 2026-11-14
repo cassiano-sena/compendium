@@ -1,0 +1,20 @@
+{
+  "name": "Cajado da Luz Esquecida",
+  "source": "Casa Varhen",
+  "type": "Staff (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #057 — III. Equipamentos e Armas da Casa Varhen (Item 17/20 da categoria).",
+    "Cajado +2, foco mágico. Possui 7 cargas, recuperando {@dice 1d6+1} ao amanhecer. Pode lançar magias de luz e proteção apropriadas ao nível do item.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #17 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #57/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

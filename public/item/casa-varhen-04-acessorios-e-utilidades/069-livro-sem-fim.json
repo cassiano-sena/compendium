@@ -1,0 +1,20 @@
+{
+  "name": "Livro Sem Fim",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #069 — IV. Acessórios e Utilidades Mágicas (Item 9/20 da categoria).",
+    "Possui páginas ilimitadas, mas só registra informações escritas nele.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #9 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #69/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "A Chama do Primeiro Dia",
+  "source": "Casa Varhen",
+  "type": "Chama de Lathander (Artefato — P)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #217 — XI. Tesouros Extremos e Recompensas de Campanha (Item 17/20 da categoria).",
+    "Concede imunidade a dano necrótico e resistência a dano de força. Uma vez por descanso longo, pode lançar uma explosão de luz que causa {@dice 10d8} de dano radiante.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #17 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #217/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

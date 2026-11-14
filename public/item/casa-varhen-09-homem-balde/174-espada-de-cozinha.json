@@ -1,0 +1,20 @@
+{
+  "name": "Espada de Cozinha",
+  "source": "Casa Varhen",
+  "type": "Weapon (shortsword) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #174 — IX. Itens e Relíquias do Homem Balde (Item 14/20 da categoria).",
+    "Espada curta +1. Causa dano adicional contra criaturas classificadas como alimento pelo portador.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #14 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #174/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

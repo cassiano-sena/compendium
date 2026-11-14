@@ -1,0 +1,21 @@
+{
+  "name": "Animositas",
+  "source": "Casa Varhen",
+  "type": "Fragmento de Hadar (P)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #122 — VII. Fragmentos de Hadar (Item 2/20 da categoria).",
+    "Uma vez por descanso longo, recebe um Action Surge adicional.",
+    "Drawback / Consequência: pode ficar Charmed por criaturas que odeia.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca / Ato IV (Bênção de Hadar — Elijah)",
+        "Tabela de Rolagem: 1d20 #2 (VII. Fragmentos de Hadar) · Catálogo Global #122/220",
+        "Dificuldades (Nível 14): Sabedoria CD 18 (Fúria/Controle)"
+      ]
+    }
+  ]
+}

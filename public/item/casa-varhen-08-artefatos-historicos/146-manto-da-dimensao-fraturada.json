@@ -1,0 +1,20 @@
+{
+  "name": "Manto da Dimensão Fraturada",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #146 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 6/20 da categoria).",
+    "Permite lançar Plane Shift uma vez por semana, desde que o destino seja conhecido.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #6 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #146/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

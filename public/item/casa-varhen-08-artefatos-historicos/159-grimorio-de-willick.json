@@ -1,0 +1,20 @@
+{
+  "name": "Grimório de Willick",
+  "source": "Casa Varhen",
+  "type": "Spellbook (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #159 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 19/20 da categoria).",
+    "Contém fórmulas de magia espacial, temporal e gravitacional. Permite lançar uma magia de até 5º nível dessas escolas uma vez por descanso longo.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #19 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #159/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

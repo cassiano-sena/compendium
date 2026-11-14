@@ -1,0 +1,20 @@
+{
+  "name": "Balde da Aniquilação",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Artefato — Eq)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #165 — IX. Itens e Relíquias do Homem Balde (Item 5/20 da categoria).",
+    "Pode ser colocado na cabeça de uma criatura voluntária para suprimir temporariamente uma manifestação de Hadar. Uma vez por descanso longo.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde / Mansão (CD 20)",
+        "Tabela de Rolagem: 1d20 #5 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #165/220",
+        "Dificuldades (Nível 14): Persuasão CD 18 / Arcanismo CD 20"
+      ]
+    }
+  ]
+}

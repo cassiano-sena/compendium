@@ -1,0 +1,20 @@
+{
+  "name": "Armadura do Patriarca",
+  "source": "Casa Varhen",
+  "type": "Armor (plate) — Equipamento (Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #045 — III. Equipamentos e Armas da Casa Varhen (Item 5/20 da categoria).",
+    "Armadura de placas +2. Concede resistência a dano necrótico.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #5 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #45/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

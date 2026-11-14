@@ -325,13 +325,17 @@
             const scope = rootEl || (typeof document !== 'undefined' ? document : null);
             if (!scope || typeof scope.querySelectorAll !== 'function') return 0;
             const slots = scope.querySelectorAll('.cv-tracker-slot');
-            if (!slots || slots.length === 0) return 0;
-            const st = loadState();
-            slots.forEach(slot => {
-                const mode = slot.getAttribute('data-cv-mode') === 'full' ? 'full' : 'compact';
-                slot.innerHTML = mode === 'full' ? renderFullBoardHtml(st) : renderCompactStripHtml(st);
-            });
-            return slots.length;
+            if (slots && slots.length > 0) {
+                const st = loadState();
+                slots.forEach(slot => {
+                    const mode = slot.getAttribute('data-cv-mode') === 'full' ? 'full' : 'compact';
+                    slot.innerHTML = mode === 'full' ? renderFullBoardHtml(st) : renderCompactStripHtml(st);
+                });
+            }
+            if (typeof CompendioVarhenLoot !== 'undefined' && typeof CompendioVarhenLoot.hydrate === 'function') {
+                CompendioVarhenLoot.hydrate(scope);
+            }
+            return slots ? slots.length : 0;
         },
 
         _commitAndRefresh() {

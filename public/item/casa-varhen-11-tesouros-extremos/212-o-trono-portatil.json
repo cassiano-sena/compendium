@@ -1,0 +1,20 @@
+{
+  "name": "O Trono Portátil",
+  "source": "Casa Varhen",
+  "type": "Relíquia Aristocrática (Eq — L)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #212 — XI. Tesouros Extremos e Recompensas de Campanha (Item 12/20 da categoria).",
+    "Invoca uma cadeira aristocrática que concede vantagem em testes de resistência contra ser movido enquanto o usuário estiver sentado.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Eq",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #12 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #212/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

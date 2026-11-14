@@ -1,0 +1,21 @@
+{
+  "name": "Cérebro de Hadar",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #107 — VI. Bênçãos Permanentes — Com Drawbacks (Item 7/20 da categoria).",
+    "Vantagem em testes de Inteligência e Arcanismo.",
+    "Drawback / Consequência: desvantagem em testes de Intuição.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #7 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #107/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

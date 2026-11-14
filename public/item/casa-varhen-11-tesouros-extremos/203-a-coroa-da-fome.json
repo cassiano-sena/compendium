@@ -1,0 +1,20 @@
+{
+  "name": "A Coroa da Fome",
+  "source": "Casa Varhen",
+  "type": "Poder / Coroa (Artefato — P)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #203 — XI. Tesouros Extremos e Recompensas de Campanha (Item 3/20 da categoria).",
+    "Permite comandar criaturas simbióticas de Hadar. Uma vez por descanso longo, pode impor a condição Amedrontado a criaturas escolhidas em uma área de 9 m, CD 19.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #3 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #203/220",
+        "Dificuldades (Nível 14): Cofre de Astel · CD 19 para resistir ao efeito"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Arco do Caçador de Estrelas",
+  "source": "Casa Varhen",
+  "type": "Weapon (longbow) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #048 — III. Equipamentos e Armas da Casa Varhen (Item 8/20 da categoria).",
+    "Arco longo +2. Ignora meia cobertura e causa +{@dice 1d6} de dano de força.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #8 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #48/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

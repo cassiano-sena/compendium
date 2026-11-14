@@ -1,0 +1,20 @@
+{
+  "name": "Garrafa de Vinho de 800 Anos",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #004 — I. Relíquias Mundanas da Casa Varhen (Item 4/20 da categoria).",
+    "O vinho virou vinagre. Ainda está em uma garrafa magnífica.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #4 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #4/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

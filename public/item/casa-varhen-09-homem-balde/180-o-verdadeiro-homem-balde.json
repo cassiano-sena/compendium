@@ -1,0 +1,20 @@
+{
+  "name": "O Verdadeiro Homem Balde",
+  "source": "Casa Varhen",
+  "type": "Artefato Senciente (Eq)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #180 — IX. Itens e Relíquias do Homem Balde (Item 20/20 da categoria).",
+    "Uma manifestação de uma consciência residual de Kael. Pode conversar, mover-se e utilizar uma versão reduzida de suas capacidades. Não obedece necessariamente ao portador.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde / Pós-Santuário",
+        "Tabela de Rolagem: 1d20 #20 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #180/220",
+        "Dificuldades (Nível 14): Persuasão CD 20 (Consciência de Kael)"
+      ]
+    }
+  ]
+}

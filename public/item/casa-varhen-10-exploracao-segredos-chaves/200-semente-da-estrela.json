@@ -1,0 +1,20 @@
+{
+  "name": "Semente da Estrela",
+  "source": "Casa Varhen",
+  "type": "Núcleo Vivo de Hadar (Mágico)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #200 — X. Tesouros de Exploração, Segredos e Chaves (Item 20/20 da categoria).",
+    "Um fragmento vivo de Hadar. Pode ser plantado, destruído, consumido ou utilizado para criar uma nova manifestação cósmica.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Mágico",
+        "Locais Sugeridos: Salas secretas / Câmara Profunda (CD 22)",
+        "Tabela de Rolagem: 1d20 #20 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #200/220",
+        "Dificuldades (Nível 14): Arcanismo CD 22 / Sabedoria CD 20 ao tocar"
+      ]
+    }
+  ]
+}

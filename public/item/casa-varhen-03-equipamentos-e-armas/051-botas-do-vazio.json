@@ -1,0 +1,20 @@
+{
+  "name": "Botas do Vazio",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #051 — III. Equipamentos e Armas da Casa Varhen (Item 11/20 da categoria).",
+    "Concedem deslocamento de voo de 9 m por 10 minutos, uma vez por descanso longo.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #11 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #51/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

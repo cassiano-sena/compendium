@@ -1,0 +1,20 @@
+{
+  "name": "A Estrela Condensada",
+  "source": "Casa Varhen",
+  "type": "Bênção / Núcleo Cósmico (Artefato — P)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #205 — XI. Tesouros Extremos e Recompensas de Campanha (Item 5/20 da categoria).",
+    "Concede resistência a todos os danos de força, psíquico e necrótico. Uma vez por descanso longo, permite lançar uma versão de 8º nível de Desintegrar, utilizando dano de força.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #5 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #205/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

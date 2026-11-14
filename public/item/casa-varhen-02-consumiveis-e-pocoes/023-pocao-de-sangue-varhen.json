@@ -1,0 +1,20 @@
+{
+  "name": "Poção de Sangue Varhen",
+  "source": "Casa Varhen",
+  "type": "Poção (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #023 — II. Consumíveis e Poções (Item 3/20 da categoria).",
+    "Recupera {@dice 6d8} PV e concede vantagem em salvaguardas contra efeitos de medo por 1 hora.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #3 (II. Consumíveis e Poções) · Catálogo Global #23/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

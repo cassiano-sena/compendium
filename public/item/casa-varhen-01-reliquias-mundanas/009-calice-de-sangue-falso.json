@@ -1,0 +1,20 @@
+{
+  "name": "Cálice de Sangue Falso",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #009 — I. Relíquias Mundanas da Casa Varhen (Item 9/20 da categoria).",
+    "Utilizado em cerimônias teatrais da família. Contém um líquido vermelho que parece sangue.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #9 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #9/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

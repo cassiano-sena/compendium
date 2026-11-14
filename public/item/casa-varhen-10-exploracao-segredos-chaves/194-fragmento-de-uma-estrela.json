@@ -1,0 +1,20 @@
+{
+  "name": "Fragmento de uma Estrela",
+  "source": "Casa Varhen",
+  "type": "Reagente Cósmico (Mágico)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #194 — X. Tesouros de Exploração, Segredos e Chaves (Item 14/20 da categoria).",
+    "Pequena rocha cósmica que emite luz negra. Pode ser utilizada para criar um item mágico.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Mágico",
+        "Locais Sugeridos: Salas secretas & Catacumbas (181–200)",
+        "Tabela de Rolagem: 1d20 #14 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #194/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

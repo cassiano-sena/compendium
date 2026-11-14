@@ -1,0 +1,20 @@
+{
+  "name": "Sangue do Fundador",
+  "source": "Casa Varhen",
+  "type": "Elixir Ancestral (Artefato — Cn)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #202 — XI. Tesouros Extremos e Recompensas de Campanha (Item 2/20 da categoria).",
+    "Ao beber, o personagem aumenta um atributo em 2 permanentemente, até o máximo de 24. Em contrapartida, recebe uma marca permanente de Hadar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Cn",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #2 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #202/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

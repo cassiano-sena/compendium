@@ -1,0 +1,21 @@
+{
+  "name": "Fragmento do Primogênito",
+  "source": "Casa Varhen",
+  "type": "Fragmento de Hadar (P)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #140 — VII. Fragmentos de Hadar (Item 20/20 da categoria).",
+    "Permite manipular uma pequena área da realidade, criando efeitos mágicos equivalentes a uma magia de até 5º nível uma vez por descanso longo.",
+    "Drawback / Consequência: Astel passa a ter influência direta sobre o usuário.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #20 (VII. Fragmentos de Hadar) · Catálogo Global #140/220",
+        "Dificuldades (Nível 14): Arcanismo CD 22 / Sabedoria CD 22"
+      ]
+    }
+  ]
+}

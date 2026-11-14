@@ -1,0 +1,20 @@
+{
+  "name": "Máscara do Ancestral",
+  "source": "Casa Varhen",
+  "type": "Relíquia Ancestral (Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #196 — X. Tesouros de Exploração, Segredos e Chaves (Item 16/20 da categoria).",
+    "Permite conversar com uma memória residual de um antigo Varhen uma vez por descanso longo.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Salas secretas & Catacumbas (181–200)",
+        "Tabela de Rolagem: 1d20 #16 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #196/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

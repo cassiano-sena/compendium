@@ -1,0 +1,20 @@
+{
+  "name": "Intelecto Primordial",
+  "source": "Casa Varhen",
+  "type": "Bênção Permanente (P)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #092 — V. Bênçãos Permanentes — Sem Drawbacks (Item 12/20 da categoria).",
+    "Aumenta Inteligência em 2, até o máximo de 22.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140) · Refúgio da Matilha (81–100)",
+        "Tabela de Rolagem: 1d20 #12 (V. Bênçãos Permanentes — Sem Drawbacks) · Catálogo Global #92/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

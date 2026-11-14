@@ -1,0 +1,20 @@
+{
+  "name": "Faca de Manteiga Cerimonial",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #015 — I. Relíquias Mundanas da Casa Varhen (Item 15/20 da categoria).",
+    "Feita de prata, completamente incapaz de cortar qualquer coisa mais dura que manteiga.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #15 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #15/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

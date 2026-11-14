@@ -1,0 +1,20 @@
+{
+  "name": "Olho de Hadar",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #147 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 7/20 da categoria).",
+    "Permite enxergar a verdadeira natureza de criaturas e objetos mágicos. O usuário começa a enxergar coisas que não deveriam existir.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #7 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #147/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

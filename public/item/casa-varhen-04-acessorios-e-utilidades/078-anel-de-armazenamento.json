@@ -1,0 +1,20 @@
+{
+  "name": "Anel de Armazenamento",
+  "source": "Casa Varhen",
+  "type": "Ring (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #078 — IV. Acessórios e Utilidades Mágicas (Item 18/20 da categoria).",
+    "Armazena uma magia de até 3º nível, que pode ser liberada posteriormente.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #18 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #78/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

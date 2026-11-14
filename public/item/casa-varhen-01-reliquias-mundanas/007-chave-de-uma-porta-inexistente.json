@@ -1,0 +1,20 @@
+{
+  "name": "Chave de uma Porta Inexistente",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #007 — I. Relíquias Mundanas da Casa Varhen (Item 7/20 da categoria).",
+    "Chave dourada cuja fechadura ninguém conhece.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #7 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #7/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

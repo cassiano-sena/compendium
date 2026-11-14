@@ -1,0 +1,20 @@
+{
+  "name": "Tinta de Sangue",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #076 — IV. Acessórios e Utilidades Mágicas (Item 16/20 da categoria).",
+    "Permite escrever mensagens que só aparecem sob luz lunar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #16 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #76/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

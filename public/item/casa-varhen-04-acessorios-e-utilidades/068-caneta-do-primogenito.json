@@ -1,0 +1,20 @@
+{
+  "name": "Caneta do Primogênito",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #068 — IV. Acessórios e Utilidades Mágicas (Item 8/20 da categoria).",
+    "Escreve em qualquer superfície, inclusive pedra e metal.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #8 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #68/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

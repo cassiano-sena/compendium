@@ -1,0 +1,20 @@
+{
+  "name": "Sino da Lua",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #070 — IV. Acessórios e Utilidades Mágicas (Item 10/20 da categoria).",
+    "Toca quando uma criatura invisível se aproxima a até 9 m.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #10 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #70/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

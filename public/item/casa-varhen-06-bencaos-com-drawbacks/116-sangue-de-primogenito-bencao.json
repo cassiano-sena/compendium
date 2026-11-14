@@ -1,0 +1,21 @@
+{
+  "name": "Sangue de Primogênito (Bênção)",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #116 — VI. Bênçãos Permanentes — Com Drawbacks (Item 16/20 da categoria).",
+    "Recebe +1 em todas as salvaguardas.",
+    "Drawback / Consequência: não consegue mentir deliberadamente sobre a Casa Varhen.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #16 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #116/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

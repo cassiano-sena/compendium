@@ -1,0 +1,21 @@
+{
+  "name": "Sombra de Astel",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #112 — VI. Bênçãos Permanentes — Com Drawbacks (Item 12/20 da categoria).",
+    "Uma vez por descanso longo, pode lançar Teleport.",
+    "Drawback / Consequência: sempre que usa o poder, Astel percebe sua localização.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #12 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #112/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19 · Resistir/Controlar Drawback CD 20"
+      ]
+    }
+  ]
+}

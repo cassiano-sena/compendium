@@ -1,0 +1,20 @@
+{
+  "name": "Ampola de Gravidade",
+  "source": "Casa Varhen",
+  "type": "Ampola Arcana (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #030 — II. Consumíveis e Poções (Item 10/20 da categoria).",
+    "Cria uma zona de gravidade alterada de 6 m durante 1 minuto. Criaturas escolhidas podem levitar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #10 (II. Consumíveis e Poções) · Catálogo Global #30/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

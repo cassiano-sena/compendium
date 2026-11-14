@@ -1,0 +1,20 @@
+{
+  "name": "Manto do Fazendeiro",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #175 — IX. Itens e Relíquias do Homem Balde (Item 15/20 da categoria).",
+    "Concede vantagem em testes de Natureza e Sobrevivência. Uma vez por dia, pode fazer crescer uma pequena plantação.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #15 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #175/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Avental do Carniceiro",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #179 — IX. Itens e Relíquias do Homem Balde (Item 19/20 da categoria).",
+    "Concede resistência a dano necrótico e de força. Uma vez por turno, ao abater uma criatura, recupera {@dice 1d8} PV.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #19 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #179/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

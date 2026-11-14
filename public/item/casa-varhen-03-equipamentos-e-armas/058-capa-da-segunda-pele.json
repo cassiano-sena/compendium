@@ -1,0 +1,20 @@
+{
+  "name": "Capa da Segunda Pele",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #058 — III. Equipamentos e Armas da Casa Varhen (Item 18/20 da categoria).",
+    "Uma vez por descanso longo, concede resistência a todos os danos até o início do próximo turno.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #18 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #58/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

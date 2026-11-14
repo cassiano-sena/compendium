@@ -1,0 +1,21 @@
+{
+  "name": "Fragmento da Memória",
+  "source": "Casa Varhen",
+  "type": "Fragmento de Hadar (P)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #129 — VII. Fragmentos de Hadar (Item 9/20 da categoria).",
+    "Permite recordar perfeitamente qualquer informação.",
+    "Drawback / Consequência: memórias dolorosas também se tornam impossíveis de esquecer.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #9 (VII. Fragmentos de Hadar) · Catálogo Global #129/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15 · Resistir/Controlar Drawback CD 16"
+      ]
+    }
+  ]
+}

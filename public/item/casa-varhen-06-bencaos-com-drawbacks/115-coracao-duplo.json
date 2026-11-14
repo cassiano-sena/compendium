@@ -1,0 +1,21 @@
+{
+  "name": "Coração Duplo",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #115 — VI. Bênçãos Permanentes — Com Drawbacks (Item 15/20 da categoria).",
+    "Uma vez por descanso longo, quando cair a 0 PV, permanece com 1 PV.",
+    "Drawback / Consequência: depois disso, sofre 2 níveis de exaustão.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #15 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #115/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19 · Resistir/Controlar Drawback CD 20"
+      ]
+    }
+  ]
+}

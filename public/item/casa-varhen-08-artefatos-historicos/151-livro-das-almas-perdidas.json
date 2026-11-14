@@ -1,0 +1,20 @@
+{
+  "name": "Livro das Almas Perdidas",
+  "source": "Casa Varhen",
+  "type": "Tomo Senciente (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #151 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 11/20 da categoria).",
+    "Contém fragmentos de consciências de antigos Varhen. Pode ser consultado para obter informações sobre a linhagem.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #11 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #151/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

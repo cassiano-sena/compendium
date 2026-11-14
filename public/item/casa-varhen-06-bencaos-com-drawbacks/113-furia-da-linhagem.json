@@ -1,0 +1,21 @@
+{
+  "name": "Fúria da Linhagem",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #113 — VI. Bênçãos Permanentes — Com Drawbacks (Item 13/20 da categoria).",
+    "Uma vez por descanso longo, entra em um estado de fúria por 1 minuto, causando +{@dice 2d6} de dano.",
+    "Drawback / Consequência: não pode distinguir facilmente aliados de inimigos durante o primeiro turno.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #13 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #113/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

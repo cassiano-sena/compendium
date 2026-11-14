@@ -1,0 +1,20 @@
+{
+  "name": "Balde de Teletransporte",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #176 — IX. Itens e Relíquias do Homem Balde (Item 16/20 da categoria).",
+    "Quando colocado na cabeça, permite teleportar-se até 9 m uma vez por descanso curto. O destino precisa estar visível.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #16 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #176/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

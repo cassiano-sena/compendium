@@ -1,0 +1,20 @@
+{
+  "name": "O Pacto Original",
+  "source": "Casa Varhen",
+  "type": "Contrato Primordial (Artefato — Mágico)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #204 — XI. Tesouros Extremos e Recompensas de Campanha (Item 4/20 da categoria).",
+    "Permite alterar uma cláusula de um contrato mágico, mas exige um sacrifício de valor equivalente.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Mágico",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #4 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #204/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

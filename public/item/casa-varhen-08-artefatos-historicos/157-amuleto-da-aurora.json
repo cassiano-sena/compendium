@@ -1,0 +1,20 @@
+{
+  "name": "Amuleto da Aurora",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #157 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 17/20 da categoria).",
+    "Concede resistência a dano necrótico e vantagem contra efeitos de corrupção. É uma relíquia ligada à memória do Orfanato da Aurora.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #17 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #157/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

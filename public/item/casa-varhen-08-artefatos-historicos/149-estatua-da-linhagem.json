@@ -1,0 +1,20 @@
+{
+  "name": "Estátua da Linhagem",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #149 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 9/20 da categoria).",
+    "Uma vez por semana, invoca uma manifestação ancestral Varhen para lutar ao lado do portador por 1 minuto.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #9 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #149/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

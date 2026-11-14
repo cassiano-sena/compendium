@@ -1,0 +1,20 @@
+{
+  "name": "O Verdadeiro Legado Varhen",
+  "source": "Casa Varhen",
+  "type": "Legado da Linhagem (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #220 — XI. Tesouros Extremos e Recompensas de Campanha (Item 20/20 da categoria).",
+    "O portador recebe uma bênção permanente: +2 em um atributo, +1 na CA, +1 em todas as salvaguardas e resistência a um tipo de dano à escolha. Uma vez por descanso longo, pode sobreviver a um golpe fatal com 1 PV. O preço é carregar para sempre a responsabilidade de decidir o futuro da linhagem Varhen.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: A",
+        "Locais Sugeridos: Cofre de Astel (Escolha final da linhagem)",
+        "Tabela de Rolagem: 1d20 #20 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #220/220",
+        "Dificuldades (Nível 14): Persuasão / Sabedoria CD 22"
+      ]
+    }
+  ]
+}

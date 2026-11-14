@@ -1,0 +1,20 @@
+{
+  "name": "Livro da Estrela Faminta",
+  "source": "Casa Varhen",
+  "type": "Tomo Arcano (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #142 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 2/20 da categoria).",
+    "Contém conhecimentos proibidos sobre Hadar. Permite aprender duas magias de até 5º nível de evocação ou necromancia, sujeitas à aprovação do mestre.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #2 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #142/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

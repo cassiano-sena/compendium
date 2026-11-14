@@ -1,0 +1,20 @@
+{
+  "name": "Elmo do Observador",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #053 — III. Equipamentos e Armas da Casa Varhen (Item 13/20 da categoria).",
+    "Concede visão no escuro de 36 m e vantagem em testes de Percepção baseados em visão.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #13 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #53/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

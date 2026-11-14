@@ -1,0 +1,20 @@
+{
+  "name": "Balde de Contenção",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #080 — IV. Acessórios e Utilidades Mágicas (Item 20/20 da categoria).",
+    "Um balde de metal escuro que pode armazenar uma criatura Pequena por até 1 hora, desde que ela aceite entrar ou esteja incapacitada. A criatura não sofre dano enquanto estiver dentro.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #20 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #80/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

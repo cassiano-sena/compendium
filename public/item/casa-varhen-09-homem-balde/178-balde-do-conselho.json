@@ -1,0 +1,20 @@
+{
+  "name": "Balde do Conselho",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #178 — IX. Itens e Relíquias do Homem Balde (Item 18/20 da categoria).",
+    "Uma vez por descanso longo, permite fazer uma pergunta a uma memória residual de Kael. A resposta é sempre sincera, mas pode ser incompleta.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #18 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #178/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

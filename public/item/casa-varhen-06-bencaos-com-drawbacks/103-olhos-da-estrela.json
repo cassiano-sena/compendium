@@ -1,0 +1,21 @@
+{
+  "name": "Olhos da Estrela",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #103 — VI. Bênçãos Permanentes — Com Drawbacks (Item 3/20 da categoria).",
+    "Percebe criaturas invisíveis e ilusões a até 18 m.",
+    "Drawback / Consequência: sofre desvantagem em testes de Percepção baseados em visão sob luz solar intensa.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #3 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #103/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Balde do Infinito",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #164 — IX. Itens e Relíquias do Homem Balde (Item 4/20 da categoria).",
+    "Possui espaço interno equivalente a uma Bag of Holding, mas só aceita objetos relacionados a cozinha, agricultura ou combate.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #4 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #164/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

@@ -193,3 +193,91 @@
     .session-part .part-table { display: block; overflow-x: auto; }
     .cv-portrait-card { flex-direction: column; }
 }
+
+/* ---------- Catálogo de Drops & Loot (220 Itens) ---------- */
+.cv-table-wrap { width: 100%; overflow-x: auto; }
+.cv-loot-legend-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-bottom: 12px; border-radius: 5px;
+    background: rgba(24, 21, 28, 0.85); border: 1px solid #41352b; font-size: 12px; color: #dcd2bd;
+}
+.cv-loot-legend-bar > div { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.cv-rar-badge, .cv-type-badge, .cv-curse-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.35;
+}
+.cv-rar-badge.is-common { background: rgba(145, 149, 160, 0.18); color: #cfd3dc; border: 1px solid #636773; }
+.cv-rar-badge.is-uncommon { background: rgba(76, 175, 80, 0.18); color: #a5e6a8; border: 1px solid #4c8c50; }
+.cv-rar-badge.is-rare { background: rgba(66, 165, 245, 0.2); color: #9ad1ff; border: 1px solid #3f82b8; }
+.cv-rar-badge.is-very-rare { background: rgba(171, 71, 188, 0.24); color: #e2aef2; border: 1px solid #8f47a3; }
+.cv-rar-badge.is-legendary { background: rgba(255, 179, 0, 0.22); color: #ffd970; border: 1px solid #c28a1d; }
+.cv-rar-badge.is-artifact { background: rgba(229, 57, 53, 0.25); color: #ffb3ad; border: 1px solid #b53f3a; }
+.cv-type-badge { background: rgba(212, 154, 55, 0.14); color: #ebd7ab; border: 1px solid #594a36; font-weight: 600; }
+.cv-curse-badge { background: rgba(156, 39, 176, 0.25); color: #f3c4ff; border: 1px solid #8d39a1; }
+
+.cv-loot-roller-panel {
+    background: linear-gradient(155deg, rgba(31, 24, 34, 0.96), rgba(16, 14, 18, 0.96));
+    border: 1px solid #6e5434; border-radius: 6px; padding: 14px; margin-bottom: 14px;
+}
+.cv-loot-roller-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.cv-loot-roller-head h3 { margin: 0 0 3px; color: #f3cf7a; font-size: 16px; }
+.cv-loot-roller-head p { margin: 0; font-size: 12.5px; color: #c9bfae; }
+.cv-loot-roller-controls { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.cv-loot-roller-controls label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #d8c8aa; font-weight: 600; }
+.cv-loot-roller-controls select, .cv-loot-filter-bar input, .cv-loot-filter-bar select {
+    background: #141218; color: #efe7d6; border: 1px solid #4a3f35; border-radius: 4px; padding: 7px 10px; font-size: 13px;
+}
+.cv-quick-loc-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.cv-loot-empty { padding: 12px; border: 1px dashed #473d36; border-radius: 4px; color: #b8af9e; font-size: 13px; background: rgba(15, 14, 18, 0.55); }
+.cv-loot-result-card {
+    background: rgba(20, 18, 25, 0.94); border: 1px solid #c49234; border-radius: 5px; padding: 12px 14px;
+}
+.cv-loot-result-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.cv-loot-roll-meta { display: block; font-size: 11.5px; color: #d8b467; font-weight: 600; margin-bottom: 2px; }
+.cv-loot-result-head h4 { margin: 0; font-size: 17px; color: #fff1cc; }
+.cv-loot-badges { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.cv-loot-badges.compact { margin-top: 4px; }
+.cv-loot-result-desc { margin: 6px 0; font-size: 14px; color: #eee4cf; }
+.cv-loot-result-foot {
+    display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0; padding-top: 8px;
+    border-top: 1px solid #352e28; font-size: 12.5px; color: #cabfa9;
+}
+.cv-loot-actions-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+.cv-loot-filter-bar {
+    display: grid; grid-template-columns: minmax(190px, 1.5fr) repeat(4, minmax(120px, 1fr)) auto;
+    gap: 8px; margin-bottom: 10px; align-items: center;
+}
+.cv-loot-count-bar { font-size: 12.5px; color: #cbbda3; margin-bottom: 10px; }
+.cv-loot-cat-block { margin-bottom: 18px; border: 1px solid #3c322b; border-radius: 5px; background: rgba(18, 16, 21, 0.72); overflow: hidden; }
+.cv-loot-cat-head {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 14px; background: linear-gradient(90deg, rgba(145, 102, 26, 0.16), rgba(32, 24, 42, 0.55));
+    border-bottom: 1px solid #3f342a;
+}
+.cv-loot-cat-head h3 { margin: 0 0 2px; font-size: 15.5px; color: #f1cc78; }
+.cv-loot-cat-head p { margin: 0; font-size: 12px; color: #c7bba7; }
+.cv-cat-range { color: #b993cc; font-weight: 600; font-size: 13px; }
+.cv-loot-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cv-loot-table th { text-align: left; padding: 7px 10px; background: rgba(15, 14, 18, 0.85); color: #e2c073; border-bottom: 1px solid #3a3129; font-size: 12px; }
+.cv-loot-table td { padding: 8px 10px; border-bottom: 1px solid #2b2420; vertical-align: top; color: #e5dcc8; }
+.cv-loot-table tr.is-rolled-row td { background: rgba(212, 154, 55, 0.14); }
+.cv-drawback-inline { margin-top: 4px; padding: 4px 8px; border-left: 2px solid #ab47bc; background: rgba(156, 39, 176, 0.12); color: #e9c5f7; font-size: 12px; }
+.cv-loot-loc-cell { font-size: 12px; color: #ded3bc; font-weight: 600; }
+.cv-loot-dc-cell { font-size: 11.5px; color: #b5a892; margin-top: 3px; }
+.cv-row-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.cv-special-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.cv-special-card {
+    display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 5px;
+    background: linear-gradient(155deg, rgba(30, 23, 33, 0.92), rgba(16, 15, 20, 0.92));
+    border: 1px solid #594735;
+}
+.cv-special-card h3 { margin: 2px 0 0; font-size: 15px; color: #f5d382; }
+.cv-special-card p { margin: 0 0 auto; font-size: 13px; color: #d5cab5; }
+
+@media (max-width: 980px) {
+    .cv-loot-filter-bar, .cv-special-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+    .cv-loot-filter-bar, .cv-special-grid { grid-template-columns: 1fr; }
+}

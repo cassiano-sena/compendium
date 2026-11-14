@@ -1,0 +1,21 @@
+{
+  "name": "Herdeiro da Aniquilação",
+  "source": "Casa Varhen",
+  "type": "Bênção Suprema c/ Maldição (P — Ma)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #120 — VI. Bênçãos Permanentes — Com Drawbacks (Item 20/20 da categoria).",
+    "Aumenta um atributo em 2, até o máximo de 24, concede resistência a força e necrótico e adiciona {@dice 1d8} de dano de força uma vez por turno.",
+    "Drawback / Consequência: ao morrer, o usuário se torna uma manifestação de Hadar, a menos que a maldição seja removida.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca / Altar de Hadar (CD 22)",
+        "Tabela de Rolagem: 1d20 #20 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #120/220",
+        "Dificuldades (Nível 14): Arcanismo CD 22 / Sabedoria CD 22"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Espada de Picolé",
+  "source": "Casa Varhen",
+  "type": "Weapon (greatsword) — Equipamento (Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #167 — IX. Itens e Relíquias do Homem Balde (Item 7/20 da categoria).",
+    "Espada grande +2, aparentemente feita de matéria estelar condensada. Causa {@dice 2d6} de dano de força adicional uma vez por turno.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Ecos do Homem Balde — Floresta, Vila & Passagens (161–180)",
+        "Tabela de Rolagem: 1d20 #7 (IX. Itens e Relíquias do Homem Balde) · Catálogo Global #167/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

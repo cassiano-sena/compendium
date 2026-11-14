@@ -1,0 +1,20 @@
+{
+  "name": "Bússola de Hadar",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #064 — IV. Acessórios e Utilidades Mágicas (Item 4/20 da categoria).",
+    "Aponta para a fonte de energia cósmica mais próxima.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #4 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #64/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

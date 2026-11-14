@@ -1,0 +1,20 @@
+{
+  "name": "Lupa do Ocultista",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #075 — IV. Acessórios e Utilidades Mágicas (Item 15/20 da categoria).",
+    "Revela inscrições mágicas e armadilhas arcanas.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #15 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #75/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

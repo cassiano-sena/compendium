@@ -1,0 +1,20 @@
+{
+  "name": "Candelabro de Lathander",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #079 — IV. Acessórios e Utilidades Mágicas (Item 19/20 da categoria).",
+    "Cria luz solar verdadeira em um raio de 6 m.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #19 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #79/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

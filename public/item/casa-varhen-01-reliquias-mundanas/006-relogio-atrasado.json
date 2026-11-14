@@ -1,0 +1,20 @@
+{
+  "name": "Relógio Atrasado",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #006 — I. Relíquias Mundanas da Casa Varhen (Item 6/20 da categoria).",
+    "Relógio de bolso que sempre marca 11h47.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #6 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #6/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

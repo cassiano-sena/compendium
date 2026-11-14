@@ -1,0 +1,20 @@
+{
+  "name": "A Última Foice",
+  "source": "Casa Varhen",
+  "type": "Weapon (scythe/glaive) — Artefato (A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #207 — XI. Tesouros Extremos e Recompensas de Campanha (Item 7/20 da categoria).",
+    "Foice +3. Causa +{@dice 3d8} de dano de força uma vez por turno. Quando reduz uma criatura a 0 PV, pode absorver uma fração de sua essência para recuperar 20 PV.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: A",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #7 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #207/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

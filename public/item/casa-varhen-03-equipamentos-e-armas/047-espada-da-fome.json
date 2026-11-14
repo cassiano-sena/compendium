@@ -1,0 +1,20 @@
+{
+  "name": "Espada da Fome",
+  "source": "Casa Varhen",
+  "type": "Weapon (greatsword) — Equipamento (Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #047 — III. Equipamentos e Armas da Casa Varhen (Item 7/20 da categoria).",
+    "Espada grande +2. Causa +{@dice 1d8} de dano de força. Ao reduzir um inimigo a 0 PV, recupera {@dice 2d8} PV.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #7 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #47/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

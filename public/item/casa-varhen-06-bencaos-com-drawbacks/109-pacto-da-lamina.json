@@ -1,0 +1,21 @@
+{
+  "name": "Pacto da Lâmina",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #109 — VI. Bênçãos Permanentes — Com Drawbacks (Item 9/20 da categoria).",
+    "Uma arma escolhida recebe +2 permanente.",
+    "Drawback / Consequência: se ficar 24 horas sem empunhá-la, sofre {@dice 3d8} de dano psíquico.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #9 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #109/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19 · Resistir/Controlar Drawback CD 20"
+      ]
+    }
+  ]
+}

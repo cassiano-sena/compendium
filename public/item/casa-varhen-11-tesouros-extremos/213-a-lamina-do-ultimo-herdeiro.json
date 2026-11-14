@@ -1,0 +1,20 @@
+{
+  "name": "A Lâmina do Último Herdeiro",
+  "source": "Casa Varhen",
+  "type": "Weapon — Artefato (A — Eq)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #213 — XI. Tesouros Extremos e Recompensas de Campanha (Item 13/20 da categoria).",
+    "Arma +3. Quando o portador fica abaixo de metade dos PV, seus ataques causam +{@dice 2d8} de dano de força.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Eq",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #13 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #213/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

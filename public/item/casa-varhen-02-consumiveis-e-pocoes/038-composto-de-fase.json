@@ -1,0 +1,20 @@
+{
+  "name": "Composto de Fase",
+  "source": "Casa Varhen",
+  "type": "Composto Planar (Consumível — Cn)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #038 — II. Consumíveis e Poções (Item 18/20 da categoria).",
+    "Durante 1 rodada, o usuário pode atravessar criaturas e objetos como terreno difícil.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #18 (II. Consumíveis e Poções) · Catálogo Global #38/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

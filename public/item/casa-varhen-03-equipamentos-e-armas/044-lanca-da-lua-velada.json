@@ -1,0 +1,20 @@
+{
+  "name": "Lança da Lua Velada",
+  "source": "Casa Varhen",
+  "type": "Weapon (spear) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #044 — III. Equipamentos e Armas da Casa Varhen (Item 4/20 da categoria).",
+    "Lança +2. Pode ser arremessada e retorna à mão no final do turno.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #4 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #44/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

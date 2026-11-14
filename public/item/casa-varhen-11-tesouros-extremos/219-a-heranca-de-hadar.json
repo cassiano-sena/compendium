@@ -1,0 +1,21 @@
+{
+  "name": "A Herança de Hadar",
+  "source": "Casa Varhen",
+  "type": "Transformação Suprema (Artefato — A)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #219 — XI. Tesouros Extremos e Recompensas de Campanha (Item 19/20 da categoria).",
+    "Concede +2 em dois atributos diferentes, até o máximo de 24, e resistência a dano de força, psíquico e necrótico. O usuário recebe uma habilidade de regeneração de 5 PV por turno.",
+    "Drawback / Consequência: a morte transforma o usuário em uma Cria das Estrelas.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: A",
+        "Locais Sugeridos: Cofre pessoal de Astel (Alternativa ao destino de Kael)",
+        "Tabela de Rolagem: 1d20 #19 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #219/220",
+        "Dificuldades (Nível 14): Persuasão CD 22 c/ Astel · Cofre CD 24 · Sabedoria CD 22"
+      ]
+    }
+  ]
+}

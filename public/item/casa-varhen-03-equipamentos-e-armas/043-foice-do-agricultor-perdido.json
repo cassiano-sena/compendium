@@ -1,0 +1,20 @@
+{
+  "name": "Foice do Agricultor Perdido",
+  "source": "Casa Varhen",
+  "type": "Weapon (sickle) — Equipamento (Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #043 — III. Equipamentos e Armas da Casa Varhen (Item 3/20 da categoria).",
+    "Foice +1. Uma vez por turno, causa +{@dice 1d6} de dano necrótico. Referência à infância de Kael.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #3 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #43/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

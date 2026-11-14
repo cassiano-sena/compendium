@@ -1,0 +1,20 @@
+{
+  "name": "Herança dos Cinco",
+  "source": "Casa Varhen",
+  "type": "Bênção Permanente (P)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #100 — V. Bênçãos Permanentes — Sem Drawbacks (Item 20/20 da categoria).",
+    "Aumenta um atributo em 2, até o máximo de 22, e concede uma proficiência em perícia à escolha. O usuário passa a carregar uma pequena marca do Orfanato da Aurora.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140) · Refúgio da Matilha (81–100)",
+        "Tabela de Rolagem: 1d20 #20 (V. Bênçãos Permanentes — Sem Drawbacks) · Catálogo Global #100/220",
+        "Dificuldades (Nível 14): Biblioteca / Refúgio da Matilha (CD 19)"
+      ]
+    }
+  ]
+}

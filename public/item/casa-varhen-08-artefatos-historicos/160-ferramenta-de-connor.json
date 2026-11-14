@@ -1,0 +1,20 @@
+{
+  "name": "Ferramenta de Connor",
+  "source": "Casa Varhen",
+  "type": "Dispositivo Experimental (Relíquia — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #160 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 20/20 da categoria).",
+    "Dispositivo experimental capaz de reproduzir um efeito mágico de até 5º nível uma vez por descanso longo. A cada uso, role {@dice 1d20}. Com 1, o dispositivo falha de maneira imprevisível.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #20 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #160/220",
+        "Dificuldades (Nível 14): Arsenal / Oficina de Connor (Falha no 1 em 1d20)"
+      ]
+    }
+  ]
+}

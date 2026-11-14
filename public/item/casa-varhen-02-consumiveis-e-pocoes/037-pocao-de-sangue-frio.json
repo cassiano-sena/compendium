@@ -1,0 +1,20 @@
+{
+  "name": "Poção de Sangue Frio",
+  "source": "Casa Varhen",
+  "type": "Poção (Consumível — Cn)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #037 — II. Consumíveis e Poções (Item 17/20 da categoria).",
+    "Concede imunidade à condição Amedrontado por 10 minutos.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #17 (II. Consumíveis e Poções) · Catálogo Global #37/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

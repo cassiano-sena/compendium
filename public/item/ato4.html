@@ -1,0 +1,161 @@
+<link rel="stylesheet" href="./session/casa-varhen/session.css">
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Ato IV</div>
+        <h1>O Primogênito</h1>
+        <p class="part-subtitle">Mudança brusca de ritmo: da perseguição desesperada à calma absoluta de Astel Vhalzar Varhen sob o olhar de Hadar.</p>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('loot')">🎁 Drops &amp; Loot (220)</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'ato4-flow')">Refúgio, Astel &amp; Diálogo</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato4-hook')">A Verdade de Kael &amp; Escolha Moral</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato4-rewards')">Cajado de Vecna &amp; Fragmentos</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato4-tools')">Transição Kaiju &amp; Controle</button>
+    </div>
+
+    <div class="tab-content ato4-flow active">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 1 — O Refúgio de Astel (Leitura em Voz Alta)</h2>
+                <div class="cv-read-aloud">
+                    A passagem termina em uma enorme porta de madeira escura decorada em ouro. Ao atravessá-la, a mansão parece ficar em outro mundo: estantes gigantescas sobem até o teto repletas de artefatos, esculturas e grimórios de diferentes eras. Pela imensa janela ao fundo vê-se o céu negro — e bem no centro dele pulsa Hadar. Sentado no trono, lendo um livro sem sequer erguer o olhar, um homem velho de cabelos prateados e longa barba diz calmamente:<br>
+                    <strong>"Demoraram. Finalmente."</strong>
+                </div>
+                <div class="cv-portrait-card">
+                    <img src="./npc/astel/astel-vhalzar-varhen.png" alt="Astel Vhalzar Varhen" class="cv-portrait-img">
+                    <div>
+                        <h3>Cena 2 — Como Interpretar Astel</h3>
+                        <p>Arrogante, porém educado e sereno. Extremamente inteligente, sem medo algum do Arauto e avesso ao desperdício. Fez o pacto com Hadar há milênios entregando sua linhagem em busca de evolução e poder. <strong>Não revele todos os segredos de sua história agora.</strong></p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', '', 'astel-vhalzar-varhen')">🕯️ Ficha de Astel</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Perguntas Prováveis &amp; Respostas de Astel</h2>
+                <table class="part-table">
+                    <thead><tr><th>Pergunta dos PJs</th><th>Resposta de Astel</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>"Você é responsável por tudo isso?"</strong></td><td><em>"Responsável? Não. Eu apenas permiti que continuasse existindo."</em></td></tr>
+                        <tr><td><strong>"Por que pactuou com Hadar?"</strong></td><td><em>"Porque havia algo que eu desejava alcançar e nenhuma divindade estava disposta a conceder."</em></td></tr>
+                        <tr><td><strong>"Você é maligno?"</strong></td><td><em>"Uma pergunta infantil. O que torna alguém maligno: suas intenções ou os resultados de suas escolhas?"</em></td></tr>
+                        <tr><td><strong>"Você criou Zaltherion?"</strong></td><td><em>"Sim. Um dos meus projetos mais interessantes — queria algo perfeito, incapaz de ser corrompido. Curiosamente, ele contrariou sua origem."</em></td></tr>
+                        <tr><td><strong>"O que aconteceu com Kael?"</strong></td><td><em>"Ele finalmente começou a se tornar aquilo que sua família passou milênios tentando esconder."</em></td></tr>
+                        <tr><td><strong>"Consegue salvá-lo?"</strong></td><td><em>"Salvar? Não. Mas posso ajudá-lo a sobreviver a si mesmo."</em></td></tr>
+                    </tbody>
+                </table>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'zaltherion', 'zaltherion')">⚡ Ver Ficha de Zaltherion</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato4-hook">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 3 — A Verdade Sobre Kael</h2>
+                <p>Astel revela que Kael <strong>não está apenas possuído</strong>: ele e a maldição estão se fundindo em uma nova consciência. O Homem Balde ainda existe lá dentro, mas o Arauto representa a chance de ele se tornar muito maior do que um simples hospedeiro descartável.</p>
+                <p>Astel não consegue simplesmente extirpar a maldição; para ele, Kael precisa aprender a controlar a própria natureza.</p>
+                <div class="cv-portrait-card">
+                    <img src="./npc/zaltherion/zaltherion-act-2-profile.png" alt="Zaltherion" class="cv-portrait-img">
+                    <div>
+                        <p><strong>Conexão de campanha:</strong> Assim como Zaltherion foi um experimento de Astel para resistir à corrupção, Kael e os Fragmentos de Hadar continuam essa obsessão por evolução controlada.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>O Gancho Moral — O Balde de Kael</h2>
+                <p>A hostilidade com Astel depende de uma única escolha dos aventureiros, não de uma batalha forçada:</p>
+                <p><strong>Pedido de Astel:</strong> Ele exige que os jogadores entreguem o <strong>balde de Kael</strong> e aceitem que ele assuma o controle definitivo da manifestação para impedir o fim da dimensão.</p>
+                <table class="part-table">
+                    <thead><tr><th>Decisão do Grupo</th><th>Consequência Imediata</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Entregam o balde e aceitam</strong></td><td>Astel permanece aliado pleno durante o clímax.</td></tr>
+                        <tr><td><strong>Recusam, mas argumentam</strong></td><td>Astel aceita negociar termos futuros sem combate imediato.</td></tr>
+                        <tr><td><strong>Atacam, ameaçam ou roubam</strong></td><td>Astel torna-se hostil (mas o tremor do Ato V força trégua ou fuga).</td></tr>
+                    </tbody>
+                </table>
+                <div class="part-callout cosmic">
+                    <strong>Dilema real:</strong> A pergunta não é se Kael merece viver — é se os jogadores confiam em Astel para decidir o que Kael deve se tornar.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato4-rewards">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Cena 4 — O Fragmento do Cajado de Vecna</h2>
+                <p>Astel oferece duas dádivas ao grupo antes do tremor. Ao entregar o fragmento que conecta esta sidequest à campanha principal (<em>Eve of Ruin</em>), diz:</p>
+                <div class="cv-read-aloud">"Vocês chegaram até aqui carregando algo que não compreendem. Talvez seja justo que saiam daqui carregando algo que ainda não conseguem controlar."</div>
+                <div class="cv-reward-card">
+                    <h4>Fragmento do Cajado de Vecna (Raro ou Muito Raro)</h4>
+                    <ul>
+                        <li>Funciona como foco arcano e concede <strong>+1 nas jogadas de ataque mágico</strong>.</li>
+                        <li><strong>1× por descanso longo:</strong> permite recuperar um espaço de magia de até <strong>3º nível</strong>.</li>
+                        <li>Carrega conexão residual direta com <strong>Vecna</strong>. <em>("Algumas coisas são melhores quando permanecem incompletas.")</em></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>A Bênção de Hadar — Os Três Fragmentos</h2>
+                <p>Escolha individual: aceita ou recusada por cada PJ. Gera uma <strong>marca visível permanente</strong> que evolui na campanha.</p>
+
+                <div class="cv-reward-card">
+                    <h4>Alexander Anderson — Chiaroscuro (Luz Absoluta)</h4>
+                    <p><strong>Poder (1×/descanso longo):</strong> Ao lançar uma magia que cause dano, torna os alvos atingidos <strong>vulneráveis ao dano dessa magia</strong>.</p>
+                    <div class="cv-consequence"><strong>Consequência (1d20):</strong> Sempre que usar o fragmento, em <strong>10 ou menos</strong>, uma entidade mental influencia seu corpo e personalidade (pode consentir ou resistir parcialmente).</div>
+                </div>
+
+                <div class="cv-reward-card">
+                    <h4>Elijah — Animositas (Instinto)</h4>
+                    <p><strong>Poder (1×/descanso longo):</strong> Executa um <strong>Action Surge adicional</strong> como ação livre em seu turno, ignorando desvantagens de limitações físicas até o fim do turno.</p>
+                    <div class="cv-consequence"><strong>Consequência (1d20):</strong> Ao encontrar uma criatura que odeia, em <strong>10 ou menos</strong> fica <strong>Enfeitiçado (Charmed)</strong> por ela, mesmo sendo normalmente imune.</div>
+                </div>
+
+                <div class="cv-reward-card">
+                    <h4>Jester — Simplicitas (Probabilidade)</h4>
+                    <p><strong>Poder (1×/descanso longo):</strong> Antes de conhecer o resultado de uma rolagem, remove todos os modificadores positivos/negativos e adiciona <strong>10d10</strong> ao resultado.</p>
+                    <div class="cv-consequence"><strong>Consequência (1d20):</strong> Ao abater uma criatura, em <strong>10 ou menos</strong> surge uma cópia maligna de Jester (1 PV, sem equipamento) tentando provar ser superior.</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato4-tools">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Gancho Imediato para o Ato V — O Tremor</h2>
+                <p>Assim que os jogadores tomarem suas decisões e receberem as recompensas, introduza os primeiros sinais sísmicos na conversa:</p>
+                <ol>
+                    <li>Copos sobre a mesa começam a vibrar suavemente.</li>
+                    <li>Livros caem das estantes altas sem vento algum.</li>
+                    <li>Rachaduras atravessam o piso de mármore escuro.</li>
+                    <li>O céu fora da janela clareia bruscamente — mas não há estrela nova.</li>
+                </ol>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Iniciar Ato V — A Batalha Kaiju</button>
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+</div>

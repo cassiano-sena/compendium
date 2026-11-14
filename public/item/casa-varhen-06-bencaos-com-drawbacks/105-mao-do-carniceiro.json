@@ -1,0 +1,21 @@
+{
+  "name": "Mão do Carniceiro",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #105 — VI. Bênçãos Permanentes — Com Drawbacks (Item 5/20 da categoria).",
+    "Ataques com a mão marcada causam +{@dice 2d8} de dano de força.",
+    "Drawback / Consequência: objetos não mágicos tocados por ela se deterioram após alguns minutos.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #5 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #105/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19 · Resistir/Controlar Drawback CD 20"
+      ]
+    }
+  ]
+}

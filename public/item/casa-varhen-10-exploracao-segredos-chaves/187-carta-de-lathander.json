@@ -1,0 +1,20 @@
+{
+  "name": "Carta de Lathander",
+  "source": "Casa Varhen",
+  "type": "Documento / Pista (M)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #187 — X. Tesouros de Exploração, Segredos e Chaves (Item 7/20 da categoria).",
+    "Mensagem antiga destinada a Astel antes de seu pacto.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: M",
+        "Locais Sugeridos: Salas secretas & Catacumbas (181–200)",
+        "Tabela de Rolagem: 1d20 #7 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #187/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

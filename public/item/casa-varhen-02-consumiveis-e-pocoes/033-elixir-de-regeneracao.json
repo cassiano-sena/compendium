@@ -1,0 +1,20 @@
+{
+  "name": "Elixir de Regeneração",
+  "source": "Casa Varhen",
+  "type": "Elixir (Consumível — Cn)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #033 — II. Consumíveis e Poções (Item 13/20 da categoria).",
+    "Recupera 3 PV no início de cada turno durante 1 minuto.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #13 (II. Consumíveis e Poções) · Catálogo Global #33/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Cinto do Gigante Faminto",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #055 — III. Equipamentos e Armas da Casa Varhen (Item 15/20 da categoria).",
+    "Define Força em 23, caso seja inferior.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #15 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #55/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

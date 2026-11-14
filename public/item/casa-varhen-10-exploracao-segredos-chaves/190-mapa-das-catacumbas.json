@@ -1,0 +1,20 @@
+{
+  "name": "Mapa das Catacumbas",
+  "source": "Casa Varhen",
+  "type": "Documento / Mapa (M)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #190 — X. Tesouros de Exploração, Segredos e Chaves (Item 10/20 da categoria).",
+    "Revela passagens subterrâneas esquecidas.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: M",
+        "Locais Sugeridos: Salas secretas & Catacumbas (181–200)",
+        "Tabela de Rolagem: 1d20 #10 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #190/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

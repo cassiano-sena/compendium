@@ -1,0 +1,20 @@
+{
+  "name": "O Sol Negro",
+  "source": "Casa Varhen",
+  "type": "Orbe Apocalíptico (Artefato — Cn)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #216 — XI. Tesouros Extremos e Recompensas de Campanha (Item 16/20 da categoria).",
+    "Uma esfera de energia que, ao ser quebrada, causa {@dice 12d10} de dano de força em uma área de 9 m. Salvaguarda de Destreza CD 20 reduz à metade.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Cn",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #16 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #216/220",
+        "Dificuldades (Nível 14): Cofre de Astel · Salvaguarda de Des CD 20"
+      ]
+    }
+  ]
+}

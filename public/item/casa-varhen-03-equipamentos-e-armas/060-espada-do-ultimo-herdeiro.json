@@ -1,0 +1,20 @@
+{
+  "name": "Espada do Último Herdeiro",
+  "source": "Casa Varhen",
+  "type": "Weapon (greatsword) — Equipamento (Eq)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #060 — III. Equipamentos e Armas da Casa Varhen (Item 20/20 da categoria).",
+    "Espada grande +3. Uma vez por descanso longo, quando o portador cair a 0 PV, permanece com 1 PV e libera uma onda de {@dice 4d10} de dano de força em criaturas a até 3 m.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #20 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #60/220",
+        "Dificuldades (Nível 14): Arsenal (Vitrine Selada CD 19)"
+      ]
+    }
+  ]
+}

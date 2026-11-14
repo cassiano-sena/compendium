@@ -1,0 +1,291 @@
+<link rel="stylesheet" href="./session/casa-varhen/session.css">
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Drops, Loot &amp; Tesouros</div>
+        <h1>Drops &amp; Loot — Catálogo de Tesouros (220 Itens)</h1>
+        <p class="part-subtitle">220 itens em 11 categorias · D&amp;D 5e / 5.5e (Nível 14) · Tabelas de dados clicáveis, dificuldades (CDs) e distribuição por locais da dimensão.</p>
+        <div class="cv-meta-badges">
+            <span class="cv-badge">📦 220 Itens · 11 Categorias</span>
+            <span class="cv-badge">🎲 Tabelas por Local &amp; d20</span>
+            <span class="cv-badge void">☄️ Hadar &amp; Fragmentos</span>
+            <span class="cv-badge crimson">⚖️ Balanceado p/ Nível 14</span>
+        </div>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('loot')">🎁 Drops &amp; Loot (220)</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'loot-catalog')">🎲 Rolador &amp; Catálogo (220 Itens)</button>
+        <button class="tab-btn" onclick="openTab(this, 'loot-locations')">🗺️ Locais, Tabelas de Dados &amp; CDs</button>
+        <button class="tab-btn" onclick="openTab(this, 'loot-lore')">⚖️ Lore, Especiais &amp; Balanceamento</button>
+    </div>
+
+    <div class="tab-content loot-catalog active">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <div class="cv-loot-legend-bar">
+                    <div>
+                        <strong>Raridade:</strong>
+                        <span class="cv-rar-badge is-common">C: Comum</span>
+                        <span class="cv-rar-badge is-uncommon">I: Incomum</span>
+                        <span class="cv-rar-badge is-rare">R: Raro</span>
+                        <span class="cv-rar-badge is-very-rare">MR: Muito Raro</span>
+                        <span class="cv-rar-badge is-legendary">L: Lendário</span>
+                        <span class="cv-rar-badge is-artifact">A: Artefato</span>
+                    </div>
+                    <div>
+                        <strong>Tipo:</strong>
+                        <span class="cv-type-badge">M = Mundano</span>
+                        <span class="cv-type-badge">Cn = Consumível</span>
+                        <span class="cv-type-badge">Eq = Equipamento</span>
+                        <span class="cv-type-badge">P = Permanente</span>
+                        <span class="cv-curse-badge">Ma = Maldição</span>
+                    </div>
+                </div>
+                <div class="cv-loot-slot" data-cv-loot="full"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content loot-locations">
+        <div class="part-grid">
+            <section class="part-panel wide">
+                <h2>Como Distribuir os Itens por Ambiente, Dados e Dificuldades (CDs)</h2>
+                <p>Evite jogar os 220 itens em uma única pilha indiferenciada. Use a tabela abaixo conforme o ambiente explorado pelo grupo — cada linha combina <strong>faixa oficial</strong>, <strong>fórmula de dados clicável</strong>, <strong>CDs de busca/abertura/resistência</strong> e <strong>consequência de falha</strong>.</p>
+                <div class="cv-table-wrap">
+                    <table class="part-table">
+                        <thead>
+                            <tr>
+                                <th>Local da Sessão</th>
+                                <th>Tipo de Recompensa</th>
+                                <th>Itens Sugeridos</th>
+                                <th>Fórmula de Sorteio</th>
+                                <th>Dificuldades (CDs)</th>
+                                <th>Falha / Risco</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Quartos dos Empregados</strong></td>
+                                <td>Mundanos e consumíveis (Cat. I &amp; II)</td>
+                                <td>1–40</td>
+                                <td>1d6 (1–3 Cat. I · 4–6 Cat. II) + 1d20</td>
+                                <td>Busca rápida CD 12 · Fundos falsos / Ladinagem CD 14</td>
+                                <td>Estilhaços ou barulho (+1 Medidor do Arauto); frasco pode quebrar.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Escritórios &amp; Ala Administrativa</strong></td>
+                                <td>Utilidades e equipamentos (Cat. III &amp; IV)</td>
+                                <td>41–80</td>
+                                <td>1d6 (1–3 Cat. III · 4–6 Cat. IV) + 1d20</td>
+                                <td>Investigação CD 15 · Cofres selados / Arcanismo / Ladinagem CD 17</td>
+                                <td>Agulha necrótica (3d8 necrótico, Con CD 15 metade) ou alerta arcano.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Biblioteca da Estrela</strong></td>
+                                <td>Bênçãos e fragmentos (Cat. V, VI &amp; VII)</td>
+                                <td>81–140</td>
+                                <td>1d6 (1–2 Cat. V · 3–4 Cat. VI · 5–6 Cat. VII) + 1d20</td>
+                                <td>Arcanismo / Religião CD 16 · Salvaguarda de Sabedoria CD 18 ao absorver</td>
+                                <td>Falha na absorção: 2d8 psíquico e sussurro intrusivo de Hadar.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Arsenal &amp; Sala de Troféus</strong></td>
+                                <td>Armas, armaduras e relíquias (Cat. III &amp; VIII)</td>
+                                <td>41–60 e 141–160</td>
+                                <td>1d6 (1–3 Cat. III · 4–6 Cat. VIII) + 1d20</td>
+                                <td>Vitrines de ferro CD 16 · Glifos / Relíquias Históricas CD 18–20</td>
+                                <td>Glifo explosivo (4d8 força, Des CD 16 metade) ou desperta guarda/Carrasco.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ecos do Homem Balde (Floresta, Vila &amp; Passagens)</strong></td>
+                                <td>Relíquias de Kael e objetos absurdos (Cat. IX)</td>
+                                <td>161–180</td>
+                                <td>1d20 na Tabela IX (+160)</td>
+                                <td>Sobrevivência / Percepção CD 13 · Consciência residual / Persuasão CD 17</td>
+                                <td>Badalada ensurdecedora do balde (Sabedoria CD 14 ou atordoado 1 turno).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Salas Secretas, Catacumbas &amp; Enigmas</strong></td>
+                                <td>Relíquias, segredos e chaves (Cat. X)</td>
+                                <td>181–200</td>
+                                <td>1d20 na Tabela X (+180)</td>
+                                <td>Nichos ocultos CD 17 · Selos de sangue / Enigmas da mansão CD 19</td>
+                                <td>Selo trava por 10 min ou exige sacrifício de 2d6 PV necrótico.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cofre Pessoal de Astel</strong></td>
+                                <td>Lendários e artefatos extremos (Cat. XI)</td>
+                                <td>201–220 (destaque #219)</td>
+                                <td>1d20 na Tabela XI (+200)</td>
+                                <td>C/ chave Varhen CD 20 · Persuasão c/ Astel CD 22 · Arrombar sem chave CD 25</td>
+                                <td>Barreira dimensional de Astel (4d10 força, Con CD 19) e hostilização imediata.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Refúgio da Matilha (Lyra Bloodseeker)</strong></td>
+                                <td>Consumíveis, equipamentos e bênçãos (Cat. II &amp; V)</td>
+                                <td>21–40 e 81–100</td>
+                                <td>1d6 (1–3 Cat. II · 4–6 Cat. V) + 1d20</td>
+                                <td>Sobrevivência / Medicina CD 14 · Persuasão / Honra c/ Lyra CD 16</td>
+                                <td>Lyra cobra um favor pesado ou recusa entregas extras antes da luta.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Grau de Sucesso no Teste de Busca &amp; CDs por Raridade</h2>
+                <p>Compare o teste de perícia do grupo (1d20 + bônus) contra a CD do local:</p>
+                <table class="part-table">
+                    <thead><tr><th>Resultado vs CD</th><th>Consequência no Drop</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Falha por 5 ou mais</strong></td><td>Nenhum tesouro encontrado e aciona uma complicação (1d8 abaixo).</td></tr>
+                        <tr><td><strong>Falha por 1 a 4</strong></td><td>Encontra apenas 1 Relíquia Mundana (1d20 na Cat. I) ou pista parcial do local.</td></tr>
+                        <tr><td><strong>Sucesso (&ge; CD)</strong></td><td>Role normalmente na faixa do local usando os dados indicados.</td></tr>
+                        <tr><td><strong>Sucesso Crítico (CD +5 ou 20 natural)</strong></td><td>Rola duas vezes na tabela e escolhe o item, OU evita o drawback imediato na ativação.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top:14px;">Dificuldades Base por Raridade do Item</h3>
+                <table class="part-table">
+                    <thead><tr><th>Raridade</th><th>Achar / Destrancar</th><th>Identificar (Arc./Hist.)</th><th>Resistir Maldição / Drawback</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Comum (C)</strong></td><td>CD 11</td><td>CD 10</td><td>CD 12</td></tr>
+                        <tr><td><strong>Incomum (I)</strong></td><td>CD 13</td><td>CD 12</td><td>CD 14</td></tr>
+                        <tr><td><strong>Raro (R)</strong></td><td>CD 15</td><td>CD 15</td><td>CD 16</td></tr>
+                        <tr><td><strong>Muito Raro (MR)</strong></td><td>CD 17</td><td>CD 17</td><td>CD 18</td></tr>
+                        <tr><td><strong>Lendário (L)</strong></td><td>CD 19</td><td>CD 19</td><td>CD 20</td></tr>
+                        <tr><td><strong>Artefato (A)</strong></td><td>CD 21–25</td><td>CD 22</td><td>CD 22</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="part-panel">
+                <h2>Oráculo Aleatório (1d12) &amp; Complicações de Saque (1d8)</h2>
+                <div class="part-roll"><span>Oráculo Global de Categoria</span><code>1d12</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d12</th><th>Categoria Sorteada (depois role 1d20)</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>I. Relíquias Mundanas da Casa Varhen (1–20)</td></tr>
+                        <tr><td>2</td><td>II. Consumíveis e Poções (21–40)</td></tr>
+                        <tr><td>3</td><td>III. Equipamentos e Armas da Casa Varhen (41–60)</td></tr>
+                        <tr><td>4</td><td>IV. Acessórios e Utilidades Mágicas (61–80)</td></tr>
+                        <tr><td>5</td><td>V. Bênçãos Permanentes — Sem Drawbacks (81–100)</td></tr>
+                        <tr><td>6</td><td>VI. Bênçãos Permanentes — Com Drawbacks (101–120)</td></tr>
+                        <tr><td>7</td><td>VII. Fragmentos de Hadar (121–140)</td></tr>
+                        <tr><td>8</td><td>VIII. Artefatos Históricos e Relíquias Lendárias (141–160)</td></tr>
+                        <tr><td>9</td><td>IX. Itens e Relíquias do Homem Balde (161–180)</td></tr>
+                        <tr><td>10</td><td>X. Tesouros de Exploração, Segredos e Chaves (181–200)</td></tr>
+                        <tr><td>11</td><td>XI. Tesouros Extremos e Recompensas de Campanha (201–220)</td></tr>
+                        <tr><td>12</td><td><strong>Seleção Temática Especial do Mestre</strong> (ou #219 Herança de Hadar)</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="part-roll" style="margin-top:12px;"><span>Falhas &amp; Complicações ao Violar Cofres</span><code>1d8</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d8</th><th>Efeito / Risco</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>Barulho metálico ecoa pelos corredores (+1 no Medidor do Arauto).</td></tr>
+                        <tr><td>2</td><td>Selo de Hadar libera pulso psíquico: Sabedoria CD 17 ou 2d8 de dano psíquico.</td></tr>
+                        <tr><td>3</td><td>Gaveta falsa dispara gás ou dardo necrótico: Constituição CD 16 ou 3d8 necrótico.</td></tr>
+                        <tr><td>4</td><td>Um frasco consumível próximo racha antes da coleta (só dura 10 minutos).</td></tr>
+                        <tr><td>5</td><td>Rastro cósmico gruda nas mãos do personagem (marca visível por 1 hora).</td></tr>
+                        <tr><td>6</td><td>Eco do Homem Balde repete uma palavra do usuário como alerta audível.</td></tr>
+                        <tr><td>7</td><td>Fechadura trava em falso: exige 10 minutos extras ou Arcanismo CD 18.</td></tr>
+                        <tr><td>8</td><td>Símbolo do Primogênito desperta um Vigia/Massa Simbiótica na sala adjacente.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content loot-lore">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Os Cinco Eixos Temáticos &amp; Balanceamento</h2>
+                <ul>
+                    <li><strong>Hadar:</strong> fome, vazio, consumo, matéria estelar, corrupção e simbiose.</li>
+                    <li><strong>Casa Varhen:</strong> aristocracia, ocultismo, pactos, experimentos, linhagem e artefatos ancestrais.</li>
+                    <li><strong>Kael:</strong> a foice antiga, Mormesk, a mão corrompida, o Homem Balde e o Arauto da Aniquilação.</li>
+                    <li><strong>Astel:</strong> Lathander, o pacto primordial, conhecimento, autoridade dimensional e experimentos.</li>
+                    <li><strong>Os Cinco Terríveis:</strong> Orfanato da Aurora, juramento de irmandade, Zaltherion, Connor, Willick e Eskinn.</li>
+                </ul>
+                <div class="part-callout" style="margin-top:10px;">
+                    <strong>Convenção de balanceamento:</strong> Os itens são majoritariamente homebrew, com algumas referências a itens oficiais de D&amp;D. Os bônus permanentes são pensados para personagens de <strong>nível 14</strong>. Itens com efeitos especialmente fortes possuem custos, limitações ou consequências.
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Três Regras de Balanceamento &amp; Observações</h2>
+                <ol>
+                    <li><strong>Bênçãos permanentes:</strong> distribua no máximo <strong>uma ou duas por personagem</strong> durante essa aventura. Resistências, aumento de atributos e regeneração são especialmente impactantes.</li>
+                    <li><strong>Artefatos (itens 201–220):</strong> não precisam ser encontrados completos. Podem ser fragmentos, projetos de Astel ou recompensas condicionais.</li>
+                    <li><strong>Maldições:</strong> não obrigue ninguém a aceitar um drawback. A tentação de poder deve ser uma escolha do jogador.</li>
+                </ol>
+                <div class="cv-alt-box">
+                    <strong>Observação — Itens 121–140 (Fragmentos de Hadar):</strong> Os itens 121–140 são adaptações dos Fragmentos de Hadar desenvolvidos para <strong>Alexander</strong> (#121 Chiaroscuro), <strong>Elijah</strong> (#122 Animositas) e <strong>Jester</strong> (#123 Simplicitas). Mantenha suas versões originais caso já tenham sido aprovadas pelo mestre.
+                </div>
+                <div class="cv-reward-card" style="margin-top:10px;">
+                    <strong>Ideia Favorita do Mestre — #219 Herança de Hadar:</strong> Coloque o item 219 no cofre pessoal de Astel. Ele pode oferecê-lo como uma alternativa ao destino de Kael: não uma cura, mas a aceitação consciente daquilo que a linhagem Varhen se tornou.
+                    <div class="cv-actions-row">
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(219)">📖 Abrir #219 Herança de Hadar</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <h2>Seleção de Recompensas Especiais do Mestre</h2>
+                <p>Seleção temática recomendada para colocar diretamente na aventura:</p>
+                <div class="cv-special-grid">
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-artifact">Artefato · #165</span>
+                        <h3>🪣 Balde da Aniquilação</h3>
+                        <p>A recompensa mais temática. Uma conexão direta com o Homem Balde e o Arauto.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(165)">📖 Ver na Aba Itens</button>
+                    </div>
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-artifact">Artefato · #153</span>
+                        <h3>⚔️ Lâmina de Mormesk</h3>
+                        <p>Uma oportunidade de trazer de volta a história do antigo patrono de Kael.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(153)">📖 Ver na Aba Itens</button>
+                    </div>
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-legendary">Lendário · #141</span>
+                        <h3>👑 Coroa do Primeiro Varhen</h3>
+                        <p>Uma recompensa diretamente ligada à autoridade de Astel.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(141)">📖 Ver na Aba Itens</button>
+                    </div>
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-legendary">Lendário · #101</span>
+                        <h3>🖤 Coração de Hadar</h3>
+                        <p>Uma bênção muito poderosa com um custo permanente.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(101)">📖 Ver na Aba Itens</button>
+                    </div>
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-legendary">Lendário · #148</span>
+                        <h3>🏆 Cálice do Primogênito</h3>
+                        <p>Uma relíquia da época em que Astel ainda servia a Lathander.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(148)">📖 Ver na Aba Itens</button>
+                    </div>
+                    <div class="cv-special-card">
+                        <span class="cv-rar-badge is-artifact">Artefato · #219</span>
+                        <h3>🌌 A Herança de Hadar</h3>
+                        <p>Alternativa moral no cofre de Astel: aceitação consciente da linhagem Varhen.</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenLoot.openInItemsTab(219)">📖 Ver na Aba Itens</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

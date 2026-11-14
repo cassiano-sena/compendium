@@ -1,0 +1,20 @@
+{
+  "name": "Cálice de Purificação",
+  "source": "Casa Varhen",
+  "type": "Relíquia Sagrada (Eq)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #193 — X. Tesouros de Exploração, Segredos e Chaves (Item 13/20 da categoria).",
+    "Pode remover uma corrupção menor de Hadar uma vez por semana.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Salas secretas & Catacumbas (181–200)",
+        "Tabela de Rolagem: 1d20 #13 (X. Tesouros de Exploração, Segredos e Chaves) · Catálogo Global #193/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

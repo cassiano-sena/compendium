@@ -1,0 +1,20 @@
+{
+  "name": "Baralho Aristocrático",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #010 — I. Relíquias Mundanas da Casa Varhen (Item 10/20 da categoria).",
+    "Cartas ilustradas com membros da Casa Varhen. Um dos reis foi riscado violentamente.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #10 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #10/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

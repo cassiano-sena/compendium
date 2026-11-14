@@ -1,0 +1,20 @@
+{
+  "name": "Lâmina de Mormesk",
+  "source": "Casa Varhen",
+  "type": "Weapon — Artefato Senciente (A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #153 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 13/20 da categoria).",
+    "Lâmina senciente +3. Causa +{@dice 2d8} de dano de força e pode se materializar na mão do portador. Sua personalidade é desconhecida.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #13 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #153/220",
+        "Dificuldades (Nível 14): Arsenal / Selo de Kael (CD 21)"
+      ]
+    }
+  ]
+}

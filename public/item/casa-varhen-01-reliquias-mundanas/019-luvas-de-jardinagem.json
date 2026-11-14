@@ -1,0 +1,20 @@
+{
+  "name": "Luvas de Jardinagem",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #019 — I. Relíquias Mundanas da Casa Varhen (Item 19/20 da categoria).",
+    "Pertenceram a um antigo jardineiro. Ainda possuem terra de uma dimensão desconhecida.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #19 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #19/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

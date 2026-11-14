@@ -1,0 +1,20 @@
+{
+  "name": "Frasco de Antimatéria",
+  "source": "Casa Varhen",
+  "type": "Frasco Arremessável (Consumível — Cn)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #024 — II. Consumíveis e Poções (Item 4/20 da categoria).",
+    "Ao quebrar, causa {@dice 8d8} de dano de força em uma esfera de 3 m. Salvaguarda de Destreza CD 17 reduz à metade.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #4 (II. Consumíveis e Poções) · Catálogo Global #24/220",
+        "Dificuldades (Nível 14): Investigação CD 15 / Salvaguarda de Des CD 17"
+      ]
+    }
+  ]
+}

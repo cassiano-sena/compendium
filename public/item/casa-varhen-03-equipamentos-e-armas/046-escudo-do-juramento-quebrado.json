@@ -1,0 +1,20 @@
+{
+  "name": "Escudo do Juramento Quebrado",
+  "source": "Casa Varhen",
+  "type": "Armor (shield) — Equipamento (Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #046 — III. Equipamentos e Armas da Casa Varhen (Item 6/20 da categoria).",
+    "Escudo +2. Uma vez por descanso longo, reduz pela metade o dano de um ataque recebido.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #6 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #46/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

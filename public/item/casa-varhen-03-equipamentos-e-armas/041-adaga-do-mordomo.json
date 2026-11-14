@@ -1,0 +1,20 @@
+{
+  "name": "Adaga do Mordomo",
+  "source": "Casa Varhen",
+  "type": "Weapon (dagger) — Equipamento (Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #041 — III. Equipamentos e Armas da Casa Varhen (Item 1/20 da categoria).",
+    "+1 em ataques e danos. Pode ser escondida facilmente.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #1 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #41/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

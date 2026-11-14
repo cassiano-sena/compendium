@@ -1,0 +1,20 @@
+{
+  "name": "Máscara do Anfitrião",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #072 — IV. Acessórios e Utilidades Mágicas (Item 12/20 da categoria).",
+    "Permite alterar temporariamente a aparência facial.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #12 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #72/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

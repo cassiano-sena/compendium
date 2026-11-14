@@ -1,0 +1,20 @@
+{
+  "name": "Relógio de Astel",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #066 — IV. Acessórios e Utilidades Mágicas (Item 6/20 da categoria).",
+    "Uma vez por descanso longo, permite repetir uma jogada de iniciativa.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #6 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #66/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

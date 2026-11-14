@@ -1,0 +1,20 @@
+{
+  "name": "Essência de Memória",
+  "source": "Casa Varhen",
+  "type": "Essência (Consumível — Cn)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #036 — II. Consumíveis e Poções (Item 16/20 da categoria).",
+    "Permite recordar perfeitamente uma lembrança esquecida ou reprimida.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #16 (II. Consumíveis e Poções) · Catálogo Global #36/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

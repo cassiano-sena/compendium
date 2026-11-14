@@ -1,0 +1,21 @@
+{
+  "name": "Fragmento da Carne",
+  "source": "Casa Varhen",
+  "type": "Fragmento de Hadar (P)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #135 — VII. Fragmentos de Hadar (Item 15/20 da categoria).",
+    "Pode regenerar membros perdidos ao longo de 24 horas.",
+    "Drawback / Consequência: cada regeneração exige {@dice 1d4} PV máximos temporários perdidos até o próximo descanso longo.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #15 (VII. Fragmentos de Hadar) · Catálogo Global #135/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

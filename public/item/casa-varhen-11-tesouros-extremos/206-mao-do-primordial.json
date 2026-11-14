@@ -1,0 +1,20 @@
+{
+  "name": "Mão do Primordial",
+  "source": "Casa Varhen",
+  "type": "Prótese Cósmica (Artefato — P)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #206 — XI. Tesouros Extremos e Recompensas de Campanha (Item 6/20 da categoria).",
+    "Substitui uma mão perdida. Concede +2 em Força e permite criar uma arma de matéria estelar como ação bônus.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: P",
+        "Locais Sugeridos: Cofre de Astel (201–220)",
+        "Tabela de Rolagem: 1d20 #6 (XI. Tesouros Extremos e Recompensas de Campanha) · Catálogo Global #206/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

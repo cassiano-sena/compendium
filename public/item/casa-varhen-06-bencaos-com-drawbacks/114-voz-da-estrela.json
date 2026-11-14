@@ -1,0 +1,21 @@
+{
+  "name": "Voz da Estrela",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #114 — VI. Bênçãos Permanentes — Com Drawbacks (Item 14/20 da categoria).",
+    "Pode comunicar-se telepaticamente a até 36 m.",
+    "Drawback / Consequência: Hadar pode transmitir pensamentos e sussurros ao usuário.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #14 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #114/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17 · Resistir/Controlar Drawback CD 18"
+      ]
+    }
+  ]
+}

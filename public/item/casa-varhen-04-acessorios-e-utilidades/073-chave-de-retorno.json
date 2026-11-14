@@ -1,0 +1,20 @@
+{
+  "name": "Chave de Retorno",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #073 — IV. Acessórios e Utilidades Mágicas (Item 13/20 da categoria).",
+    "Permite teleportar o usuário para o último local onde completou um descanso longo, uma vez por semana.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #13 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #73/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

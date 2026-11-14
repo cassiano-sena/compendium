@@ -1,0 +1,20 @@
+{
+  "name": "Corrente do Guardião",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #059 — III. Equipamentos e Armas da Casa Varhen (Item 19/20 da categoria).",
+    "Pode prender uma criatura Grande ou menor. CD 17 para escapar.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #19 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #59/220",
+        "Dificuldades (Nível 14): Ladinagem CD 16 / Escapar CD 17"
+      ]
+    }
+  ]
+}

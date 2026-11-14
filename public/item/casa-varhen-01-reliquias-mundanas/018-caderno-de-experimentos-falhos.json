@@ -1,0 +1,20 @@
+{
+  "name": "Caderno de Experimentos Falhos",
+  "source": "Casa Varhen",
+  "type": "Relíquia Mundana (M)",
+  "rarity": "common",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #018 — I. Relíquias Mundanas da Casa Varhen (Item 18/20 da categoria).",
+    "47 experiências de Astel, todas marcadas como fracassos.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Comum (C) · Código de Tipo: M",
+        "Locais Sugeridos: Quartos dos empregados (1–40)",
+        "Tabela de Rolagem: 1d20 #18 (I. Relíquias Mundanas da Casa Varhen) · Catálogo Global #18/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 11 · Identificar CD 10"
+      ]
+    }
+  ]
+}

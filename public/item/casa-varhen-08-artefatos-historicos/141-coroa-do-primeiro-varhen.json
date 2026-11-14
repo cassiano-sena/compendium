@@ -1,0 +1,20 @@
+{
+  "name": "Coroa do Primeiro Varhen",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Relíquia Histórica — L)",
+  "rarity": "legendary",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #141 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 1/20 da categoria).",
+    "Concede +2 em Carisma, até o máximo de 24, e vantagem em testes de Persuasão. O portador é reconhecido como herdeiro da linhagem.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: Relíquia Lendária (L)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #1 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #141/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19"
+      ]
+    }
+  ]
+}

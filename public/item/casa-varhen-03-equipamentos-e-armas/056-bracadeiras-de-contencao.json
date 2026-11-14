@@ -1,0 +1,20 @@
+{
+  "name": "Braçadeiras de Contenção",
+  "source": "Casa Varhen",
+  "type": "Wondrous Item (Equipamento — Eq)",
+  "rarity": "rare",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #056 — III. Equipamentos e Armas da Casa Varhen (Item 16/20 da categoria).",
+    "Vantagem em testes para evitar ser agarrado ou empurrado.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80) · Arsenal (41–60)",
+        "Tabela de Rolagem: 1d20 #16 (III. Equipamentos e Armas da Casa Varhen) · Catálogo Global #56/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

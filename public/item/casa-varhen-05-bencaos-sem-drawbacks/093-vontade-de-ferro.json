@@ -1,0 +1,20 @@
+{
+  "name": "Vontade de Ferro",
+  "source": "Casa Varhen",
+  "type": "Bênção Permanente (P)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #093 — V. Bênçãos Permanentes — Sem Drawbacks (Item 13/20 da categoria).",
+    "Uma vez por descanso longo, quando falhar em uma salvaguarda, pode escolher obter sucesso.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140) · Refúgio da Matilha (81–100)",
+        "Tabela de Rolagem: 1d20 #13 (V. Bênçãos Permanentes — Sem Drawbacks) · Catálogo Global #93/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

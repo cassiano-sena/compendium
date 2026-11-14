@@ -1,0 +1,20 @@
+{
+  "name": "Armadura do Carniceiro",
+  "source": "Casa Varhen",
+  "type": "Armor (plate) — Artefato (A)",
+  "rarity": "artifact",
+  "reqAttune": true,
+  "entries": [
+    "Catálogo Casa Varhen #152 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 12/20 da categoria).",
+    "Armadura de placas +3. Concede resistência a dano de força, necrótico e psíquico. Uma vez por descanso longo, libera uma onda de {@dice 6d8} de dano de força.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #12 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #152/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}

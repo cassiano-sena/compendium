@@ -1,0 +1,21 @@
+{
+  "name": "Alma Dividida",
+  "source": "Casa Varhen",
+  "type": "Bênção c/ Maldição (P — Ma)",
+  "rarity": "legendary",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #118 — VI. Bênçãos Permanentes — Com Drawbacks (Item 18/20 da categoria).",
+    "Uma vez por descanso longo, pode realizar uma ação adicional.",
+    "Drawback / Consequência: ao terminar, perde a reação até o próximo turno e sofre {@dice 4d6} de dano psíquico.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Lendário (L) · Código de Tipo: P — Ma",
+        "Locais Sugeridos: Biblioteca (81–140)",
+        "Tabela de Rolagem: 1d20 #18 (VI. Bênçãos Permanentes — Com Drawbacks) · Catálogo Global #118/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 19 · Identificar CD 19 · Resistir/Controlar Drawback CD 20"
+      ]
+    }
+  ]
+}

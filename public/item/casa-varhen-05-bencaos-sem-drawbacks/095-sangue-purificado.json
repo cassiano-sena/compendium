@@ -1,0 +1,20 @@
+{
+  "name": "Sangue Purificado",
+  "source": "Casa Varhen",
+  "type": "Bênção Permanente (P)",
+  "rarity": "rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #095 — V. Bênçãos Permanentes — Sem Drawbacks (Item 15/20 da categoria).",
+    "Imunidade a doenças não mágicas e vantagem contra venenos.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Raro (R) · Código de Tipo: P",
+        "Locais Sugeridos: Biblioteca (81–140) · Refúgio da Matilha (81–100)",
+        "Tabela de Rolagem: 1d20 #15 (V. Bênçãos Permanentes — Sem Drawbacks) · Catálogo Global #95/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 15 · Identificar CD 15"
+      ]
+    }
+  ]
+}

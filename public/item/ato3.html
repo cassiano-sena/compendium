@@ -1,0 +1,282 @@
+<link rel="stylesheet" href="./session/casa-varhen/session.css">
+<div class="item-detail active session-part">
+    <header class="part-header">
+        <div class="part-kicker">Casa Varhen — O Santuário da Fome · Ato III</div>
+        <h1>O Labirinto do Arauto</h1>
+        <p class="part-subtitle">A mansão funciona como um survival horror estilo Resident Evil: explorar, resolver os quatro emblemas, gerenciar recursos e escapar da perseguição.</p>
+    </header>
+
+    <div class="cv-act-nav">
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('prologo')">📜 Guia &amp; Painel</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato1')">🌲 Ato I: Ilusão de Poder</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato2')">🔔 Ato II: O Sino</button>
+        <button type="button" class="cv-nav-btn is-current" onclick="CompendioVarhenTracker.openChapter('ato3')">🏰 Ato III: Mansão RPD</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('ato4')">🕯️ Ato IV: Primogênito</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('epilogo')">🌋 Ato V: Kaiju &amp; Fuga</button>
+        <button type="button" class="cv-nav-btn" onclick="CompendioVarhenTracker.openChapter('loot')">🎁 Drops &amp; Loot (220)</button>
+    </div>
+
+    <div class="cv-tracker-slot" data-cv-mode="compact"></div>
+
+    <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab(this, 'ato3-flow')">Mansão, Safe Rooms &amp; Salas</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato3-puzzles')">Os Quatro Enigmas</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato3-stalker')">Arauto Stalker (0–6)</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato3-loot')">Inimigos, Loot &amp; Tabelas</button>
+        <button class="tab-btn" onclick="openTab(this, 'ato3-maps')">Mapas da Mansão &amp; Controle</button>
+    </div>
+
+    <div class="tab-content ato3-flow active">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Estrutura &amp; Lobby Inferior</h2>
+                <p>Grande templo aristocrático gótico com iluminação escassa. Os jogadores decidem a todo momento se exploram outra sala, buscam recursos, encaram um puzzle, recuam para uma Safe Room ou despistam o Arauto.</p>
+                <p><strong>A Estátua Central:</strong> No centro do lobby inferior há uma estátua de um homem segurando uma estrela. Ao encaixar os <strong>4 emblemas</strong> (ou <strong>3 na versão curta</strong>), a estrela brilha e revela a passagem secreta para o <strong>Refúgio de Astel</strong> (e uma entrada selada para catacumbas antigas não usadas nesta aventura).</p>
+                <div class="cv-portrait-card">
+                    <img src="./npc/connor/connor-smith.png" alt="Connor Smith" class="cv-portrait-img">
+                    <div>
+                        <h3>Connor Smith (Projeção Holográfica)</h3>
+                        <p>Surge em uma sala de apoio ou diante de um mecanismo travado. Faz uma piada sobre o <em>Wish</em> usado contra Vecna, comenta que os mecanismos da mansão são antiquíssimos e pode destrancar <strong>um</strong> bloqueio caso o grupo fique preso tempo demais (sem resolver todos os enigmas).</p>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openEntry('npcs', 'connor', 'connor')">🤖 Ficha de Connor</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Salas Seguras (Safe Rooms)</h2>
+                <p>Identificadas por <strong>porta pesada de metal</strong>, símbolos antigos da Casa Varhen, luz quente de velas e ausência total de piche negro. A proteção pertence a Astel: o Arauto <strong>não entra</strong>, mas pode aguardar do lado de fora.</p>
+                <table class="part-table">
+                    <thead><tr><th>Safe Room</th><th>Recompensas &amp; Pistas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>1. Escritório do Mordomo</strong></td><td>Mapa incompleto da mansão, Poção de Cura Superior, carta de Astel e diário sobre criaturas simbióticas.</td></tr>
+                        <tr><td><strong>2. Capela Antiga</strong></td><td>Símbolos de Lathander, altar parcialmente destruído, fragmento de relíquia divina e pista sobre o passado clerical de Astel.</td></tr>
+                        <tr><td><strong>3. Sala de Connor</strong></td><td>Projeção holográfica, terminal de manutenção, caixa de equipamentos e mensagem gravada sobre a estátua do lobby.</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="part-callout cosmic">
+                    <strong>Encontro Opcional — O Hospedeiro (Sala de Observação):</strong> Homem preso a uma cadeira com um fragmento de Hadar implantado no tórax. Se ajudado, avisa:<br>
+                    <em>"Ele não quer sair daqui. Ele quer chegar ao coração."</em> (sobre o Arauto). Retirar o fragmento sem cuidado transforma-o em Massa Simbiótica.
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <h2>Pontos de Interesse Adicionais da Mansão</h2>
+                <table class="part-table">
+                    <thead><tr><th>Sala</th><th>Descoberta / Função na Exploração</th><th>Sala</th><th>Descoberta / Função na Exploração</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Sala de operações</strong></td><td>Mapa tático da propriedade e rotas.</td><td><strong>Sala de imprensa</strong></td><td>Registros antigos da família Varhen.</td></tr>
+                        <tr><td><strong>Sala de segurança</strong></td><td>Câmeras e registros da Matilha da Lua Velada.</td><td><strong>Banheiro</strong></td><td>Uma criatura simbiótica escondida no teto.</td></tr>
+                        <tr><td><strong>Sala escura</strong></td><td>Experimentos de Astel e seus antepassados.</td><td><strong>Sala de caldeiras</strong></td><td>Sistema que alimenta as proteções mágicas.</td></tr>
+                        <tr><td><strong>Sala de interrogatório</strong></td><td>Prisioneiro consciente marcado pelo piche.</td><td><strong>Telhado</strong></td><td>Vista completa da dimensão fraturada e de Hadar.</td></tr>
+                        <tr><td><strong>Sala de observação</strong></td><td>Fragmentos de Hadar suspensos em recipientes.</td><td><strong>Supressão (3º+ nív.)</strong></td><td>Role 1d20: em 1, consulte Tabela Complicações.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato3-puzzles">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>1. Emblema do Sacrifício — O Peso do Passado</h2>
+                <p><strong>Local:</strong> Sala dos Troféus (armas, armaduras e troféus antigos). Uma grande balança no centro traz a inscrição:</p>
+                <div class="cv-read-aloud">"TUDO QUE É TOMADO PRECISA SER PAGO. Aquele que deseja avançar precisa compreender que nem toda vitória é gratuita. O passado pesa tanto quanto o futuro."</div>
+                <p>Um prato contém uma estátua de ouro; na parede há quatro suportes: <em>Sangue</em>, <em>Poder</em>, <em>Memória</em>, <em>Sacrifício</em>.</p>
+                <p><strong>Solução principal:</strong> Colocar nos pratos itens de peso simbólico equivalente (relíquias de inimigos derrotados, objetos pessoais importantes, itens mágicos ou partes extraordinárias — ex.: <strong>cabeça de Alazão</strong> ou <strong>capacete de abóbora do Inspetor Jirimum</strong>).</p>
+                <div class="cv-dc-list">
+                    <span class="cv-dc-pill">Investigação CD 13: mecanismo</span>
+                    <span class="cv-dc-pill">História CD 15: Casa Varhen</span>
+                    <span class="cv-dc-pill">Intuição CD 15: troca voluntária</span>
+                    <span class="cv-dc-pill">Arcanismo CD 17: valor simbólico</span>
+                </div>
+                <div class="cv-fail-box"><strong>Falha:</strong> Pulso necrótico de 3d8 de dano em quem estiver perto (não destrói os itens).</div>
+                <div class="cv-alt-box"><strong>Solução alternativa:</strong> Emprestar temporariamente um item mágico próprio; a balança devolve após entregar o <strong>Medalhão da Estrela Atravessada por uma Espada</strong>.</div>
+            </section>
+
+            <section class="part-panel">
+                <h2>2. Emblema da Conquista — Galeria dos Inimigos</h2>
+                <p><strong>Local:</strong> Galeria com cinco estátuas sem nomes escritos, representando inimigos históricos enfrentados pelo grupo (Crônicas de Waterdeep / Cinco Terríveis): uma com coroa de dragão, figura de mão decepada e artefato, guerreiro com arma lunar, criatura de múltiplos olhos e vulto encapuzado com ampulheta.</p>
+                <div class="cv-read-aloud">"O vencedor escreve a história. Mas a história nunca esquece quem veio antes."</div>
+                <p><strong>Solução principal:</strong> Girar as cinco estátuas na ordem cronológica real em que esses confrontos foram vencidos na campanha.</p>
+                <div class="cv-dc-list">
+                    <span class="cv-dc-pill">História CD 15: lembra eventos</span>
+                    <span class="cv-dc-pill">Investigação CD 15: marcas na base</span>
+                    <span class="cv-dc-pill">Arcanismo CD 17: energia residual</span>
+                    <span class="cv-dc-pill">Inteligência CD 18: ordem exata</span>
+                </div>
+                <div class="cv-fail-box"><strong>Falha:</strong> 2 a 3 guardiões animados de dificuldade moderada atacam (ou onda arcana da sala).</div>
+                <div class="cv-alt-box"><strong>Solução alternativa:</strong> Destruir ou derrubar as estátuas na sequência correta. Prêmio: <strong>Medalhão da Coroa Quebrada</strong>.</div>
+            </section>
+
+            <section class="part-panel">
+                <h2>3. Emblema do Conhecimento — Biblioteca da Estrela</h2>
+                <p><strong>Local:</strong> Pedestal com três encaixes (<em>Origem</em>, <em>Hospedeiro</em>, <em>Manifestação</em>) e três livros abertos:</p>
+                <ul>
+                    <li><strong>Livro I — A Estrela:</strong> <em>"Aquilo que não nasce, mas existe. Aquilo que não vive, mas consome."</em> &rarr; <strong>Origem</strong>.</li>
+                    <li><strong>Livro II — A Linhagem:</strong> <em>"Aquilo que carrega o que não deveria carregar."</em> &rarr; <strong>Hospedeiro</strong>.</li>
+                    <li><strong>Livro III — A Fome:</strong> <em>"Aquilo que transforma a existência em necessidade."</em> &rarr; <strong>Manifestação</strong>.</li>
+                </ul>
+                <div class="cv-dc-list">
+                    <span class="cv-dc-pill">Arcanismo CD 14</span>
+                    <span class="cv-dc-pill">Religião CD 15</span>
+                    <span class="cv-dc-pill">Investigação CD 15</span>
+                    <span class="cv-dc-pill">História CD 17</span>
+                </div>
+                <div class="cv-fail-box"><strong>Falha:</strong> Sussurros cósmicos — Salvaguarda de Sabedoria CD 16 ou Amedrontado por 1 minuto.</div>
+                <div class="cv-alt-box"><strong>Solução alternativa:</strong> Oferecer uma lembrança pessoal significativa à biblioteca; a sala revela a resposta e entrega o <strong>Medalhão dos Três Círculos Concêntricos</strong>.</div>
+
+                <h3>Descoberta Opcional — A Carta de Kael (dentro de um livro)</h3>
+                <div class="cv-letter">
+                    "Se você está lendo isso, provavelmente já aconteceu.<br>
+                    Não sei exatamente o que sou. Não sei se aquilo que sinto é fome, medo ou apenas uma necessidade que não consigo explicar. Mas existe uma coisa que ainda sei: eu não quero machucar meus amigos.<br>
+                    Se eu estiver diferente quando me encontrarem, não confiem no que eu disser.<br>
+                    <strong>E, por favor, não deixem que tirem meu balde.</strong>"
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>4. Emblema da Autoridade — Escritório do Primogênito</h2>
+                <p><strong>Local:</strong> Escritório do chefe com quatro gavetas, mesa e o retrato de <strong>Astel</strong> ainda jovem vestindo mantos de <strong>clérigo de Lathander</strong>, com a inscrição atrás:</p>
+                <div class="cv-read-aloud">"O primeiro entre nós não foi o primeiro a cair."</div>
+                <p>Quatro documentos sobre a mesa: carta de Lathander, <strong>Registro Genealógico da Casa Varhen</strong>, contrato em idioma desconhecido e carta de despedida sem nome.</p>
+                <p><strong>Solução principal:</strong> O <strong>Registro Genealógico</strong> (senha/identidade: <strong>Astel Vhalzar Varhen</strong>). Ele não é o primogênito porque Hadar o escolheu — sua autoridade é anterior ao pacto.</p>
+                <div class="cv-dc-list">
+                    <span class="cv-dc-pill">História CD 14: genealogia</span>
+                    <span class="cv-dc-pill">Religião CD 15: Lathander</span>
+                    <span class="cv-dc-pill">Investigação CD 16: cofre oculto</span>
+                    <span class="cv-dc-pill">Arcanismo CD 18: contrato</span>
+                </div>
+                <div class="cv-fail-box"><strong>Falha:</strong> Uma mão espectral sai de uma gaveta e agarra quem está perto (ND 5–7 ou armadilha de contenção).</div>
+                <div class="cv-alt-box"><strong>Solução alternativa:</strong> Usar sangue de um Varhen (amostra obtida do sangue de Kael). Prêmio: <strong>Medalhão do Trono e Estrela</strong>.</div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato3-stalker">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>O Arauto como Stalker — Medidor (0–6)</h2>
+                <p><strong>Não role iniciativa toda vez que ele aparecer.</strong> A cada <strong>duas salas exploradas</strong>, role 1d6: em <strong>5–6</strong>, o Arauto surge ou deixa uma manifestação próxima. Ouvi-lo arrastar a espada pelo corredor assusta mais do que vê-lo.</p>
+                <table class="part-table">
+                    <thead><tr><th>Medidor</th><th>Estado da Perseguição</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>0–1</strong></td><td>Arauto distante. Sons de metal arrastando e sinais na escuridão.</td></tr>
+                        <tr><td><strong>2–3</strong></td><td>Presença próxima. Rastros de piche e paredes rasgadas recentemente.</td></tr>
+                        <tr><td><strong>4–5</strong></td><td>Encontro iminente. Ele entra na mesma ala do grupo.</td></tr>
+                        <tr><td><strong>6</strong></td><td>Perseguição direta ou bloqueio da saída principal.</td></tr>
+                    </tbody>
+                </table>
+                <ul>
+                    <li><strong>Sobe (+1/+2):</strong> muito barulho, demora numa sala, magia de alto nível, falha em fuga, acionar mecanismo ruidoso.</li>
+                    <li><strong>Desce (−1/−2):</strong> entrar em Safe Room, achar passagem secreta, despistar com mecanismo, distração criativa.</li>
+                </ul>
+                <div class="part-callout">
+                    <strong>Três comportamentos + Pausa de Kael:</strong> 1. <em>Caçador</em> (rastreia assinaturas mágicas), 2. <em>Predador</em> (incapacita alvos), 3. <em>Curioso</em> (para para observar o balde de Kael). Se falarem com ele: <em>"KAEL NÃO ESTÁ AQUI." / "EU SOU AQUILO QUE ELE DEIXOU PARA TRÁS." / "ELE ESTÁ COM FOME."</em> — mencionar o <strong>Homem Balde</strong> faz ele congelar por alguns segundos para fuga!
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>Aparições (Medidor 4–6) &amp; Ações Criativas</h2>
+                <div class="part-roll"><span>Entrada do Arauto na Ala</span><code>1d8</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d8</th><th>Aparição</th><th>1d8</th><th>Aparição</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>Mão atravessa a parede e tenta agarrar alguém.</td><td>5</td><td>A espada astral fura a parede antes do corpo.</td></tr>
+                        <tr><td>2</td><td>Teto desaba e ele cai sobre os escombros.</td><td>6</td><td>Salta do mezanino superior para o inferior.</td></tr>
+                        <tr><td>3</td><td>Parado imóvel ao fim do corredor, observando.</td><td>7</td><td>Arremessa um monstro morto na direção do grupo.</td></tr>
+                        <tr><td>4</td><td>Um tentáculo desliza por baixo da porta trancada.</td><td>8</td><td>Materializa-se exatamente atrás do último da fila.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Incapacitação &amp; Ações Criativas dos Jogadores</h3>
+                <p><strong>Se alguém cair:</strong> O Arauto agarra e arrasta o PJ em vez de matá-lo na hora — dando aos aliados chance de resgate, distração ou quebra de cenário.</p>
+                <table class="part-table">
+                    <thead><tr><th>Ação Criativa</th><th>Efeito Narrativo</th><th>Ação Criativa</th><th>Efeito Narrativo</th></tr></thead>
+                    <tbody>
+                        <tr><td>Muralha de Força</td><td>Compra 1 rodada de fuga.</td><td>Ilusão</td><td>Atrai o Arauto por 1 rodada.</td></tr>
+                        <tr><td>Desabamento</td><td>Atrasa 1–2 rodadas.</td><td>Armadilha física</td><td>Prende 1 tentáculo, não o corpo.</td></tr>
+                        <tr><td>Invisibilidade</td><td>Oculta visão, não odor/assinatura.</td><td>Quebrar escada</td><td>Força mudança de rota.</td></tr>
+                        <tr><td>Teleporte</td><td>Funciona com leve desvio espacial.</td><td>Invocação</td><td>Serve de isca temporária.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato3-loot">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>Grunts, Elites &amp; Encontros (Escolha só 2–3)</h2>
+                <table class="part-table">
+                    <thead><tr><th>Criatura</th><th>ND</th><th>Função</th></tr></thead>
+                    <tbody>
+                        <tr><td>Hospedeiro Corrompido</td><td>2</td><td>Corpo a corpo</td></tr>
+                        <tr><td>Cultista da Estrela</td><td>3</td><td>Conjurador</td></tr>
+                        <tr><td>Massa Simbiótica / Cão Astral</td><td>4</td><td>Emboscada / Perseguidor</td></tr>
+                        <tr><td>Guarda Varhen</td><td>5</td><td>Tanque de corredor</td></tr>
+                        <tr><td>Cria das Estrelas Menor</td><td>6</td><td>Subchefe tático</td></tr>
+                        <tr><td><strong>O Carrasco Varhen (Elite)</strong></td><td>10</td><td>Ex-guarda-costas; arma pesada e agarrão</td></tr>
+                        <tr><td><strong>O Vigia do Santuário (Elite)</strong></td><td>11</td><td>Manipula gravidade e cria cópias ilusórias</td></tr>
+                    </tbody>
+                </table>
+                <p><strong>Sugestões de distribuição:</strong> Sala de segurança (2 Guardas Varhen); Sala de observação (1 Massa Simbiótica); Interrogatório (1 Hospedeiro + 2 Cultistas); Caldeiras (Carrasco Varhen); Galeria superior (Vigia do Santuário).</p>
+            </section>
+
+            <section class="part-panel">
+                <h2>Loot Aleatório &amp; Tabelas Rápidas da Mansão</h2>
+                <div class="part-roll"><span>Baú / Compartimento Secreto</span><code>1d12</code></div>
+                <table class="part-table">
+                    <thead><tr><th>1d12</th><th>Recompensa</th><th>1d12</th><th>Recompensa</th></tr></thead>
+                    <tbody>
+                        <tr><td>1</td><td>2 Poções de Cura Superior</td><td>7</td><td>1 Pedra Iônica menor</td></tr>
+                        <tr><td>2</td><td>1 Poção de Velocidade</td><td>8</td><td>1 Pergaminho de Teleporte</td></tr>
+                        <tr><td>3</td><td>Pergaminho de Contramágica</td><td>9</td><td>1 Poção de Invisibilidade</td></tr>
+                        <tr><td>4</td><td>Pergaminho de Dissipar Magia</td><td>10</td><td>Anel de Proteção temporário (3 cargas)</td></tr>
+                        <tr><td>5</td><td>3 doses de munição prateada</td><td>11</td><td>1 Fragmento de Hadar instável</td></tr>
+                        <tr><td>6</td><td>Elixir de Resistência Necrótica</td><td>12</td><td>Item mágico raro da Casa Varhen</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="part-roll"><span>Sons da Mansão (10 entradas)</span><code>1d10</code></div>
+                <p style="font-size:13px;"><strong>1:</strong> Madeira rangendo · <strong>2:</strong> Passos acima · <strong>3:</strong> Porta batendo · <strong>4:</strong> Voz chamando um PJ pelo nome · <strong>5:</strong> Sino distante · <strong>6:</strong> Algo pesado arrastando · <strong>7:</strong> Risada infantil · <strong>8:</strong> Batidas dentro da parede · <strong>9:</strong> Rugido abafado · <strong>10:</strong> Espada do Arauto raspando o piso.</p>
+
+                <div class="part-roll"><span>Eventos de Exploração (12 entradas)</span><code>1d12</code></div>
+                <p style="font-size:13px;"><strong>1:</strong> Cadáver c/ chave · <strong>2:</strong> Espelho reflete Arauto atrás · <strong>3:</strong> Porta fecha sozinha · <strong>4:</strong> Passagem secreta · <strong>5:</strong> Corpo mexe · <strong>6:</strong> Lembrança de Kael · <strong>7:</strong> Quadro muda posição · <strong>8:</strong> Luz se apaga · <strong>9:</strong> Poção escondida · <strong>10:</strong> Sala cheia de piche · <strong>11:</strong> Sobrevivente pede socorro · <strong>12:</strong> Arauto surge noutra ala.</p>
+                <div class="cv-actions-row">
+                    <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.openChapter('loot')">🎁 Abrir Catálogo de 220 Drops &amp; Loot por Sala/CD</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content ato3-maps">
+        <div class="part-grid">
+            <section class="part-panel">
+                <h2>1º Andar (Lobby Inferior &amp; Troféus)</h2>
+                <div class="cv-map-card">
+                    <img src="./map/varhen-mansion/FULL_Varhen_Mansion_LowerFloor.png" alt="Mansão Varhen - Térreo (GM)" class="cv-map-thumb">
+                    <div class="cv-actions-row">
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/FULL_Varhen_Mansion_LowerFloor.png')">🗺️ 1º Andar (GM) no VTT</button>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/PLAYERS_Varhen_Mansion_LowerFloor.png')">🧭 1º Andar (Jogadores)</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel">
+                <h2>2º Andar (Biblioteca &amp; Escritório)</h2>
+                <div class="cv-map-card">
+                    <img src="./map/varhen-mansion/FULL_Varhen_Mansion_UpperFloor.png" alt="Mansão Varhen - Superior (GM)" class="cv-map-thumb">
+                    <div class="cv-actions-row">
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/FULL_Varhen_Mansion_UpperFloor.png')">🗺️ 2º Andar (GM) no VTT</button>
+                        <button type="button" class="cv-link-btn" onclick="CompendioVarhenTracker.sendMapToTabletop('./map/varhen-mansion/PLAYERS_Varhen_Mansion_UpperFloor.png')">🧭 2º Andar (Jogadores)</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="part-panel wide">
+                <div class="cv-tracker-slot" data-cv-mode="full"></div>
+            </section>
+        </div>
+    </div>
+</div>

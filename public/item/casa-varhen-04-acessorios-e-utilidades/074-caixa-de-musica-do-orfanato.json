@@ -1,0 +1,20 @@
+{
+  "name": "Caixa de Música do Orfanato",
+  "source": "Casa Varhen",
+  "type": "Utilidade Mágica (Equipamento — Eq)",
+  "rarity": "uncommon",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #074 — IV. Acessórios e Utilidades Mágicas (Item 14/20 da categoria).",
+    "Ao tocar, criaturas escolhidas a até 6 m recebem vantagem em salvaguardas contra medo por 1 minuto.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Incomum (I) · Código de Tipo: Eq",
+        "Locais Sugeridos: Escritórios (41–80)",
+        "Tabela de Rolagem: 1d20 #14 (IV. Acessórios e Utilidades Mágicas) · Catálogo Global #74/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 13 · Identificar CD 12"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "Lágrima de Lathander",
+  "source": "Casa Varhen",
+  "type": "Poção Sagrada (Consumível — Cn)",
+  "rarity": "very rare",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #028 — II. Consumíveis e Poções (Item 8/20 da categoria).",
+    "Recupera {@dice 8d8+8} PV e encerra uma condição de cegueira, surdez ou envenenamento.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Muito Raro (MR) · Código de Tipo: Cn",
+        "Locais Sugeridos: Quartos dos empregados (1–40) · Refúgio da Matilha (21–40)",
+        "Tabela de Rolagem: 1d20 #8 (II. Consumíveis e Poções) · Catálogo Global #28/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 17 · Identificar CD 17"
+      ]
+    }
+  ]
+}

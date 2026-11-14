@@ -1,0 +1,20 @@
+{
+  "name": "Trono de Astel",
+  "source": "Casa Varhen",
+  "type": "Artefato Dimensional (A)",
+  "rarity": "artifact",
+  "reqAttune": false,
+  "entries": [
+    "Catálogo Casa Varhen #155 — VIII. Artefatos Históricos e Relíquias Lendárias (Item 15/20 da categoria).",
+    "Permite ao usuário manipular a dimensão fraturada como se fosse seu território. Fora dela, não possui poder.",
+    {
+      "type": "list",
+      "items": [
+        "Raridade: Artefato (A) · Código de Tipo: Artefato (A)",
+        "Locais Sugeridos: Arsenal & Sala de Troféus (141–160)",
+        "Tabela de Rolagem: 1d20 #15 (VIII. Artefatos Históricos e Relíquias Lendárias) · Catálogo Global #155/220",
+        "Dificuldades (Nível 14): Obter/Destrancar CD 21 · Identificar CD 22"
+      ]
+    }
+  ]
+}
