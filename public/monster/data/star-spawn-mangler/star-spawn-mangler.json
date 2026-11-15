@@ -1,0 +1,74 @@
+{
+  "name": "Star Spawn Mangler",
+  "size": [
+    "M"
+  ],
+  "type": "aberration",
+  "alignment": [
+    "C E"
+  ],
+  "ac": [
+    "14"
+  ],
+  "hp": {
+    "average": 71,
+    "formula": "13d8 + 13"
+  },
+  "speed": "40 ft., climb 40 ft.",
+  "str": 8,
+  "dex": 18,
+  "con": 12,
+  "int": 11,
+  "wis": 12,
+  "cha": 7,
+  "save": {
+    "dex": "+7",
+    "con": "+4"
+  },
+  "skill": {
+    "stealth": "+7"
+  },
+  "resist": [
+    "cold"
+  ],
+  "immune": [
+    "psychic"
+  ],
+  "senses": [
+    "darkvision 60 ft."
+  ],
+  "passive": 11,
+  "languages": [
+    "Deep Speech"
+  ],
+  "cr": "5",
+  "trait": [
+    {
+      "name": "Ambusher",
+      "entries": [
+        "The mangler has advantage on initiative rolls."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiattack",
+      "entries": [
+        "The mangler makes two Claw attacks."
+      ]
+    },
+    {
+      "name": "Claw",
+      "entries": [
+        "{@atk mw} {@hit 7} to hit, reach 5 ft., one target. {@h}8 ({@damage 1d8 + 4}) slashing damage. If the attack roll has advantage, the target also takes 7 ({@damage 2d6}) psychic damage."
+      ]
+    },
+    {
+      "name": "Flurry of Claws {@recharge 5}",
+      "entries": [
+        "The mangler makes six Claw attacks. Either before or after these attacks, it can move up to its speed without provoking {@action opportunity attack||opportunity attacks}."
+      ]
+    }
+  ],
+  "legendary": []
+}

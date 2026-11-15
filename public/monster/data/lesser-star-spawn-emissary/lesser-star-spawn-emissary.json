@@ -1,0 +1,96 @@
+{
+  "name": "Lesser Star Spawn Emissary",
+  "size": [
+    "S"
+  ],
+  "type": "aberration",
+  "alignment": [
+    "C E"
+  ],
+  "ac": [
+    "19"
+  ],
+  "hp": {
+    "average": 241,
+    "formula": "21d8 + 147"
+  },
+  "speed": "40 ft., fly [object Object] ft., canHover true ft.",
+  "str": 21,
+  "dex": 18,
+  "con": 24,
+  "int": 25,
+  "wis": 20,
+  "cha": 23,
+  "save": {
+    "int": "+13",
+    "wis": "+11",
+    "cha": "+12"
+  },
+  "skill": {
+    "arcana": "+19",
+    "deception": "+18",
+    "perception": "+11"
+  },
+  "resist": [
+    "acid",
+    "force",
+    "necrotic",
+    "psychic"
+  ],
+  "senses": [
+    "Truesight 120 ft."
+  ],
+  "passive": 21,
+  "languages": [
+    "all; telepathy 120 ft."
+  ],
+  "cr": "19",
+  "trait": [
+    {
+      "name": "Legendary Resistance (3/Day, or 4/Day in lair)",
+      "entries": [
+        "If the emissary fails a saving throw, it can choose to succeed instead."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiattack",
+      "entries": [
+        "The emissary makes three attacks, using Lashing Maw or Invert Flesh in any combination."
+      ]
+    },
+    {
+      "name": "Lashing Maw",
+      "entries": [
+        "{@atkr m} {@hit 11}, reach 15 ft. {@h}16 ({@damage 2d10 + 5}) Piercing damage plus 13 ({@damage 3d8}) Acid damage."
+      ]
+    },
+    {
+      "name": "Invert Flesh",
+      "entries": [
+        "{@actSave con} {@dc 21}, one creature the emissary can see within 120 feet. {@actSaveFail} 29 ({@damage 4d10 + 7}) Force damage."
+      ]
+    }
+  ],
+  "legendary": [
+    {
+      "name": "Teleporting Lash",
+      "entries": [
+        "The emissary teleports up to 30 feet to an unoccupied space it can see and makes one Lashing Maw attack."
+      ]
+    },
+    {
+      "name": "Twist",
+      "entries": [
+        "The emissary uses Invert Flesh."
+      ]
+    },
+    {
+      "name": "Warp Body",
+      "entries": [
+        "{@actSave con} {@dc 21}, one creature the emissary can see within 30 feet. {@actSaveFail} 27 ({@damage 6d8}) Force damage, and the target has the {@condition Stunned|XPHB} condition until the start of its next turn. {@actSaveSuccessOrFail} The emissary can't take this action again until the start of its next turn."
+      ]
+    }
+  ]
+}

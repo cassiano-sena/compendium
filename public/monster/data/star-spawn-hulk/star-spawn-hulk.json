@@ -1,0 +1,73 @@
+{
+  "name": "Star Spawn Hulk",
+  "size": [
+    "L"
+  ],
+  "type": "aberration",
+  "alignment": [
+    "C E"
+  ],
+  "ac": [
+    "16 (natural armor)"
+  ],
+  "hp": {
+    "average": 136,
+    "formula": "13d10 + 65"
+  },
+  "speed": "30 ft.",
+  "str": 20,
+  "dex": 8,
+  "con": 21,
+  "int": 7,
+  "wis": 12,
+  "cha": 9,
+  "save": {
+    "dex": "+3",
+    "wis": "+5"
+  },
+  "skill": {
+    "perception": "+5"
+  },
+  "resist": [
+    "bludgeoning",
+    "piercing",
+    "slashing from nonmagical attacks"
+  ],
+  "senses": [
+    "darkvision 60 ft."
+  ],
+  "passive": 15,
+  "languages": [
+    "Deep Speech"
+  ],
+  "cr": "10",
+  "trait": [
+    {
+      "name": "Psychic Mirror",
+      "entries": [
+        "If the hulk takes psychic damage, each creature within 10 feet of the hulk takes that damage instead; the hulk takes none of the damage. In addition, the hulk's thoughts and location can't be discerned by magic."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiattack",
+      "entries": [
+        "The hulk makes two Slam attacks. If both attacks hit the same target, the target also takes 9 ({@damage 2d8}) psychic damage and must succeed on a {@dc 17} Constitution saving throw or be {@condition stunned} until the end of the target's next turn."
+      ]
+    },
+    {
+      "name": "Slam",
+      "entries": [
+        "{@atk mw} {@hit 9} to hit, reach 10 ft., one target. {@h}14 ({@damage 2d8 + 5}) bludgeoning damage."
+      ]
+    },
+    {
+      "name": "Reaping Arms {@recharge 5}",
+      "entries": [
+        "The hulk makes a separate Slam attack against each creature within 10 feet of it. Each creature that is hit must also succeed on a {@dc 17} Dexterity saving throw or be knocked {@condition prone}."
+      ]
+    }
+  ],
+  "legendary": []
+}

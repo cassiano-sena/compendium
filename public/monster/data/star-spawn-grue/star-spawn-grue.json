@@ -1,0 +1,52 @@
+{
+  "name": "Star Spawn Grue",
+  "size": [
+    "S"
+  ],
+  "type": "aberration",
+  "alignment": [
+    "N E"
+  ],
+  "ac": [
+    "11"
+  ],
+  "hp": {
+    "average": 17,
+    "formula": "5d6"
+  },
+  "speed": "30 ft.",
+  "str": 6,
+  "dex": 13,
+  "con": 10,
+  "int": 9,
+  "wis": 11,
+  "cha": 6,
+  "immune": [
+    "psychic"
+  ],
+  "senses": [
+    "darkvision 60 ft."
+  ],
+  "passive": 10,
+  "languages": [
+    "Deep Speech"
+  ],
+  "cr": "1/4",
+  "trait": [
+    {
+      "name": "Aura of Shrieks",
+      "entries": [
+        "Creatures within 20 feet of the grue that aren't Aberrations have disadvantage on saving throws, as well as on attack rolls against creatures other than a star spawn grue."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Confounding Bite",
+      "entries": [
+        "{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}6 ({@damage 2d4 + 1}) piercing damage, and the target must succeed on a {@dc 10} Wisdom saving throw or attack rolls against it have advantage until the start of the grue's next turn."
+      ]
+    }
+  ],
+  "legendary": []
+}

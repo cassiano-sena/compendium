@@ -2650,35 +2650,50 @@
             const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
             const title = entry?.title || fallbackTitle || itemKey;
 
-            let hp = 30;
-            let ac = 14;
-            let imgSrc = '';
-            let sizeSquares = 1;
+            if (typeof fetchCompendiumLocalAssets === 'function') {
+                await fetchCompendiumLocalAssets();
+            }
+
             let loadedJson = (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedJson)
                 ? activeItemContext.loadedJson
                 : null;
+            let loadedHtml = (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedHtml)
+                ? activeItemContext.loadedHtml
+                : '';
+            let rawText = entry?.inlineContent || '';
 
-            if (!loadedJson && entry && isJsonPath(entry.path, entry.tipo)) {
-                try {
-                    const rawText = entry.inlineContent || (entry.path ? await (await fetchWithRetry(entry.path)).text() : '');
-                    if (rawText) loadedJson = parseJsonWithFallback(rawText, entry.path || itemKey);
-                } catch (e) {}
+            if (!loadedJson && !loadedHtml && !rawText && entry) {
+                if (typeof loadCompendiumEntryRawText === 'function') {
+                    rawText = await loadCompendiumEntryRawText(entry, cat, itemKey);
+                } else if (entry.path) {
+                    try { rawText = await (await fetchWithRetry(entry.path)).text(); } catch (e) {}
+                }
             }
 
-            if (loadedJson) {
-                const j = loadedJson;
-                hp = Number(j.hp?.average) || Number(j.hp) || 30;
-                ac = Array.isArray(j.ac) ? (j.ac[0]?.ac || j.ac[0] || 14) : (Number(j.ac) || 14);
-                const rawSz = Array.isArray(j.size) ? j.size[0] : (j.size || 'M');
-                if (typeof CompendioRules !== 'undefined') sizeSquares = CompendioRules.getCreatureFootprintSquares(rawSz);
-                const paths = getResourcePaths(entry || {}, j);
-                if (j.customToken) imgSrc = virtualFiles[j.customToken] || j.customToken;
-                else if (paths.token && paths.token[0]) imgSrc = paths.token[0];
-            } else if (entry?.path && isImagePath(entry.path, entry.tipo)) {
+            const isItemCat = (cat === 'items' || cat === 'curio');
+            const meta = (typeof resolveCreatureEntryMeta === 'function')
+                ? resolveCreatureEntryMeta(entry || {}, {
+                    category: cat,
+                    groupKey: groupKey || '',
+                    itemKey,
+                    fallbackTitle: title,
+                    loadedJson,
+                    loadedHtml,
+                    rawText
+                })
+                : { title, hp: 30, ac: 14, sizeSquares: 1, initMod: 0, tokenCandidates: [] };
+
+            const hp = isItemCat ? 10 : meta.hp;
+            const ac = isItemCat ? 10 : meta.ac;
+            const sizeSquares = isItemCat ? 1 : meta.sizeSquares;
+            let imgSrc = (typeof resolveBestTokenImageSrc === 'function' && meta.tokenCandidates.length)
+                ? await resolveBestTokenImageSrc(meta.tokenCandidates)
+                : '';
+            if (!imgSrc && entry?.path && isImagePath(entry.path, entry.tipo)) {
                 imgSrc = resolveRenderableImageSrc(entry.path, entry.inlineContent);
             }
 
-            const tokenType = cat === 'items' || cat === 'curio' ? 'item' : (cat === 'npcs' ? 'npc' : 'monster');
+            const tokenType = isItemCat ? 'item' : (cat === 'npcs' ? 'npc' : 'monster');
             const offset = (tabletopState.tokens.length % 10) * (tabletopState.gridSize || 56);
 
             const knowRec = getEntityKnowledgeRecord(cat, itemKey);
@@ -2690,7 +2705,7 @@
                 category: cat,
                 groupKey: groupKey || '',
                 itemKey,
-                name: title,
+                name: meta.title || title,
                 type: tokenType,
                 ownerId: 'gm-master',
                 x: 224 + offset,
@@ -2698,6 +2713,7 @@
                 hpCurrent: hp,
                 hpMax: hp,
                 ac,
+                initMod: isItemCat ? 0 : (meta.initMod || 0),
                 sizeSquares,
                 imgSrc
             });
@@ -3580,9 +3596,19 @@
                 return `<div class="map-viewport" style="margin:12px 0;"><img src="${resolvedSrc}" alt="${filePath}" class="map-image ${isSvg ? 'is-svg-map' : ''}"></div>`;
             });
 
-            // 2. Resolve atributos src="..." que apontem para virtualFiles (incluindo SVGs puros em virtualFiles)
+            // 2. Resolve atributos src="..." via virtualFiles e corrige caminhos legados ausentes via manifesto local
             out = out.replace(/(<img\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (full, pre, srcVal, post) => {
-                const resolved = resolveRenderableImageSrc(srcVal);
+                let resolved = resolveRenderableImageSrc(srcVal);
+                const manifest = typeof window !== 'undefined' ? window.compendiumLocalAssets : null;
+                if (manifest && manifest.loaded && resolved && !/^(data:|blob:|https?:)/i.test(resolved)) {
+                    const normKey = resolved.startsWith('./') ? resolved.toLowerCase() : ('./' + resolved.replace(/^\.\//, '')).toLowerCase();
+                    if (!manifest.byPath.has(normKey) && typeof findLocalManifestImagesForHints === 'function') {
+                        const ctx = typeof activeItemContext !== 'undefined' ? activeItemContext : null;
+                        const hints = [ctx?.key, ctx?.groupKey, ctx?.itemData?.title].filter(Boolean);
+                        const alts = findLocalManifestImagesForHints(hints, ctx?.category || '', resolved);
+                        if (alts.length > 0) resolved = alts[0];
+                    }
+                }
                 return pre + resolved + post;
             });
 
@@ -3809,8 +3835,24 @@
             const iKey = activeItemContext.key || '';
             const effLvl = getEffectiveKnowledgeLevel(cat, iKey);
 
+            let summonMeta = null;
+            if (includeHtmlMonsterSpawner && isGm && typeof resolveCreatureEntryMeta === 'function') {
+                summonMeta = resolveCreatureEntryMeta(activeItemContext.itemData || {}, {
+                    category: cat,
+                    groupKey: gKey,
+                    itemKey: iKey,
+                    fallbackTitle: activeItemContext.itemData?.title || 'Criatura',
+                    loadedJson: activeItemContext.loadedJson || null,
+                    loadedHtml: activeItemContext.loadedHtml || '',
+                    rawText: activeItemContext.loadedText || ''
+                });
+            }
             const extraSummon = (includeHtmlMonsterSpawner && isGm)
-                ? renderSummonSealHtml(activeItemContext.itemData?.title || 'Criatura', 80, '15')
+                ? renderSummonSealHtml(
+                    summonMeta?.title || activeItemContext.itemData?.title || 'Criatura',
+                    summonMeta?.hp ?? 80,
+                    String(summonMeta?.ac ?? '14')
+                )
                 : '<div></div>';
 
             const safeCat = String(cat).replace(/'/g, "\\'");
@@ -3920,6 +3962,10 @@
 
             try {
                 displayArea.innerHTML = '<div style="text-align: center; padding: 50px; color: #828699;">Carregando registro...</div>';
+                if (typeof fetchCompendiumLocalAssets === 'function') {
+                    await fetchCompendiumLocalAssets();
+                    if (loadSeq !== window._compendiumLoadSeq) return;
+                }
 
                 let htmlFinal = "";
                 const itemTitle = itemData.title || itemKey;
@@ -3986,7 +4032,9 @@
                 }
                 // 3. Se for JSON (5etools, Criador Visual ou Layout de Mapa como layout.json)
                 else if (isJsonPath(effectivePath, itemData.tipo)) {
-                    const rawText = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                    const rawText = effectiveInline || (typeof loadCompendiumEntryRawText === 'function'
+                        ? await loadCompendiumEntryRawText(itemData, currentCategory, itemKey)
+                        : (await (await fetchWithRetry(effectivePath)).text()));
                     if (loadSeq !== window._compendiumLoadSeq) return;
                     const rawJson = parseJsonWithFallback(rawText, effectivePath);
                     activeItemContext.loadedJson = rawJson;
@@ -4086,7 +4134,9 @@
                 // 5. Se for Página HTML (ou conteúdo livre / misto)
                 else {
                     const isMonsterOrNpc = (currentCategory === 'monsters' || currentCategory === 'npcs');
-                    const rawHtml = effectiveInline || (await (await fetchWithRetry(effectivePath)).text());
+                    const rawHtml = effectiveInline || (typeof loadCompendiumEntryRawText === 'function'
+                        ? await loadCompendiumEntryRawText(itemData, currentCategory, itemKey)
+                        : (await (await fetchWithRetry(effectivePath)).text()));
                     if (loadSeq !== window._compendiumLoadSeq) return;
                     activeItemContext.loadedHtml = rawHtml;
 
@@ -4164,10 +4214,27 @@
 
         // Busca caminhos locais + espelhos oficiais do 5etools (Token sempre prioritário)
         function getResourcePaths(itemData, json = null) {
+            const audioList = [];
+            if (itemData && itemData.path) {
+                const pathParts = itemData.path.split('/');
+                const fileName = pathParts.pop().replace(/\.(json|html?|txt|md)$/i, '');
+                const directory = pathParts.join('/');
+                ['opus', 'mp3', 'ogg'].forEach(ext => audioList.push(`${directory}/${fileName}.${ext}`));
+            }
+
+            if (typeof buildCompendiumTokenImageCandidates === 'function') {
+                const ctx = (typeof activeItemContext !== 'undefined' && activeItemContext) ? activeItemContext : null;
+                const cand = buildCompendiumTokenImageCandidates(itemData || {}, json, {
+                    category: ctx?.category || (typeof currentCategory !== 'undefined' ? currentCategory : ''),
+                    groupKey: ctx?.groupKey || '',
+                    itemKey: ctx?.key || '',
+                    htmlContent: ctx?.loadedHtml || ''
+                });
+                return { token: cand.token, fluff: cand.fluff, audio: audioList };
+            }
+
             const tokenList = [];
             const fluffList = [];
-            const audioList = [];
-
             if (itemData && itemData.path) {
                 const pathParts = itemData.path.split('/');
                 const fileName = pathParts.pop().replace(/\.json$/i, '');
@@ -4177,7 +4244,6 @@
 
                 tokenList.push(...candidates(['', '-token', '_token']));
                 fluffList.push(...candidates(['-art', '_art', '-fluff', '_fluff', '-big', '_big']));
-                audioList.push(...candidates([''], ['opus', 'mp3', 'ogg']));
             }
 
             if (json && json.name) {
@@ -4434,7 +4500,8 @@
                 acShort = parseInt(json.ac) || 10;
             }
 
-            const baseHp = json.hp?.average ?? (typeof json.hp === 'number' ? json.hp : 30);
+            const jsonMetaStats = typeof extractCreatureStatsFromJson === 'function' ? extractCreatureStatsFromJson(json) : null;
+            const baseHp = jsonMetaStats?.hp ?? json.hp?.average ?? (typeof json.hp === 'number' ? json.hp : 30);
 
             const formatSpeed = (speed) => {
                 if (!speed) return "30 ft.";

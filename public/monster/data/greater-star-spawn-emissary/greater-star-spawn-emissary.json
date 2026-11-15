@@ -1,0 +1,102 @@
+{
+  "name": "Greater Star Spawn Emissary",
+  "size": [
+    "H"
+  ],
+  "type": "aberration",
+  "alignment": [
+    "C E"
+  ],
+  "ac": [
+    "15"
+  ],
+  "hp": {
+    "average": 304,
+    "formula": "21d12 + 168"
+  },
+  "speed": "40 ft., fly [object Object] ft., canHover true ft.",
+  "str": 24,
+  "dex": 13,
+  "con": 26,
+  "int": 27,
+  "wis": 22,
+  "cha": 25,
+  "save": {
+    "con": "+15",
+    "int": "+15",
+    "wis": "+13",
+    "cha": "+14"
+  },
+  "skill": {
+    "arcana": "+22",
+    "perception": "+13"
+  },
+  "resist": [
+    "acid",
+    "force",
+    "necrotic",
+    "psychic"
+  ],
+  "senses": [
+    "Truesight 120 ft."
+  ],
+  "passive": 23,
+  "languages": [
+    "all; telepathy 120 ft."
+  ],
+  "cr": "21",
+  "trait": [
+    {
+      "name": "Aberrant Restoration",
+      "entries": [
+        "If destroyed, the emissary revives with all its {@variantrule Hit Points|XPHB} in 1 day in the space of a Gibbering Mouther that was within 300 feet of the emissary when the emissary was destroyed; that mouther is destroyed."
+      ]
+    },
+    {
+      "name": "Legendary Resistance (3/Day, or 4/Day in Lair)",
+      "entries": [
+        "If the emissary fails a saving throw, it can choose to succeed instead."
+      ]
+    }
+  ],
+  "action": [
+    {
+      "name": "Multiattack",
+      "entries": [
+        "The emissary makes two attacks, using Lashing Maw or Coagulated Nodule in any combination. It can replace one attack with Unearthly Bile if available."
+      ]
+    },
+    {
+      "name": "Lashing Maw",
+      "entries": [
+        "{@atkr m} {@hit 14}, reach 15 ft. {@h}33 ({@damage 4d12 + 7}) Piercing damage plus 18 ({@damage 4d8}) Acid damage."
+      ]
+    },
+    {
+      "name": "Coagulated Nodule",
+      "entries": [
+        "{@atkr r} {@hit 15}, range 120 ft. {@h}44 ({@damage 8d8 + 8}) Acid damage."
+      ]
+    },
+    {
+      "name": "Unearthly Bile {@recharge 5}",
+      "entries": [
+        "{@actSave dex} {@dc 23}, each creature in a 30-foot-radius {@variantrule Sphere [Area of Effect]|XPHB|Sphere} centered on a point the emissary can see within 120 feet. {@actSaveFail} 54 ({@damage 12d8}) Acid damage, and a Gibbering Mouther appears in an unoccupied space within 30 feet of the target. The mouthers take their turn immediately after the emissary on the same {@variantrule Initiative|XPHB} count. Each mouther fights until destroyed. {@actSaveSuccess} Half damage only."
+      ]
+    }
+  ],
+  "legendary": [
+    {
+      "name": "Forced Mutations",
+      "entries": [
+        "{@actSave cha} {@dc 23}, up to two creatures the emissary can see within 30 feet. {@actSaveFail} The target has the {@condition Paralyzed|XPHB} condition until the end of its next turn. {@actSaveSuccessOrFail} The emissary can't take this action again until the start of its next turn."
+      ]
+    },
+    {
+      "name": "Teleporting Lash",
+      "entries": [
+        "The emissary can teleport up to 30 feet to an unoccupied space it can see, and it makes one Lashing Maw attack."
+      ]
+    }
+  ]
+}

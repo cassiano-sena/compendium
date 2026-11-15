@@ -1888,7 +1888,49 @@ function updateTabletopTokenDom(tokenId) {
             hpEl.textContent = showExact ? `${tok.hpCurrent}/${tok.hpMax}` : describeQualitativeHealth(tok.hpCurrent, tok.hpMax, tok.type);
         }
     }
+    const imgEl = el.querySelector('.tt-token-img');
+    const initEl = el.querySelector('.tt-token-initials');
+    if (imgEl && tok.imgSrc && imgEl.getAttribute('src') !== tok.imgSrc) {
+        imgEl.dataset.fallbackIdx = '0';
+        imgEl.style.display = '';
+        imgEl.src = tok.imgSrc;
+        if (initEl) initEl.style.display = 'none';
+    }
     return true;
+}
+
+function handleTabletopTokenImgLoad(imgEl) {
+    if (!imgEl) return;
+    imgEl.style.display = '';
+    const tokenEl = imgEl.closest('.tt-token');
+    const initEl = tokenEl ? tokenEl.querySelector('.tt-token-initials') : null;
+    if (initEl) initEl.style.display = 'none';
+
+    const tokId = imgEl.dataset.tokenId;
+    const loadedSrc = imgEl.getAttribute('src') || '';
+    if (tokId && loadedSrc && typeof tabletopState !== 'undefined' && Array.isArray(tabletopState.tokens)) {
+        const tok = tabletopState.tokens.find(t => String(t.id) === String(tokId));
+        if (tok && tok.imgSrc !== loadedSrc && !/^data:/i.test(loadedSrc)) {
+            tok.imgSrc = loadedSrc;
+        }
+    }
+}
+
+function handleTabletopTokenImgError(imgEl) {
+    if (!imgEl) return;
+    let paths = [];
+    try { paths = JSON.parse(imgEl.dataset.fallbackPaths || '[]'); } catch (e) {}
+    const nextIdx = (Number(imgEl.dataset.fallbackIdx) || 0) + 1;
+    if (nextIdx < paths.length) {
+        imgEl.dataset.fallbackIdx = String(nextIdx);
+        imgEl.style.display = '';
+        imgEl.src = paths[nextIdx];
+        return;
+    }
+    imgEl.style.display = 'none';
+    const tokenEl = imgEl.closest('.tt-token');
+    const initEl = tokenEl ? tokenEl.querySelector('.tt-token-initials') : null;
+    if (initEl) initEl.style.display = '';
 }
 
 function updateTabletopSelectionUI() {
@@ -3952,35 +3994,51 @@ async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle 
     const entry = groupKey ? root[groupKey]?.children?.[itemKey] : root[itemKey];
     const title = entry?.title || fallbackTitle || itemKey;
 
-    let hp = 30;
-    let ac = 14;
-    let imgSrc = '';
-    let sizeSquares = 1;
-    let loadedJson = (activeItemContext && activeItemContext.key === itemKey && activeItemContext.loadedJson)
-        ? activeItemContext.loadedJson
-        : null;
-
-    if (!loadedJson && entry && isJsonPath(entry.path, entry.tipo)) {
-        try {
-            const rawText = entry.inlineContent || (entry.path ? await (await fetchWithRetry(entry.path)).text() : '');
-            if (rawText) loadedJson = parseJsonWithFallback(rawText, entry.path || itemKey);
-        } catch (e) {}
+    if (typeof fetchCompendiumLocalAssets === 'function') {
+        await fetchCompendiumLocalAssets();
     }
 
-    if (loadedJson) {
-        const j = loadedJson;
-        hp = Number(j.hp?.average) || Number(j.hp) || 30;
-        ac = Array.isArray(j.ac) ? (j.ac[0]?.ac || j.ac[0] || 14) : (Number(j.ac) || 14);
-        const rawSz = Array.isArray(j.size) ? j.size[0] : (j.size || 'M');
-        if (typeof CompendioRules !== 'undefined') sizeSquares = CompendioRules.getCreatureFootprintSquares(rawSz);
-        const paths = getResourcePaths(entry || {}, j);
-        if (j.customToken) imgSrc = virtualFiles[j.customToken] || j.customToken;
-        else if (paths.token && paths.token[0]) imgSrc = paths.token[0];
-    } else if (entry?.path && isImagePath(entry.path, entry.tipo)) {
+    const activeMatches = activeItemContext && activeItemContext.key === itemKey
+        && (!activeItemContext.category || activeItemContext.category === cat);
+    let loadedJson = (activeMatches && activeItemContext.loadedJson) ? activeItemContext.loadedJson : null;
+    let loadedHtml = (activeMatches && activeItemContext.loadedHtml) ? activeItemContext.loadedHtml : '';
+    let rawText = entry?.inlineContent || '';
+
+    if (!loadedJson && !loadedHtml && !rawText && entry) {
+        if (typeof loadCompendiumEntryRawText === 'function') {
+            rawText = await loadCompendiumEntryRawText(entry, cat, itemKey);
+        } else if (entry.path) {
+            try { rawText = await (await fetchWithRetry(entry.path)).text(); } catch (e) {}
+        }
+    }
+
+    const isItemCat = (cat === 'items' || cat === 'curio');
+    const meta = (typeof resolveCreatureEntryMeta === 'function')
+        ? resolveCreatureEntryMeta(entry || {}, {
+            category: cat,
+            groupKey: groupKey || '',
+            itemKey,
+            fallbackTitle: title,
+            loadedJson,
+            loadedHtml,
+            rawText
+        })
+        : { title, hp: 30, ac: 14, sizeSquares: 1, initMod: 0, tokenCandidates: [] };
+
+    const hp = isItemCat ? 10 : meta.hp;
+    const ac = isItemCat ? 10 : meta.ac;
+    const sizeSquares = isItemCat ? 1 : meta.sizeSquares;
+    const initMod = isItemCat ? 0 : meta.initMod;
+
+    let imgSrc = '';
+    if (typeof resolveBestTokenImageSrc === 'function' && meta.tokenCandidates.length) {
+        imgSrc = await resolveBestTokenImageSrc(meta.tokenCandidates);
+    }
+    if (!imgSrc && entry?.path && isImagePath(entry.path, entry.tipo)) {
         imgSrc = resolveRenderableImageSrc(entry.path, entry.inlineContent);
     }
 
-    const tokenType = (cat === 'items' || cat === 'curio') ? 'item' : (cat === 'npcs' ? 'npc' : 'monster');
+    const tokenType = isItemCat ? 'item' : (cat === 'npcs' ? 'npc' : 'monster');
     const center = getTabletopCameraCenterWorld();
     const { gx } = getTabletopGridMetrics();
     const spread = (tabletopState.tokens.length % 5) * Math.round(gx * 0.45);
@@ -3988,13 +4046,14 @@ async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle 
     const knowRec = getEntityKnowledgeRecord(cat, itemKey);
     if (knowRec.globalLevel === 'hidden') knowRec.globalLevel = 'sighted';
 
+    const resolvedName = meta.title || title;
     const tok = {
         id: 'tok-' + Date.now().toString(36) + '-' + Math.floor(Math.random() * 100),
         refId: `${cat}:${itemKey}`,
         category: cat,
         groupKey: groupKey || '',
         itemKey,
-        name: title,
+        name: resolvedName,
         type: tokenType,
         ownerId: 'gm-master',
         locked: false,
@@ -4003,6 +4062,7 @@ async function spawnCompendiumEntityToken(cat, groupKey, itemKey, fallbackTitle 
         hpCurrent: hp,
         hpMax: hp,
         ac,
+        initMod,
         sizeSquares,
         imgSrc
     };
@@ -5230,6 +5290,14 @@ function renderTabletopConnectedPlayersBarHtml() {
 /* ------------------ RENDERIZADOR PRINCIPAL DO TABLETOP VTT ------------------ */
 function renderTabletopModule() {
     ensureTabletopExtendedState();
+    if (typeof fetchCompendiumLocalAssets === 'function' && window.compendiumLocalAssets && !window.compendiumLocalAssets.loaded && !window.compendiumLocalAssets._reRenderQueued) {
+        window.compendiumLocalAssets._reRenderQueued = true;
+        fetchCompendiumLocalAssets().then(c => {
+            if (c && c.loaded && typeof activeModule !== 'undefined' && activeModule === 'tabletop') {
+                renderTabletopModule();
+            }
+        }).catch(() => {});
+    }
     const player = getActivePlayer();
     const isGm = _isVttEffectiveGm(player);
     const playerShownName = typeof getPlayerDisplayName === 'function' ? getPlayerDisplayName(player, 'Jogador') : (player ? player.name : 'Jogador');
@@ -5319,7 +5387,12 @@ function renderTabletopModule() {
                 : (t.type === 'item'
                     ? '⚔️ Item'
                     : (showExact ? `${t.hpCurrent}/${t.hpMax}` : describeQualitativeHealth(t.hpCurrent, t.hpMax, t.type))));
-        const bgImgStyle = t.imgSrc ? `background-image:url('${t.imgSrc.replace(/'/g, "\\'")}');` : '';
+        const isLootTok = (t.type === 'gold' || t.type === 'chest');
+        const imgCandidates = isLootTok
+            ? (t.imgSrc ? [t.imgSrc] : [])
+            : (typeof getTokenRenderImageCandidates === 'function' ? getTokenRenderImageCandidates(t) : (t.imgSrc ? [t.imgSrc] : []));
+        const primaryImg = imgCandidates[0] || '';
+        const escapedFallbacks = escapeHtmlText(JSON.stringify(imgCandidates));
         const ownerColor = (t.type === 'pc' && t.ownerId && typeof getPlayerColor === 'function') ? getPlayerColor(t.ownerId) : '';
         const ownerBorderStyle = ownerColor && !isTurnActive ? `border-color:${ownerColor}; box-shadow:0 0 10px ${ownerColor}66;` : '';
         const ownerDotHtml = ownerColor ? `<span class="tt-token-owner-dot" style="background:${escapeHtmlText(ownerColor)};"></span>` : '';
@@ -5328,7 +5401,7 @@ function renderTabletopModule() {
         return `
             <div class="tt-token ${typeCls} ${isSel} ${turnCls} ${lockCls} ${hiddenCls}"
                  data-token-id="${escapeHtmlText(t.id)}"
-                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${t.hiddenFromPlayers ? '0.48' : (canMove ? '1' : '0.94')}; ${ownerBorderStyle} ${bgImgStyle}"
+                 style="left:${t.x}px; top:${t.y}px; width:${sz}px; height:${sz}px; opacity:${t.hiddenFromPlayers ? '0.48' : (canMove ? '1' : '0.94')}; ${ownerBorderStyle}"
                  onmousedown="startDragTabletopToken(event, '${t.id}')"
                  ondblclick="openSheetFromTabletopToken('${t.id}')"
                  title="${escapeHtmlText(t.name)} (Clique seleciona • 2º clique arrasta • Duplo-clique abre)">
@@ -5336,7 +5409,8 @@ function renderTabletopModule() {
                 ${lockBadgeHtml}
                 ${hiddenBadgeHtml}
                 <span class="tt-token-hp">${badgeText}</span>
-                ${t.imgSrc ? '' : `<span>${escapeHtmlText(initials)}</span>`}
+                ${primaryImg ? `<img class="tt-token-img" src="${escapeHtmlText(primaryImg)}" alt="" data-token-id="${escapeHtmlText(t.id)}" data-fallback-paths="${escapedFallbacks}" data-fallback-idx="0" onload="handleTabletopTokenImgLoad(this)" onerror="handleTabletopTokenImgError(this)">` : ''}
+                <span class="tt-token-initials" style="${primaryImg ? 'display:none;' : ''}">${escapeHtmlText(initials)}</span>
                 <span class="tt-token-label">${isTurnActive ? '⚔️ ' : ''}${escapeHtmlText(t.name)}</span>
             </div>
         `;

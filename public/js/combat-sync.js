@@ -73,42 +73,812 @@ function syncCombatEntityHp(cardOrTokenOrCharId, newHp, newMaxHp = null) {
     }
 }
 
+/* =========================================================================
+   EXTRATOR UNIFICADO DE ESTATÍSTICAS & RESOLVEDOR DE IMAGENS DE TOKENS
+   Suporta fichas JSON (5etools/Homebrew) e HTML, pastas legadas (./data/...),
+   manifesto local /api/local-assets e fallback de imagens no Tabletop.
+   ========================================================================= */
+
+window.compendiumLocalAssets = window.compendiumLocalAssets || {
+    loaded: false,
+    loadingPromise: null,
+    images: [],
+    byPath: new Map(),
+    byFolder: new Map()
+};
+window._tokenImgProbeCache = window._tokenImgProbeCache || new Map();
+
+function _normalizeAssetSlug(raw) {
+    return String(raw || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/\.[^.]+$/, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function _normalizeRelImagePath(rawPath) {
+    let p = String(rawPath || '').trim().replace(/\\/g, '/');
+    if (!p) return '';
+    if (/^(data:|https?:|blob:|\/)/i.test(p)) return p;
+    if (!p.startsWith('./') && !p.startsWith('../')) p = './' + p.replace(/^\.?\//, '');
+    return p;
+}
+
+function _scoreTokenFilename(filePath) {
+    const fileName = String(filePath || '').split('/').pop().toLowerCase();
+    const stem = fileName.replace(/\.[^.]+$/, '');
+    let score = 10;
+    if (/[-_]token$/.test(stem)) score += 40;
+    if (/(?:^|[-_])(art|fluff|full|map|scene|banner)(?:[-_]|$)/.test(stem)) score -= 25;
+    if (/(?:^|[-_])big(?:[-_]?v\d+)?$/.test(stem)) score -= 18;
+    if (/\.png$/i.test(fileName)) score += 3;
+    else if (/\.webp$/i.test(fileName)) score += 2;
+    else if (/\.jpe?g$/i.test(fileName)) score += 1;
+    return score;
+}
+
+/** Registra lista de caminhos de imagens locais conhecidas para resolução instantânea de tokens. */
+function setCompendiumLocalAssetList(imageList = []) {
+    const byPath = new Map();
+    const byFolder = new Map();
+    const cleanImages = [];
+
+    for (const raw of (imageList || [])) {
+        const rel = _normalizeRelImagePath(raw);
+        if (!rel) continue;
+        const lower = rel.toLowerCase();
+        if (byPath.has(lower)) continue;
+        byPath.set(lower, rel);
+        cleanImages.push(rel);
+
+        const parts = rel.replace(/^\.\//, '').split('/');
+        parts.pop(); // remove nome do arquivo
+        const rootCat = (parts[0] || '').toLowerCase();
+        const folderKeys = new Set();
+        parts.forEach((seg, idx) => {
+            if (idx === 0 && ['monster', 'npc', 'item', 'map', 'curio', 'data'].includes(seg.toLowerCase())) return;
+            const slug = _normalizeAssetSlug(seg);
+            if (!slug || slug === 'data') return;
+            folderKeys.add(slug);
+            if (rootCat) folderKeys.add(`${rootCat}:${slug}`);
+        });
+        const stemSlug = _normalizeAssetSlug(rel.split('/').pop());
+        if (stemSlug) {
+            folderKeys.add(`file:${stemSlug}`);
+            if (rootCat) folderKeys.add(`${rootCat}:file:${stemSlug}`);
+        }
+        folderKeys.forEach(fk => {
+            if (!byFolder.has(fk)) byFolder.set(fk, []);
+            byFolder.get(fk).push(rel);
+        });
+    }
+
+    for (const [k, arr] of byFolder.entries()) {
+        arr.sort((a, b) => _scoreTokenFilename(b) - _scoreTokenFilename(a));
+        byFolder.set(k, arr);
+    }
+
+    window.compendiumLocalAssets.loaded = true;
+    window.compendiumLocalAssets.images = cleanImages;
+    window.compendiumLocalAssets.byPath = byPath;
+    window.compendiumLocalAssets.byFolder = byFolder;
+    return window.compendiumLocalAssets;
+}
+
+/** Busca o manifesto /api/local-assets uma única vez quando o servidor Node está ativo. */
+async function fetchCompendiumLocalAssets(force = false) {
+    const cache = window.compendiumLocalAssets;
+    if (cache.loaded && !force) return cache;
+    if (cache.loadingPromise && !force) return cache.loadingPromise;
+    if (typeof fetch !== 'function' || (typeof window !== 'undefined' && window.location?.protocol === 'file:')) {
+        return cache;
+    }
+
+    cache.loadingPromise = (async () => {
+        try {
+            const devId = (typeof getOrCreateDeviceId === 'function')
+                ? getOrCreateDeviceId()
+                : (typeof window !== 'undefined' ? (window.localDeviceId || window.localClientId || '') : '');
+            const url = devId ? `/api/local-assets?deviceId=${encodeURIComponent(devId)}` : '/api/local-assets';
+            const res = await fetch(url, { cache: 'no-store' });
+            if (res.ok) {
+                const data = await res.json().catch(() => null);
+                if (data && data.ok && Array.isArray(data.images)) {
+                    setCompendiumLocalAssetList(data.images);
+                }
+            }
+        } catch (e) {
+            // Modo offline / estático: segue normalmente com candidatos por caminho
+        } finally {
+            cache.loadingPromise = null;
+        }
+        return cache;
+    })();
+    return cache.loadingPromise;
+}
+
+/** Converte fórmulas como "34d20 + 340" para sua média inteira estática (sem rolagem aleatória). */
+function computeDiceFormulaAverage(formula) {
+    const raw = String(formula || '').trim();
+    if (!raw) return null;
+    const m = raw.match(/(\d+)\s*d\s*(\d+)(?:\s*([+\-])\s*(\d+))?/i);
+    if (!m) {
+        const plain = raw.match(/^(\d{1,6})$/);
+        return plain ? Number(plain[1]) : null;
+    }
+    const count = parseInt(m[1], 10) || 0;
+    const sides = parseInt(m[2], 10) || 0;
+    const sign = m[3] === '-' ? -1 : 1;
+    const bonus = m[4] ? (parseInt(m[4], 10) || 0) * sign : 0;
+    if (count <= 0 || sides <= 0) return null;
+    return Math.max(1, Math.floor(count * ((sides + 1) / 2) + bonus));
+}
+
+function parseCrToProfBonus(crVal) {
+    const raw = (crVal && typeof crVal === 'object') ? (crVal.cr ?? '') : crVal;
+    const s = String(raw || '').trim();
+    if (!s) return 2;
+    let numCr = 0;
+    if (/^\d+\s*\/\s*\d+$/.test(s)) {
+        const [a, b] = s.split('/').map(Number);
+        numCr = b ? (a / b) : 0;
+    } else {
+        numCr = parseFloat(s) || 0;
+    }
+    if (numCr < 5) return 2;
+    return Math.max(2, 2 + Math.floor((Math.ceil(numCr) - 1) / 4));
+}
+
+function normalizeCreatureSizeCode(rawSize) {
+    const raw = Array.isArray(rawSize) ? (rawSize[0] || 'M') : (rawSize || 'M');
+    const s = String(raw).trim().toUpperCase();
+    if (s === 'T' || s.startsWith('TINY') || s.startsWith('MIN')) return 'T';
+    if (s === 'S' || s.startsWith('SMALL') || s.startsWith('PEQ')) return 'S';
+    if (s === 'L' || s.startsWith('LARGE') || s.startsWith('GRAND')) return 'L';
+    if (s === 'H' || s.startsWith('HUGE') || s.startsWith('ENORM')) return 'H';
+    if (s === 'G' || s.startsWith('GARGANT') || s.startsWith('IMENS') || s.startsWith('COLOSS')) return 'G';
+    return 'M';
+}
+
+function _footprintFromSizeCode(sizeCode) {
+    if (typeof CompendioRules !== 'undefined' && typeof CompendioRules.getCreatureFootprintSquares === 'function') {
+        return CompendioRules.getCreatureFootprintSquares(sizeCode);
+    }
+    const map = { G: 4, H: 3, L: 2 };
+    return map[sizeCode] || 1;
+}
+
+/** Extrai estatísticas exatas de um statblock JSON (5etools / Homebrew). */
+function extractCreatureStatsFromJson(j) {
+    if (!j || typeof j !== 'object') return null;
+    let hp = null;
+    const rawHp = j.hp;
+    if (typeof rawHp === 'number' && Number.isFinite(rawHp) && rawHp > 0) {
+        hp = Math.round(rawHp);
+    } else if (typeof rawHp === 'string') {
+        const lm = rawHp.match(/(\d{1,6})/);
+        hp = lm ? parseInt(lm[1], 10) : computeDiceFormulaAverage(rawHp);
+    } else if (rawHp && typeof rawHp === 'object') {
+        if (rawHp.average !== undefined && rawHp.average !== null && !isNaN(Number(rawHp.average))) {
+            hp = Math.round(Number(rawHp.average));
+        } else if (rawHp.max !== undefined && rawHp.max !== null && !isNaN(Number(rawHp.max))) {
+            hp = Math.round(Number(rawHp.max));
+        } else if (typeof rawHp.special === 'string') {
+            const sm = rawHp.special.match(/(\d{1,6})/);
+            hp = sm ? parseInt(sm[1], 10) : computeDiceFormulaAverage(rawHp.special);
+        } else if (typeof rawHp.formula === 'string') {
+            hp = computeDiceFormulaAverage(rawHp.formula);
+        }
+    }
+    if ((!hp || hp <= 0) && j.hpMax !== undefined && !isNaN(Number(j.hpMax))) {
+        hp = Math.round(Number(j.hpMax));
+    }
+
+    let ac = null;
+    if (Array.isArray(j.ac) && j.ac.length > 0) {
+        const firstAc = j.ac[0];
+        if (typeof firstAc === 'number') ac = firstAc;
+        else if (firstAc && typeof firstAc === 'object' && firstAc.ac !== undefined) ac = Number(firstAc.ac);
+        else {
+            const acM = String(firstAc).match(/(\d{1,3})/);
+            if (acM) ac = parseInt(acM[1], 10);
+        }
+    } else if (typeof j.ac === 'number') {
+        ac = j.ac;
+    } else if (j.ac && typeof j.ac === 'object' && j.ac.ac !== undefined) {
+        ac = Number(j.ac.ac);
+    } else if (typeof j.ac === 'string') {
+        const acM = j.ac.match(/(\d{1,3})/);
+        if (acM) ac = parseInt(acM[1], 10);
+    }
+
+    const sizeCode = normalizeCreatureSizeCode(j.size);
+    const sizeSquares = _footprintFromSizeCode(sizeCode);
+    const dexScore = j.dex !== undefined && !isNaN(Number(j.dex)) ? Number(j.dex) : 10;
+    const dexMod = Math.floor((dexScore - 10) / 2);
+
+    let initMod = dexMod;
+    if (typeof j.initiative === 'number' && Number.isFinite(j.initiative)) {
+        initMod = j.initiative;
+    } else if (j.initiative && typeof j.initiative === 'object') {
+        if (typeof j.initiative.initiative === 'number' && Number.isFinite(j.initiative.initiative)) {
+            initMod = j.initiative.initiative;
+        } else if (typeof j.initiative.proficiency === 'number' && Number.isFinite(j.initiative.proficiency)) {
+            initMod = dexMod + Math.round(j.initiative.proficiency * parseCrToProfBonus(j.cr));
+        }
+    }
+
+    return {
+        title: String(j.name || j.title || '').trim(),
+        hp: (hp && hp > 0) ? hp : null,
+        ac: (ac !== null && Number.isFinite(ac)) ? ac : null,
+        sizeCode,
+        sizeSquares,
+        dex: dexScore,
+        initMod,
+        customToken: String(j.customToken || '').trim()
+    };
+}
+
+function _stripHtmlTagsClean(s) {
+    return String(s || '')
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(?:div|p|tr|li|h\d)>/gi, '\n')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/[ \t]+/g, ' ')
+        .trim();
+}
+
+/** Extrai PV, CA, tamanho, iniciativa, DEX e caminhos de imagem de ficha HTML. */
+function extractCreatureStatsFromHtml(htmlText, entry = null) {
+    const raw = String(htmlText || '');
+    if (!raw || !/<[a-z]/i.test(raw)) return null;
+
+    const h1Match = raw.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || raw.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = h1Match ? _stripHtmlTagsClean(h1Match[1]) : String(entry?.title || '').trim();
+
+    let sizeCode = 'M';
+    const subMatch = raw.match(/<div[^>]*class=["'][^"']*\bsubtitle\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
+    const subText = subMatch ? _stripHtmlTagsClean(subMatch[1]) : '';
+    const sizeMatch = (subText || raw.slice(0, 1500)).match(/\b(Tiny|Small|Medium|Large|Huge|Gargantuan|Min[úu]scul[oa]|Pequen[oa]|M[ée]di[oa]|Grande|Enorme|Imensur[áa]vel)\b/i);
+    if (sizeMatch) {
+        sizeCode = normalizeCreatureSizeCode(sizeMatch[1]);
+    }
+    const sizeSquares = _footprintFromSizeCode(sizeCode);
+
+    // Restringe parsing textual de fallback à seção de cabeçalho antes das ações/traços
+    const cleanText = _stripHtmlTagsClean(raw);
+    const headerCutIdx = cleanText.search(/\n\s*(?:Actions|A[çc][õo]es|Reactions|Rea[çc][õo]es|Legendary Actions)\b/i);
+    const headerText = headerCutIdx > 0 ? cleanText.slice(0, headerCutIdx) : cleanText.slice(0, 1200);
+
+    let hp = null;
+    const hpTagMatch = raw.match(/<(?:span|strong|b|td|th)\b[^>]*>\s*(?:Hit\s*Points|Pontos\s*de\s*Vida|PV(?:\s*M[áa]x(?:imos?)?)?|HP)\s*:?\s*<\/(?:span|strong|b|td|th)>\s*[:\-]?\s*(\d{1,6})/i);
+    if (hpTagMatch) {
+        hp = parseInt(hpTagMatch[1], 10);
+    } else {
+        const hpLineMatch = headerText.match(/(?:^|\n)\s*(?:Hit\s*Points|Pontos\s*de\s*Vida|HP|PV)\s*[:\-]?\s*(\d{1,6})/i);
+        if (hpLineMatch) {
+            hp = parseInt(hpLineMatch[1], 10);
+        } else {
+            const hpFormulaTag = raw.match(/<(?:span|strong|b)[^>]*>\s*(?:Hit\s*Points|Pontos\s*de\s*Vida|HP|PV)\s*:?\s*<\/(?:span|strong|b)>\s*[:\-]?\s*\(?(\d+\s*d\s*\d+(?:\s*[+\-]\s*\d+)?)/i);
+            if (hpFormulaTag) hp = computeDiceFormulaAverage(hpFormulaTag[1]);
+        }
+    }
+
+    let ac = null;
+    const acTagMatch = raw.match(/<(?:span|strong|b|td|th)\b[^>]*>\s*(?:Armor\s*Class|Classe\s*de\s*Armadura|CA|AC)\s*:?\s*<\/(?:span|strong|b|td|th)>\s*[:\-]?\s*(\d{1,3})/i);
+    if (acTagMatch) {
+        ac = parseInt(acTagMatch[1], 10);
+    } else {
+        const acLineMatch = headerText.match(/(?:^|\n)\s*(?:Armor\s*Class|Classe\s*de\s*Armadura|CA|AC)\s*[:\-]?\s*(\d{1,3})/i);
+        if (acLineMatch) ac = parseInt(acLineMatch[1], 10);
+    }
+
+    let dex = 10;
+    const abTableMatch = raw.match(/<table[^>]*class=["'][^"']*\babilities\b[^"']*["'][^>]*>([\s\S]*?)<\/table>/i);
+    if (abTableMatch) {
+        const ths = [...abTableMatch[1].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/gi)].map(m => _stripHtmlTagsClean(m[1]).toUpperCase());
+        const tds = [...abTableMatch[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map(m => _stripHtmlTagsClean(m[1]));
+        const dexIdx = ths.findIndex(h => h === 'DEX' || h === 'DES');
+        if (dexIdx >= 0 && tds[dexIdx]) {
+            const dm = tds[dexIdx].match(/(\d{1,2})/);
+            if (dm) dex = parseInt(dm[1], 10);
+        }
+    }
+    const dexMod = Math.floor((dex - 10) / 2);
+
+    let initMod = dexMod;
+    const initTagMatch = raw.match(/<(?:span|strong|b|td|th)\b[^>]*>\s*(?:Initiative|Iniciativa)\s*:?\s*<\/(?:span|strong|b|td|th)>\s*[:\-]?\s*([+\-]?\d+)/i);
+    if (initTagMatch) {
+        initMod = parseInt(initTagMatch[1], 10);
+    } else {
+        const initLineMatch = headerText.match(/(?:^|\n)\s*(?:Initiative|Iniciativa)\s*[:\-]?\s*([+\-]?\d+)/i);
+        if (initLineMatch) initMod = parseInt(initLineMatch[1], 10);
+    }
+
+    const htmlTokenSrcs = [];
+    const htmlArtSrcs = [];
+    const imgTags = [...raw.matchAll(/<img\b([^>]*)>/gi)];
+    for (const m of imgTags) {
+        const attrs = m[1] || '';
+        const srcM = attrs.match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+        if (!srcM || !srcM[1]) continue;
+        const srcVal = srcM[1].trim();
+        const isTokenImg = /\btoken-image\b/i.test(attrs) || /token/i.test(attrs);
+        const isArtImg = /\bfull-artwork\b/i.test(attrs) || /(?:[-_](?:art|fluff|big)(?:[-_.]|$))/i.test(srcVal);
+        if (isTokenImg) htmlTokenSrcs.unshift(srcVal);
+        else if (isArtImg) htmlArtSrcs.push(srcVal);
+        else htmlTokenSrcs.push(srcVal);
+    }
+
+    return {
+        title,
+        hp: (hp && hp > 0) ? hp : null,
+        ac: (ac !== null && Number.isFinite(ac)) ? ac : null,
+        sizeCode,
+        sizeSquares,
+        dex,
+        initMod: Number.isFinite(initMod) ? initMod : 0,
+        htmlTokenSrcs,
+        htmlArtSrcs
+    };
+}
+
+function _mapCatToDirPrefix(category) {
+    const c = String(category || '').toLowerCase();
+    if (c === 'monsters' || c === 'monster') return 'monster';
+    if (c === 'npcs' || c === 'npc') return 'npc';
+    if (c === 'items' || c === 'item') return 'item';
+    if (c === 'curio') return 'curio';
+    if (c === 'maps' || c === 'map') return 'map';
+    return '';
+}
+
+/** Resolve possíveis caminhos de imagens reais no manifesto local a partir de dicas/slugs/caminhos. */
+function findLocalManifestImagesForHints(hints = [], category = '', brokenPath = '') {
+    const cache = window.compendiumLocalAssets;
+    if (!cache || !cache.loaded || !cache.byFolder) return [];
+    const results = [];
+    const seen = new Set();
+    const catPrefix = _mapCatToDirPrefix(category);
+
+    const addRel = (rel) => {
+        if (!rel || seen.has(rel)) return;
+        seen.add(rel);
+        results.push(rel);
+    };
+
+    if (brokenPath) {
+        const normBroken = _normalizeRelImagePath(brokenPath).toLowerCase();
+        if (cache.byPath.has(normBroken)) addRel(cache.byPath.get(normBroken));
+        const bParts = brokenPath.replace(/^\.\//, '').split('/').filter(Boolean);
+        bParts.forEach(p => {
+            const slug = _normalizeAssetSlug(p);
+            if (slug && !['data', 'monster', 'npc', 'item', 'curio', 'map'].includes(slug)) {
+                hints = [...hints, slug];
+            }
+        });
+    }
+
+    const cleanSlugs = [];
+    const seenSlugs = new Set();
+    for (const h of hints) {
+        const s = _normalizeAssetSlug(h);
+        if (!s || seenSlugs.has(s) || s === 'data') continue;
+        seenSlugs.add(s);
+        cleanSlugs.push(s);
+    }
+
+    // 1. Prioriza match na pasta da mesma categoria; depois qualquer pasta com mesmo slug; por fim match por nome do arquivo
+    const lookupKeys = [];
+    cleanSlugs.forEach(s => { if (catPrefix) lookupKeys.push(`${catPrefix}:${s}`); });
+    cleanSlugs.forEach(s => lookupKeys.push(s));
+    cleanSlugs.forEach(s => { if (catPrefix) lookupKeys.push(`${catPrefix}:file:${s}`); });
+    cleanSlugs.forEach(s => lookupKeys.push(`file:${s}`));
+
+    for (const lk of lookupKeys) {
+        const arr = cache.byFolder.get(lk);
+        if (Array.isArray(arr)) arr.forEach(addRel);
+    }
+
+    return results;
+}
+
+/** Constrói lista ordenada de caminhos candidatos para Token/Arte de qualquer entrada (JSON ou HTML). */
+function buildCompendiumTokenImageCandidates(itemData = {}, json = null, opts = {}) {
+    const tokenList = [];
+    const fluffList = [];
+    const seenTok = new Set();
+    const seenFluff = new Set();
+    const vFiles = (typeof virtualFiles !== 'undefined' && virtualFiles) ? virtualFiles : {};
+
+    const pushTok = (p) => {
+        if (!p) return;
+        const resolved = vFiles[p] || _normalizeRelImagePath(p);
+        if (!resolved || seenTok.has(resolved)) return;
+        seenTok.add(resolved);
+        tokenList.push(resolved);
+    };
+    const pushFluff = (p) => {
+        if (!p) return;
+        const resolved = vFiles[p] || _normalizeRelImagePath(p);
+        if (!resolved || seenFluff.has(resolved)) return;
+        seenFluff.add(resolved);
+        fluffList.push(resolved);
+    };
+
+    const htmlMeta = opts.htmlContent ? extractCreatureStatsFromHtml(opts.htmlContent, itemData) : null;
+    const rawCustom = json?.customToken || itemData?.customToken;
+    if (rawCustom) pushTok(rawCustom);
+
+    const hintSlugs = [];
+    if (opts.itemKey) hintSlugs.push(opts.itemKey);
+    if (opts.groupKey) hintSlugs.push(opts.groupKey);
+    if (itemData?.title) hintSlugs.push(itemData.title);
+    if (opts.title) hintSlugs.push(opts.title);
+    if (json?.name) hintSlugs.push(json.name);
+    if (htmlMeta?.title) hintSlugs.push(htmlMeta.title);
+    let pathDir = '';
+    let pathStem = '';
+    if (itemData?.path) {
+        const parts = String(itemData.path).split('/');
+        pathStem = (parts.pop() || '').replace(/\.(json|html?|txt|md)$/i, '');
+        pathDir = parts.join('/');
+        if (pathStem) hintSlugs.push(pathStem);
+    }
+
+    // 1. Se HTML tiver <img src="..."> explícito e existir no manifesto (ou não estiver em ./data/), prioriza
+    const manifestCache = window.compendiumLocalAssets;
+    if (htmlMeta) {
+        for (const src of (htmlMeta.htmlTokenSrcs || [])) {
+            const norm = _normalizeRelImagePath(src);
+            if (!manifestCache?.loaded || manifestCache.byPath.has(norm.toLowerCase())) {
+                pushTok(norm);
+            } else {
+                // Caminho no HTML quebrado (ex: ./npc/data/astel/astel.png) -> busca equivalente real no manifesto antes
+                findLocalManifestImagesForHints(hintSlugs, opts.category, norm).forEach(pushTok);
+                pushTok(norm);
+            }
+        }
+        (htmlMeta.htmlArtSrcs || []).forEach(pushFluff);
+    }
+
+    // 2. Caminhos confirmados no manifesto local (/api/local-assets) têm prioridade sobre chutes 404
+    findLocalManifestImagesForHints(hintSlugs, opts.category, itemData?.path || '').forEach(rel => {
+        if (/(?:^|[-_])(art|fluff|big)(?:[-_.]|$)/i.test(rel) && !/(?:^|[-_])token/i.test(rel)) pushFluff(rel);
+        else pushTok(rel);
+    });
+
+    // 3. Candidatos determinísticos no diretório real da entrada (quando path NÃO é só o legado "./data/...")
+    const extensions = ['png', 'webp', 'jpg', 'jpeg'];
+    const isDummyDataDir = /^\.?\/?data$/i.test(pathDir);
+    if (pathDir && pathStem && !isDummyDataDir) {
+        ['', '-token', '_token'].forEach(sfx => {
+            extensions.forEach(ext => pushTok(`${pathDir}/${pathStem}${sfx}.${ext}`));
+        });
+        ['-art', '_art', '-fluff', '_fluff', '-big', '_big'].forEach(sfx => {
+            extensions.forEach(ext => pushFluff(`${pathDir}/${pathStem}${sfx}.${ext}`));
+        });
+    }
+
+    // 4. Candidatos determinísticos locais nas pastas padrão (para modo estático/offline sem /api/local-assets)
+    const cleanStemSet = new Set();
+    const rawSlugCandidates = [pathStem, opts.itemKey, opts.groupKey, _normalizeAssetSlug(opts.title || itemData?.title || json?.name)].filter(Boolean);
+    rawSlugCandidates.forEach(s => {
+        const norm = _normalizeAssetSlug(s);
+        if (norm && norm !== 'data') {
+            cleanStemSet.add(norm);
+            cleanStemSet.add(norm.replace(/-/g, '_'));
+        }
+    });
+
+    const catDirs = (() => {
+        const c = _mapCatToDirPrefix(opts.category);
+        if (c === 'monster') return ['./monster/data', './monster'];
+        if (c === 'npc') return ['./npc', './npc/data', './monster/data'];
+        if (c === 'item') return ['./item', './curio'];
+        if (c === 'curio') return ['./curio', './item'];
+        return ['./monster/data', './monster', './npc', './item'];
+    })();
+
+    for (const dirBase of catDirs) {
+        for (const folderSlug of cleanStemSet) {
+            ['', '-token', '_token'].forEach(sfx => {
+                extensions.forEach(ext => pushTok(`${dirBase}/${folderSlug}/${folderSlug}${sfx}.${ext}`));
+            });
+            ['-art', '_art'].forEach(sfx => {
+                extensions.forEach(ext => pushFluff(`${dirBase}/${folderSlug}/${folderSlug}${sfx}.${ext}`));
+            });
+        }
+    }
+
+    // Mesmo caminhos ./data/... ficam atrás dos caminhos reais locais (compatibilidade caso exista algo em ./data/)
+    if (isDummyDataDir && pathStem) {
+        ['', '-token', '_token'].forEach(sfx => {
+            extensions.forEach(ext => pushTok(`${pathDir}/${pathStem}${sfx}.${ext}`));
+        });
+    }
+
+    // 5. Fallback remoto (5etools) por último para não bloquear ou atrasar carregamentos locais
+    if (json && json.name) {
+        const cleanName = String(json.name).replace(/\s*\([^)]*\)\s*$/g, '').trim();
+        const encName = encodeURIComponent(cleanName);
+        const sources = json.source ? [String(json.source), 'MM', 'MPMM', 'VRGR', 'CoS', 'XMM'] : ['MM', 'MPMM', 'VRGR', 'CoS', 'XMM'];
+        [...new Set(sources)].forEach(s => {
+            const src = encodeURIComponent(s);
+            pushTok(`https://5e.tools/img/bestiary/tokens/${src}/${encName}.webp`);
+            pushTok(`https://raw.githubusercontent.com/5etools-mirror-3/5etools-img/main/bestiary/tokens/${src}/${encName}.webp`);
+            pushFluff(`https://5e.tools/img/bestiary/${src}/${encName}.webp`);
+            pushFluff(`https://raw.githubusercontent.com/5etools-mirror-3/5etools-img/main/bestiary/${src}/${encName}.webp`);
+        });
+    }
+
+    return { token: tokenList, fluff: fluffList };
+}
+
+/** Retorna rapidamente o melhor caminho síncrono (já confirmado via manifesto ou virtualFiles). */
+function resolveBestTokenImageSrcSync(candidates = []) {
+    const vFiles = (typeof virtualFiles !== 'undefined' && virtualFiles) ? virtualFiles : {};
+    const manifest = window.compendiumLocalAssets;
+    const probeCache = window._tokenImgProbeCache;
+
+    for (const c of candidates) {
+        if (!c) continue;
+        if (vFiles[c]) return vFiles[c];
+        if (/^(data:image\/|blob:)/i.test(c)) return c;
+        if (probeCache && probeCache.get(c) === true) return c;
+        if (manifest && manifest.loaded && !/^https?:/i.test(c)) {
+            const norm = _normalizeRelImagePath(c).toLowerCase();
+            if (manifest.byPath.has(norm)) return manifest.byPath.get(norm);
+        }
+    }
+    return '';
+}
+
+async function _probeSingleImageUrl(url, timeoutMs = 1500) {
+    if (!url) return false;
+    const cache = window._tokenImgProbeCache;
+    if (cache.has(url)) return cache.get(url);
+
+    const vFiles = (typeof virtualFiles !== 'undefined' && virtualFiles) ? virtualFiles : {};
+    if (vFiles[url] || /^(data:image\/|blob:)/i.test(url)) {
+        cache.set(url, true);
+        return true;
+    }
+
+    const isRemote = /^https?:\/\//i.test(url);
+    const isFileProto = typeof window !== 'undefined' && window.location?.protocol === 'file:';
+
+    if (!isRemote && !isFileProto && typeof fetch === 'function') {
+        try {
+            const res = await fetch(url, { method: 'HEAD', cache: 'force-cache' });
+            const ok = Boolean(res && res.ok);
+            cache.set(url, ok);
+            return ok;
+        } catch (e) {
+            cache.set(url, false);
+            return false;
+        }
+    }
+
+    if (typeof Image !== 'undefined') {
+        const ok = await new Promise(resolve => {
+            let done = false;
+            const finish = (val) => {
+                if (done) return;
+                done = true;
+                clearTimeout(timer);
+                resolve(val);
+            };
+            const timer = setTimeout(() => finish(false), timeoutMs);
+            const img = new Image();
+            img.onload = () => finish(true);
+            img.onerror = () => finish(false);
+            img.src = url;
+        });
+        cache.set(url, ok);
+        return ok;
+    }
+    return false;
+}
+
+/** Verifica assincronamente os candidatos locais (e depois remotos) e retorna o primeiro carregável. */
+async function resolveBestTokenImageSrc(candidates = [], allowRemote = true) {
+    if (!Array.isArray(candidates) || !candidates.length) return '';
+    await fetchCompendiumLocalAssets();
+    const syncHit = resolveBestTokenImageSrcSync(candidates);
+    if (syncHit) return syncHit;
+
+    const manifest = window.compendiumLocalAssets;
+    for (const c of candidates) {
+        if (!c) continue;
+        const isRemote = /^https?:\/\//i.test(c);
+        if (isRemote && !allowRemote) continue;
+        // Se manifesto carregou do servidor Node e este caminho local não está no manifesto, pula direto sem 404
+        if (!isRemote && manifest.loaded && !/^(data:|blob:)/i.test(c)) {
+            const norm = _normalizeRelImagePath(c).toLowerCase();
+            if (!manifest.byPath.has(norm)) continue;
+        }
+        const ok = await _probeSingleImageUrl(c, isRemote ? 1200 : 1500);
+        if (ok) return c;
+    }
+    return '';
+}
+
+/** Retorna candidatos de fallback em tempo de renderização para tokens existentes/novos. */
+function getTokenRenderImageCandidates(tok) {
+    if (!tok || typeof tok !== 'object') return [];
+    const list = [];
+    const seen = new Set();
+    const push = (val) => {
+        const s = String(val || '').trim();
+        if (!s || seen.has(s)) return;
+        seen.add(s);
+        list.push(s);
+    };
+
+    const isStaleDataPath = (p) => /^\.?\/?data\/[^/]+$/i.test(String(p || '').trim())
+        && !(typeof virtualFiles !== 'undefined' && virtualFiles && virtualFiles[p]);
+
+    if (tok.imgSrc && !isStaleDataPath(tok.imgSrc)) push(tok.imgSrc);
+
+    const cat = tok.category || (tok.type === 'npc' ? 'npcs' : (tok.type === 'item' ? 'items' : 'monsters'));
+    if (cat && cat !== 'character' && (tok.itemKey || tok.name)) {
+        const root = (typeof compendioData !== 'undefined' && compendioData) ? (compendioData[cat] || {}) : {};
+        let entry = tok.groupKey ? root[tok.groupKey]?.children?.[tok.itemKey] : root[tok.itemKey];
+        if (!entry && tok.itemKey && typeof findEntryInCatalog === 'function') {
+            const found = findEntryInCatalog(cat, tok.itemKey);
+            if (found) entry = found.entry || found;
+        }
+        const inlineHtml = (entry?.inlineContent && /<[a-z]/i.test(entry.inlineContent)) ? entry.inlineContent : '';
+        const paths = buildCompendiumTokenImageCandidates(entry || {}, null, {
+            category: cat,
+            groupKey: tok.groupKey || '',
+            itemKey: tok.itemKey || '',
+            title: tok.name || '',
+            htmlContent: inlineHtml
+        });
+        paths.token.forEach(push);
+    }
+
+    if (tok.imgSrc) push(tok.imgSrc);
+    return list;
+}
+
+/** Carrega texto bruto de entrada usando inlineContent, entry.path e fallbacks locais de pasta. */
+async function loadCompendiumEntryRawText(entry, category = '', itemKey = '') {
+    if (!entry) return '';
+    if (entry.inlineContent) return entry.inlineContent;
+
+    const tryUrls = [];
+    if (entry.path) tryUrls.push(entry.path);
+    const baseFile = entry.path ? String(entry.path).split('/').pop() : '';
+    const slug = _normalizeAssetSlug(itemKey || baseFile);
+    if (baseFile && slug && /^\.?\/?data\//i.test(String(entry.path || ''))) {
+        const cDir = _mapCatToDirPrefix(category) || 'monster';
+        if (cDir === 'monster') {
+            tryUrls.push(`./monster/data/${slug}/${baseFile}`, `./monster/${slug}/${baseFile}`, `./monster/${baseFile}`);
+        } else if (cDir === 'npc') {
+            tryUrls.push(`./npc/${slug}/${baseFile}`, `./npc/data/${slug}/${baseFile}`);
+        } else {
+            tryUrls.push(`./${cDir}/${slug}/${baseFile}`, `./${cDir}/${baseFile}`);
+        }
+    }
+
+    const fetcher = typeof fetchWithRetry === 'function' ? fetchWithRetry : fetch;
+    for (const u of [...new Set(tryUrls)]) {
+        try {
+            const res = await fetcher(u);
+            if (res && res.ok) return await res.text();
+        } catch (e) {}
+    }
+    return '';
+}
+
+/** Resolve metadados unificados (PV, CA, Iniciativa, Footprint e Imagens) para entrada JSON ou HTML. */
+function resolveCreatureEntryMeta(entry = {}, opts = {}) {
+    const titleFallback = String(opts.fallbackTitle || entry?.title || opts.itemKey || 'Criatura').trim();
+    let jsonObj = opts.loadedJson || null;
+    let htmlText = opts.loadedHtml || '';
+
+    const rawText = opts.rawText || entry?.inlineContent || '';
+    if (!jsonObj && entry && typeof isJsonPath === 'function' && isJsonPath(entry.path, entry.tipo) && rawText) {
+        try {
+            jsonObj = typeof parseJsonWithFallback === 'function'
+                ? parseJsonWithFallback(rawText, entry.path || opts.itemKey)
+                : JSON.parse(rawText);
+        } catch (e) {}
+    }
+    if (!htmlText && !jsonObj && rawText && /<[a-z]/i.test(rawText)) {
+        htmlText = rawText;
+    }
+
+    const jMeta = jsonObj ? extractCreatureStatsFromJson(jsonObj) : null;
+    const hMeta = htmlText ? extractCreatureStatsFromHtml(htmlText, entry) : null;
+    const stats = jMeta || hMeta || {};
+
+    const hp = (stats.hp && stats.hp > 0) ? stats.hp : 30;
+    const ac = (stats.ac !== null && stats.ac !== undefined && Number.isFinite(stats.ac)) ? stats.ac : 14;
+    const sizeCode = stats.sizeCode || 'M';
+    const sizeSquares = stats.sizeSquares || _footprintFromSizeCode(sizeCode);
+    const initMod = Number.isFinite(stats.initMod) ? stats.initMod : 0;
+    const title = stats.title || titleFallback;
+
+    const cand = buildCompendiumTokenImageCandidates(entry, jsonObj, {
+        category: opts.category || '',
+        groupKey: opts.groupKey || '',
+        itemKey: opts.itemKey || '',
+        title,
+        htmlContent: htmlText
+    });
+
+    return {
+        title,
+        hp,
+        ac,
+        sizeCode,
+        sizeSquares,
+        initMod,
+        loadedJson: jsonObj,
+        loadedHtml: htmlText,
+        tokenCandidates: cand.token,
+        fluffCandidates: cand.fluff
+    };
+}
+
 // Sobrescreve spawnMonsterCardFromSheet para também criar/vincular Token no Tabletop e suportar Iniciativa
 function spawnMonsterCardFromSheet(mobName, baseHp, acVal) {
     const qtyInput = document.getElementById('spawn-qty-input');
     const minionCheck = document.getElementById('spawn-minion-check');
     const eliteCheck = document.getElementById('spawn-elite-check');
-    const qty = Math.min(20, Math.max(1, parseInt(qtyInput?.value) || 1));
+    const qty = Math.min(20, Math.max(1, parseInt(qtyInput?.value, 10) || 1));
     const isMinion = Boolean(minionCheck?.checked);
     const isElite = Boolean(eliteCheck?.checked);
 
-    const sourceRef = (typeof activeItemContext !== 'undefined' && activeItemContext) ? {
-        category: activeItemContext.category || currentCategory,
-        groupKey: activeItemContext.groupKey || '',
-        itemKey: activeItemContext.key || ''
+    const ctx = (typeof activeItemContext !== 'undefined' && activeItemContext) ? activeItemContext : null;
+    const sourceRef = ctx ? {
+        category: ctx.category || currentCategory,
+        groupKey: ctx.groupKey || '',
+        itemKey: ctx.key || ''
     } : null;
 
-    let initMod = 0;
-    let sizeCode = 'M';
-    let imgSrc = '';
-    if (typeof activeItemContext !== 'undefined' && activeItemContext && activeItemContext.loadedJson) {
-        const j = activeItemContext.loadedJson;
-        if (j.dex !== undefined) initMod = Math.floor(((Number(j.dex) || 10) - 10) / 2);
-        if (Array.isArray(j.size) && j.size[0]) sizeCode = j.size[0];
-        else if (typeof j.size === 'string') sizeCode = j.size;
-        if (typeof getResourcePaths === 'function') {
-            const paths = getResourcePaths(activeItemContext.itemData || {}, j);
-            if (j.customToken) imgSrc = virtualFiles[j.customToken] || j.customToken;
-            else if (paths.token && paths.token[0]) imgSrc = paths.token[0];
-        }
+    const meta = ctx
+        ? resolveCreatureEntryMeta(ctx.itemData || {}, {
+            category: sourceRef?.category || '',
+            groupKey: sourceRef?.groupKey || '',
+            itemKey: sourceRef?.itemKey || '',
+            fallbackTitle: mobName,
+            loadedJson: ctx.loadedJson || null,
+            loadedHtml: ctx.loadedHtml || '',
+            rawText: ctx.loadedText || ''
+        })
+        : { hp: 30, ac: 14, sizeCode: 'M', sizeSquares: 1, initMod: 0, tokenCandidates: [] };
+
+    const initMod = Number.isFinite(meta.initMod) ? meta.initMod : 0;
+    const footprint = Math.max(1, Number(meta.sizeSquares) || 1);
+    const parsedBaseHp = parseInt(baseHp, 10);
+    const resolvedBaseHp = (Number.isFinite(parsedBaseHp) && parsedBaseHp > 0) ? parsedBaseHp : meta.hp;
+    const parsedAc = parseInt(acVal, 10);
+    const resolvedBaseAc = (Number.isFinite(parsedAc) && parsedAc > 0) ? parsedAc : meta.ac;
+
+    let imgSrc = resolveBestTokenImageSrcSync(meta.tokenCandidates);
+    if (!imgSrc && meta.tokenCandidates.length > 0) {
+        const firstLocal = meta.tokenCandidates.find(c => !/^https?:\/\//i.test(c) && !/^\.?\/?data\//i.test(c));
+        imgSrc = firstLocal || '';
     }
 
     const existingCount = combatCards.filter(c => c.baseName === mobName).length;
+    const spawnedTokenIds = [];
 
     for (let i = 1; i <= qty; i++) {
         const num = existingCount + i;
-        let finalHp = isMinion ? 1 : (parseInt(baseHp) || 30);
-        let finalAc = parseInt(acVal) || 14;
+        let finalHp = isMinion ? 1 : resolvedBaseHp;
+        let finalAc = resolvedBaseAc;
         if (isElite && !isMinion) {
             finalHp = Math.round(finalHp * 1.5);
             finalAc += 2;
@@ -120,7 +890,6 @@ function spawnMonsterCardFromSheet(mobName, baseHp, acVal) {
         // Também posiciona no Tabletop se o usuário desejar mesa sincronizada
         const gridPx = Number(tabletopState.gridSize) || 56;
         const offset = (tabletopState.tokens.length % 10) * gridPx;
-        const footprint = sizeCode === 'G' ? 4 : (sizeCode === 'H' ? 3 : (sizeCode === 'L' ? 2 : 1));
 
         if (sourceRef) {
             const knowRec = getEntityKnowledgeRecord(sourceRef.category, sourceRef.itemKey);
@@ -142,9 +911,11 @@ function spawnMonsterCardFromSheet(mobName, baseHp, acVal) {
             hpCurrent: finalHp,
             hpMax: finalHp,
             ac: finalAc,
+            initMod,
             sizeSquares: footprint,
             imgSrc
         });
+        spawnedTokenIds.push(tokId);
 
         combatCards.push({
             id: cardId,
@@ -165,6 +936,27 @@ function spawnMonsterCardFromSheet(mobName, baseHp, acVal) {
         });
     }
 
+    if (meta.tokenCandidates.length > 0 && spawnedTokenIds.length > 0) {
+        resolveBestTokenImageSrc(meta.tokenCandidates).then(verifiedImg => {
+            if (!verifiedImg || verifiedImg === imgSrc) return;
+            let updated = false;
+            spawnedTokenIds.forEach(tId => {
+                const tk = tabletopState.tokens.find(t => String(t.id) === String(tId));
+                if (tk) {
+                    tk.imgSrc = verifiedImg;
+                    updated = true;
+                    if (typeof updateTabletopTokenDom === 'function') updateTabletopTokenDom(tId);
+                }
+            });
+            if (updated) {
+                if (typeof saveLocalPersistence === 'function') saveLocalPersistence();
+                if (typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.broadcastTabletop) {
+                    CompendioNetAdapter.broadcastTabletop();
+                }
+            }
+        }).catch(() => {});
+    }
+
     dockCollapsed = false;
     saveLocalPersistence();
     if (typeof CompendioNetAdapter !== 'undefined') {
@@ -172,6 +964,9 @@ function spawnMonsterCardFromSheet(mobName, baseHp, acVal) {
         if (CompendioNetAdapter.broadcastCombat) CompendioNetAdapter.broadcastCombat();
     }
     renderCombatHand();
+    if (typeof activeModule !== 'undefined' && activeModule === 'tabletop' && typeof renderTabletopModule === 'function') {
+        renderTabletopModule();
+    }
     showToast(`🔮 ${qty}x "${mobName}" invocado(s) na Runa e posicionado(s) no Tabletop!`);
 }
 

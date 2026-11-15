@@ -255,9 +255,9 @@ const CompendioRules = {
 
     getCreatureFootprintSquares(sizeCode) {
         const s = String(sizeCode || 'M').trim().toUpperCase();
-        if (s.startsWith('G') || s === 'GARGANTUAN' || s === 'IMENSO') return 4;
-        if (s.startsWith('H') || s === 'HUGE' || s === 'ENORME') return 3;
-        if (s.startsWith('L') || s === 'LARGE' || s === 'GRANDE') return 2;
+        if (s === 'G' || s.startsWith('GARGANT') || s.startsWith('IMENS') || s.startsWith('COLOSS')) return 4;
+        if (s === 'H' || s.startsWith('HUGE') || s.startsWith('ENORM')) return 3;
+        if (s === 'L' || s.startsWith('LARGE') || s.startsWith('GRAND')) return 2;
         return 1;
     },
 

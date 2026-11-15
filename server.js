@@ -1207,6 +1207,26 @@ function countLeafEntries(nodeObj) {
     return total;
 }
 
+function scanLocalCompendiumImages() {
+    const images = [];
+    const walkImages = (absDir, webPrefix) => {
+        if (!fs.existsSync(absDir)) return;
+        const entries = fs.readdirSync(absDir, { withFileTypes: true })
+            .filter(e => !e.name.startsWith('.'))
+            .sort((a, b) => naturalCompareNames(a.name, b.name));
+        for (const ent of entries) {
+            const full = path.join(absDir, ent.name);
+            const rel = `${webPrefix}/${ent.name}`;
+            if (ent.isDirectory()) walkImages(full, rel);
+            else if (ent.isFile() && isImgExt(path.extname(ent.name).toLowerCase())) images.push(rel);
+        }
+    };
+    for (const folderName of Object.keys(COMPENDIUM_DIR_MAP)) {
+        walkImages(path.join(PUBLIC_DIR, folderName), `./${folderName}`);
+    }
+    return images;
+}
+
 function scanCompendiumDirectories() {
     const scanned = { monsters: {}, npcs: {}, maps: {}, items: {}, curio: {}, session: {} };
     const counts = { monsters: 0, npcs: 0, maps: 0, items: 0, curio: 0, session: 0 };
@@ -2131,6 +2151,19 @@ const server = http.createServer((req, res) => {
                 }
             }
             return sendJson(res, 200, { ok: true, mods });
+        } catch (err) {
+            return sendJson(res, 500, { ok: false, error: err.message });
+        }
+    }
+
+    // API: Listar imagens locais disponíveis nas pastas do Compêndio para fallback rápido de tokens/portraits
+    if (req.method === 'GET' && pathname === '/api/local-assets') {
+        if (!isHost && !isClientEntryApproved(req, reqDeviceId)) {
+            return sendJson(res, 403, { ok: false, error: 'Entrada aguardando aprovação na Sala de Espera.' });
+        }
+        try {
+            const images = scanLocalCompendiumImages();
+            return sendJson(res, 200, { ok: true, images });
         } catch (err) {
             return sendJson(res, 500, { ok: false, error: err.message });
         }

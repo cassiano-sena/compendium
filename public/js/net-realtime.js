@@ -190,6 +190,7 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
     CompendioNetAdapter.applyServerSessionSnapshot = function(sess) {
         if (!sess || typeof sess !== 'object') return;
+        if (typeof fetchCompendiumLocalAssets === 'function') fetchCompendiumLocalAssets();
         if (window.isHostClient === true && sess.hostInitialized === false && typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData()) {
             window.hasReceivedHostSessionSnapshot = true;
             if (sess.roomConfig && typeof sess.roomConfig === 'object') {
