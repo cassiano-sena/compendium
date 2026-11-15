@@ -24,6 +24,7 @@ window.brushDraftConfig = window.brushDraftConfig || {
 window.fogDrawShape = window.fogDrawShape || 'rect'; // 'rect' | 'polygon'
 window.fogPolygonDraft = window.fogPolygonDraft || [];
 window.activeRulerDrag = null;
+window.activeTabletopPings = Array.isArray(window.activeTabletopPings) ? window.activeTabletopPings : [];
 window.selectedShapeId = window.selectedShapeId || null;
 window.selectedTextBoxId = window.selectedTextBoxId || null;
 window.selectedDrawingId = window.selectedDrawingId || null;
@@ -1001,6 +1002,13 @@ function applyTabletopCameraTransform() {
     if (pctEl && window.tabletopCamera) {
         pctEl.textContent = `${Math.round(window.tabletopCamera.scale * 100)}%`;
     }
+    const pingLayer = document.getElementById('tt-pings-layer');
+    if (pingLayer) {
+        const invScale = String(Math.min(2.4, Math.max(0.85, 1 / Math.max(0.35, Math.min(2.0, Number(window.tabletopCamera?.scale) || 1)))));
+        pingLayer.querySelectorAll('.tt-map-ping').forEach(el => {
+            el.style.setProperty('--tt-ping-inv-scale', invScale);
+        });
+    }
 }
 
 function centerTabletopCameraOnWorld(wx, wy) {
@@ -1132,14 +1140,33 @@ function setTabletopToolMode(mode) {
         showToast('🔒 Apenas o Mestre pode usar esta ferramenta.');
         return;
     }
+    const prevMode = window.tabletopToolMode || 'move';
+    const subBarModes = ['calibrate', 'fog', 'text', 'brush'];
+    let clearedFogDraft = false;
     if (mode !== 'fog' && Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
         window.fogPolygonDraft = [];
+        clearedFogDraft = true;
     }
     window.tabletopToolMode = mode;
     updateTabletopSelectionUI();
+
+    const vp = document.getElementById('tabletop-viewport');
+    if (vp) {
+        vp.className = vp.className.replace(/\btool-\S+/g, '').trim() + ` tool-${mode}`;
+    }
+
     const tb = document.getElementById('tt-toolbar-tools-root');
-    if (!tb && activeModule === 'tabletop') {
-        renderTabletopModule();
+    const needsSubBarRender = clearedFogDraft || subBarModes.includes(prevMode) || subBarModes.includes(mode);
+    if (tb && activeModule === 'tabletop' && !needsSubBarRender) {
+        tb.querySelectorAll('.vis-pill[data-tt-tool]').forEach(btn => {
+            const btnTool = btn.getAttribute('data-tt-tool');
+            const isActive = btnTool === mode;
+            const activeClass = (btnTool === 'ping' || btnTool === 'calibrate')
+                ? 'active-sighted'
+                : (btnTool === 'fog' ? 'active-hidden' : 'active-studied');
+            btn.classList.remove('active-studied', 'active-sighted', 'active-hidden');
+            if (isActive) btn.classList.add(activeClass);
+        });
         return;
     }
     if (activeModule === 'tabletop') renderTabletopModule();
@@ -2168,6 +2195,7 @@ function _renderBoxTransformHandlesHtml(fnName, safeId) {
 }
 
 function _startBoxTransformDrag(e, cfg) {
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'fog', 'text', 'brush'].includes(window.tabletopToolMode)) return;
     if (e.button !== 0 || !cfg || !cfg.item) return;
     e.stopPropagation();
     e.preventDefault();
@@ -3169,6 +3197,7 @@ function startTransformFogRegion(e, fogId, handleKind) {
 }
 
 function startDragFogVertex(e, fogId, ptIdx) {
+    if (e.button === 2 || e.altKey || ['ruler', 'ping', 'calibrate', 'text', 'brush'].includes(window.tabletopToolMode)) return;
     if (e.button !== 0 || !_isVttEffectiveGm()) return;
     e.stopPropagation();
     e.preventDefault();
@@ -3492,30 +3521,85 @@ function clearAllTabletopTacticalOverlays() {
     showToast('🧹 Formas AoE, Textos, Pincel e Névoa da cena atual limpos.');
 }
 
-function triggerTabletopPingAt(x, y, senderName = null, broadcast = true, pingColor = null) {
+function renderTabletopPingsLayer() {
+    const layer = document.getElementById('tt-pings-layer') || document.getElementById('tabletop-stage');
+    if (!layer) return;
+    const now = Date.now();
+    const curSceneId = String(tabletopState?.activeMapInstanceId || '');
+    window.activeTabletopPings = (window.activeTabletopPings || []).filter(p => p && p.expiresAt > now);
+    const activeIds = new Set();
+    const invScale = String(Math.min(2.4, Math.max(0.85, 1 / Math.max(0.35, Math.min(2.0, Number(window.tabletopCamera?.scale) || 1)))));
+
+    window.activeTabletopPings.forEach(p => {
+        if (p.mapInstanceId && curSceneId && p.mapInstanceId !== curSceneId) return;
+        activeIds.add(p.id);
+        const safeAttr = typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(String(p.id)) : String(p.id).replace(/"/g, '\\"');
+        let el = layer.querySelector(`.tt-map-ping[data-ping-id="${safeAttr}"]`);
+        if (!el) {
+            el = document.createElement('div');
+            el.className = 'tt-map-ping';
+            el.setAttribute('data-ping-id', p.id);
+            el.style.left = `${p.x}px`;
+            el.style.top = `${p.y}px`;
+            const elapsedMs = Math.max(0, now - (p.createdAt || now));
+            const col = p.color || '#f1c40f';
+            const safeCol = escapeHtmlText(col);
+            el.innerHTML = `
+                <span class="tt-map-ping-ring" style="border-color:${safeCol}; box-shadow:0 0 18px ${safeCol}; animation-delay:-${elapsedMs}ms;"></span>
+                <span class="tt-map-ping-ring tt-map-ping-ring-2" style="border-color:${safeCol}; animation-delay:-${elapsedMs + 420}ms;"></span>
+                <span class="tt-map-ping-core" style="background:${safeCol}; box-shadow:0 0 10px ${safeCol};"></span>
+                <span class="tt-map-ping-label" style="border-color:${safeCol}; color:${safeCol};">📍 ${escapeHtmlText(p.label || 'Ping')}</span>
+            `;
+            layer.appendChild(el);
+        }
+        el.style.setProperty('--tt-ping-inv-scale', invScale);
+    });
+
+    Array.from(layer.querySelectorAll('.tt-map-ping[data-ping-id]')).forEach(node => {
+        if (!activeIds.has(node.getAttribute('data-ping-id'))) node.remove();
+    });
+}
+
+function triggerTabletopPingAt(x, y, senderName = null, broadcast = true, pingColor = null, meta = null) {
     const activePl = typeof getActivePlayer === 'function' ? getActivePlayer() : null;
     const resolvedColor = pingColor || (typeof getPlayerColor === 'function' && activePl ? getPlayerColor(activePl) : '#f1c40f');
     const resolvedLabel = senderName || (typeof getPlayerDisplayName === 'function' && activePl ? getPlayerDisplayName(activePl) : (activePl?.name || 'Ping'));
-    const stage = document.getElementById('tabletop-stage');
-    if (stage) {
-        const pingEl = document.createElement('div');
-        pingEl.className = 'tt-map-ping';
-        pingEl.style.left = `${x}px`;
-        pingEl.style.top = `${y}px`;
-        pingEl.style.borderColor = resolvedColor;
-        pingEl.style.boxShadow = `0 0 18px ${resolvedColor}`;
-        pingEl.innerHTML = `<span class="tt-map-ping-label" style="border-color:${escapeHtmlText(resolvedColor)}; color:${escapeHtmlText(resolvedColor)};">📍 ${escapeHtmlText(resolvedLabel)}</span>`;
-        stage.appendChild(pingEl);
-        setTimeout(() => pingEl.remove(), 2600);
+    const now = Date.now();
+    const pingId = (meta && meta.id) ? String(meta.id) : ('ping-' + now.toString(36) + '-' + Math.floor(Math.random() * 10000));
+    const sceneId = (meta && meta.mapInstanceId !== undefined) ? String(meta.mapInstanceId || '') : String(tabletopState?.activeMapInstanceId || '');
+    const px = Math.round(Number(x) || 0);
+    const py = Math.round(Number(y) || 0);
+
+    window.activeTabletopPings = Array.isArray(window.activeTabletopPings) ? window.activeTabletopPings : [];
+    if (!window.activeTabletopPings.some(p => p && p.id === pingId)) {
+        window.activeTabletopPings.push({
+            id: pingId,
+            x: px,
+            y: py,
+            label: resolvedLabel,
+            color: resolvedColor,
+            mapInstanceId: sceneId,
+            createdAt: now,
+            expiresAt: now + 2600
+        });
+        setTimeout(() => {
+            window.activeTabletopPings = (window.activeTabletopPings || []).filter(p => p && p.id !== pingId);
+            renderTabletopPingsLayer();
+        }, 2650);
     }
+    renderTabletopPingsLayer();
+
     if (broadcast && typeof CompendioNetAdapter !== 'undefined' && CompendioNetAdapter.sendMapPing) {
         CompendioNetAdapter.sendMapPing({
-            id: 'ping-' + Date.now(),
-            x,
-            y,
+            id: pingId,
+            x: px,
+            y: py,
             senderId: (activePl && !activePl.isUnauthenticated && activePl.id) ? activePl.id : '',
+            senderClientId: (typeof window !== 'undefined' && window.localClientId) ? window.localClientId : '',
             senderName: activePl?.name || 'Jogador',
-            color: resolvedColor
+            color: resolvedColor,
+            mapInstanceId: sceneId,
+            ts: now
         });
     }
 }
@@ -5511,11 +5595,11 @@ function renderTabletopModule() {
 
                     <!-- Ferramentas Táticas de VTT -->
                     <div style="display:flex; gap:3px; background:#18191f; padding:3px; border-radius:5px; border:1px solid #3c3e4a; flex-wrap:wrap;">
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'move' ? 'active-studied' : ''}" onclick="setTabletopToolMode('move')" title="Selecionar/Mover Tokens, Formas, Textos, Pincel ou Fog, ou Arrastar Câmera do Mapa">✋ Mover</button>
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'ruler' ? 'active-studied' : ''}" onclick="setTabletopToolMode('ruler')" title="Régua Persistente (dura até seu próximo clique)">📏 Régua</button>
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'ping' ? 'active-sighted' : ''}" onclick="setTabletopToolMode('ping')" title="Sinalizar Ponto 1 vez no mapa e voltar ao normal">📍 Ping</button>
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'text' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='text'?'move':'text')" title="Inserir Caixa de Texto no mapa (fonte, tamanho, cor, rotacionar e visibilidade)">🔤 Texto</button>
-                        <button type="button" class="vis-pill ${window.tabletopToolMode === 'brush' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='brush'?'move':'brush')" title="Desenhar livremente no mapa com Pincel (redimensionar, girar e visibilidade)">🖌️ Pincel</button>
+                        <button type="button" data-tt-tool="move" class="vis-pill ${window.tabletopToolMode === 'move' ? 'active-studied' : ''}" onclick="setTabletopToolMode('move')" title="Selecionar/Mover Tokens, Formas, Textos, Pincel ou Fog, ou Arrastar Câmera do Mapa">✋ Mover</button>
+                        <button type="button" data-tt-tool="ruler" class="vis-pill ${window.tabletopToolMode === 'ruler' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='ruler'?'move':'ruler')" title="Régua Persistente (dura até seu próximo clique)">📏 Régua</button>
+                        <button type="button" data-tt-tool="ping" class="vis-pill ${window.tabletopToolMode === 'ping' ? 'active-sighted' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='ping'?'move':'ping')" title="Sinalizar Ponto 1 vez no mapa e voltar ao normal (ou segure Alt + Clique)">📍 Ping</button>
+                        <button type="button" data-tt-tool="text" class="vis-pill ${window.tabletopToolMode === 'text' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='text'?'move':'text')" title="Inserir Caixa de Texto no mapa (fonte, tamanho, cor, rotacionar e visibilidade)">🔤 Texto</button>
+                        <button type="button" data-tt-tool="brush" class="vis-pill ${window.tabletopToolMode === 'brush' ? 'active-studied' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='brush'?'move':'brush')" title="Desenhar livremente no mapa com Pincel (redimensionar, girar e visibilidade)">🖌️ Pincel</button>
                         <select class="form-control" style="width:auto; padding:2px 6px; font-size:11px;" onchange="if(this.value){const [sh,sz,col,lbl]=this.value.split('|'); addAoeTemplateToTabletop(sh,Number(sz),col,lbl); this.value='';}" title="Inserir Forma SVG Interativa (mover, redimensionar, alongar, rotacionar)">
                             <option value="">📐 + Forma (AoE)...</option>
                             <option value="circle|4|#e65100|Esfera 6m (Bola de Fogo)">🔥 Círculo / Esfera 6m</option>
@@ -5525,8 +5609,8 @@ function renderTabletopModule() {
                             <option value="line|6|#ffa726|Linha 9m">📏 Linha 9m</option>
                         </select>
                         ${isGm ? `
-                            <button type="button" class="vis-pill ${window.tabletopToolMode === 'calibrate' ? 'active-sighted' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='calibrate'?'move':'calibrate')" title="Medir 1 quadrado do mapa para calibrar a grade">📐 Gradificar</button>
-                            <button type="button" class="vis-pill ${window.tabletopToolMode === 'fog' ? 'active-hidden' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='fog'?'move':'fog')" title="Desenhar Névoa de Guerra (Retângulo ou Polígono)">🌫️ Névoa</button>
+                            <button type="button" data-tt-tool="calibrate" class="vis-pill ${window.tabletopToolMode === 'calibrate' ? 'active-sighted' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='calibrate'?'move':'calibrate')" title="Medir 1 quadrado do mapa para calibrar a grade">📐 Gradificar</button>
+                            <button type="button" data-tt-tool="fog" class="vis-pill ${window.tabletopToolMode === 'fog' ? 'active-hidden' : ''}" onclick="setTabletopToolMode(window.tabletopToolMode==='fog'?'move':'fog')" title="Desenhar Névoa de Guerra (Retângulo ou Polígono)">🌫️ Névoa</button>
                             <button type="button" class="vis-pill" onclick="addDefaultFogCoverAll()" title="Cobrir mapa com Névoa">🌑 Cobrir</button>
                         ` : ''}
                     </div>
@@ -5553,14 +5637,14 @@ function renderTabletopModule() {
             <div id="tt-connected-players-root">${renderTabletopConnectedPlayersBarHtml()}</div>
 
             <div class="tabletop-stage-shell">
-                <div class="tabletop-board-viewport" id="tabletop-viewport"
+                <div class="tabletop-board-viewport tool-${escapeHtmlText(window.tabletopToolMode || 'move')}" id="tabletop-viewport"
+                     onmousedown="onTabletopStageMouseDown(event)"
                      onwheel="onTabletopViewportWheel(event)"
                      onmousemove="onTabletopViewportMouseMove(event)"
                      onmouseleave="onTabletopViewportMouseLeave()"
                      oncontextmenu="return false;">
                     <div class="tabletop-stage" id="tabletop-stage"
                          style="width:${stageW}px; height:${stageH}px; ${stageBgStyle}"
-                         onmousedown="onTabletopStageMouseDown(event)"
                          ondblclick="if(window.tabletopToolMode==='fog' && window.fogDrawShape==='polygon' && (window.fogPolygonDraft||[]).length>=3){ event.preventDefault(); commitFogPolygonDraft(); }">
                         <div id="tabletop-grid-overlay" class="tabletop-grid-overlay ${gmMetrics.enabled ? '' : 'is-hidden'}"
                              style="background-size:${gmMetrics.gx}px ${gmMetrics.gy}px; background-position:${gmMetrics.ox}px ${gmMetrics.oy}px;"></div>
@@ -5573,6 +5657,7 @@ function renderTabletopModule() {
                         <svg id="tabletop-ruler-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;"></svg>
                         <div id="tt-ruler-labels-layer" style="position:absolute; inset:0; pointer-events:none; z-index:45;"></div>
                         <div id="tt-remote-cursors-layer" class="tt-remote-cursors-layer"></div>
+                        <div id="tt-pings-layer" class="tt-pings-layer"></div>
                     </div>
                 </div>
                 <div id="tt-token-drawer-root">${renderTokenDrawerPanelHtml(isGm)}</div>
@@ -5594,6 +5679,7 @@ function renderTabletopModule() {
     }
     renderTabletopRulersLayer();
     renderRemoteCursorsLayer();
+    renderTabletopPingsLayer();
     if (window.tabletopToolMode === 'fog' && window.fogDrawShape === 'polygon' && Array.isArray(window.fogPolygonDraft) && window.fogPolygonDraft.length > 0) {
         updateFogPolygonDraftPreview();
     }

@@ -91,6 +91,7 @@
                         <li class="nav-item" data-cat="maps" onclick="navigateCategory('maps', this)"><span>🗺️ Mapas</span></li>
                         <li class="nav-item" data-cat="items" onclick="navigateCategory('items', this)"><span>⚔️ Itens</span></li>
                         <li class="nav-item" data-cat="session" onclick="navigateCategory('session', this)"><span>📖 Planos de Sessão</span></li>
+                        <li class="nav-item" data-cat="wildmagic" onclick="navigateCategory('wildmagic', this)" style="display:none;"><span>🌀 Magia Selvagem</span></li>
                         <li class="nav-item" data-cat="quests" onclick="navigateCategory('quests', this)"><span>🎯 Quests & Objetivos</span></li>
                         <li class="nav-item" data-cat="hitdice" onclick="navigateCategory('hitdice', this)"><span>🎲 Dados de Vida</span></li>
                     </ul>
@@ -985,6 +986,7 @@
             if (IS_LOCAL_HOST_ORIGIN) {
                 loadLocalPersistence();
                 ensureHostGmAccountPresent();
+                if (typeof CompendioWildMagic !== 'undefined') CompendioWildMagic.loadLocalPersistence();
             } else {
                 activePlayerId = '';
             }
@@ -1174,6 +1176,9 @@
                 localStorage.setItem(STORAGE_KEY_ACTIVE_PLAYER, activePlayerId);
                 localStorage.setItem(STORAGE_KEY_CHARACTERS, JSON.stringify(charactersData));
                 localStorage.setItem(STORAGE_KEY_TABLETOP, JSON.stringify(tabletopState));
+                if (typeof CompendioWildMagic !== 'undefined' && isEffectiveGmUser()) {
+                    CompendioWildMagic.saveLocalPersistence(false);
+                }
             } catch (e) {
                 console.warn('Cache local cheio ou indisponível:', e);
             }
@@ -1281,7 +1286,8 @@
                 STORAGE_KEY_ACTIVE_PLAYER,
                 STORAGE_KEY_CHARACTERS,
                 STORAGE_KEY_TABLETOP,
-                STORAGE_KEY_KNOWLEDGE
+                STORAGE_KEY_KNOWLEDGE,
+                'compendio_rpg_wildmagic_v1'
             ].forEach(k => localStorage.removeItem(k));
             window.location.reload();
         }
@@ -1341,6 +1347,14 @@
                 saveLocalPersistence();
                 CompendioNetAdapter.broadcastHitDice();
                 renderHitDiceScreen();
+                return;
+            }
+            if (currentCategory === 'wildmagic') {
+                if (!isEffectiveGmUser()) return;
+                if (typeof CompendioWildMagic !== 'undefined') {
+                    if (!confirm('Deseja limpar o Histórico de Magia Selvagem da sessão? (As magias e efeitos importados permanecem salvos)')) return;
+                    CompendioWildMagic.clearHistory();
+                }
                 return;
             }
             if (!confirm(`Tem certeza que deseja excluir TODAS as pastas e documentos da categoria "${currentCategory}"?`)) return;
@@ -1628,12 +1642,25 @@
                 switchMainModule('curio_rules');
                 return;
             }
+            if (categoryName === 'wildmagic' && !isEffectiveGmUser()) {
+                showToast('🔒 A Calculadora de Magia Selvagem é exclusiva do Host/Mestre.');
+                const mNav = document.querySelector('.sidebar .nav-item[data-cat="monsters"]');
+                if (categoryName !== 'monsters') navigateCategory('monsters', mNav);
+                return;
+            }
             activeModule = 'compendium';
             updateMainModuleButtonsUI();
             document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
             if (element) element.classList.add('active');
             
             currentCategory = categoryName;
+
+            if (categoryName === 'wildmagic') {
+                document.getElementById('dynamic-list-title').textContent = 'Magia Selvagem (GM)';
+                document.getElementById('session-back').style.display = 'none';
+                if (typeof CompendioWildMagic !== 'undefined') CompendioWildMagic.renderScreen();
+                return;
+            }
 
             if (categoryName === 'quests') {
                 document.getElementById('dynamic-list-title').textContent = 'Índice de Quests';
@@ -1693,6 +1720,8 @@
             if (ctaEl) ctaEl.style.display = isGm ? 'flex' : 'none';
             const sessNav = document.querySelector('.nav-item[data-cat="session"]');
             if (sessNav) sessNav.style.display = isGm ? 'flex' : 'none';
+            const wildNav = document.querySelector('.nav-item[data-cat="wildmagic"]');
+            if (wildNav) wildNav.style.display = isGm ? 'flex' : 'none';
         }
 
         function toggleCompendiumDirectory() {
@@ -1976,6 +2005,10 @@
                     showToast('🔒 Apenas o Mestre pode criar páginas no Compêndio.');
                     return;
                 }
+                if (currentCategory === 'wildmagic' && typeof CompendioWildMagic !== 'undefined') {
+                    CompendioWildMagic.setTab('import');
+                    return;
+                }
                 openStudioModal();
             }
         }
@@ -2038,7 +2071,7 @@
             if (activeModule === 'character') renderCharacterModule();
             else if (activeModule === 'tabletop') renderTabletopModule();
             else {
-                if (currentCategory === 'session' && targetPlayer.role !== 'gm') {
+                if ((currentCategory === 'session' || currentCategory === 'wildmagic') && targetPlayer.role !== 'gm') {
                     currentCategory = 'monsters';
                 }
                 navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));
@@ -6729,7 +6762,8 @@
                 players: playersData,
                 characters: charactersData,
                 tabletop: tabletopState,
-                knowledge: entityKnowledge
+                knowledge: entityKnowledge,
+                wildMagic: (typeof CompendioWildMagic !== 'undefined' && isEffectiveGmUser()) ? CompendioWildMagic.exportStateForBackup() : null
             };
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
@@ -6755,6 +6789,9 @@
                     if (Array.isArray(parsed.characters)) charactersData = parsed.characters;
                     if (parsed.tabletop && typeof parsed.tabletop === 'object') Object.assign(tabletopState, parsed.tabletop);
                     if (parsed.knowledge && typeof parsed.knowledge === 'object') Object.assign(entityKnowledge, parsed.knowledge);
+                    if (parsed.wildMagic && typeof CompendioWildMagic !== 'undefined' && isEffectiveGmUser()) {
+                        CompendioWildMagic.importStateFromBackup(parsed.wildMagic);
+                    }
 
                     renderPlayerIdentitySelector();
                     window._compendioReplacedAll = true;
@@ -6778,6 +6815,7 @@
     <script src="js/dice-3d-tray.js"></script>
     <script src="js/varhen-loot.js"></script>
     <script src="js/session-tracker.js"></script>
+    <script src="js/wild-magic.js"></script>
     <script src="js/combat-sync.js"></script>
     <script src="js/character-vtt.js"></script>
     <script src="js/compendium-import-sync.js"></script>

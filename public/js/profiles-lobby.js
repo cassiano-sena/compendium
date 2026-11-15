@@ -472,7 +472,7 @@ function switchProfileImmediately(newPlayerId) {
     if (activeModule === 'character') renderCharacterModule();
     else if (activeModule === 'tabletop') renderTabletopModule();
     else {
-        if (currentCategory === 'session' && p.role !== 'gm') {
+        if ((currentCategory === 'session' || currentCategory === 'wildmagic') && p.role !== 'gm') {
             currentCategory = 'monsters';
         }
         navigateCategory(currentCategory, document.querySelector(`.sidebar .nav-item[data-cat="${currentCategory}"]`));

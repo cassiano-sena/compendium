@@ -28,6 +28,8 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
         this._lastKnowledgeJson = '';
         this._lastQuestsJson = '';
         this._lastHitDiceJson = '';
+        this._seenPingIds = new Set();
+        this._hasAppliedInitialSnapshot = false;
 
         // Estende o listener do BroadcastChannel para Combate, Dados, Ping e Regras
         if (this.channel) {
@@ -165,11 +167,28 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                 CompendioDice.renderWidget();
             }
         } else if (msg.type === 'MAP_PING' && msg.ping) {
+            const ping = msg.ping;
+            if (ping.senderClientId && ping.senderClientId === window.localClientId) return;
+            this._seenPingIds = this._seenPingIds || new Set();
+            if (ping.id && this._seenPingIds.has(ping.id)) return;
+            if (ping.id) {
+                this._seenPingIds.add(ping.id);
+                if (this._seenPingIds.size > 120) {
+                    const first = this._seenPingIds.values().next().value;
+                    this._seenPingIds.delete(first);
+                }
+            }
+            if (ping.mapInstanceId && typeof tabletopState === 'object' && tabletopState?.activeMapInstanceId && ping.mapInstanceId !== tabletopState.activeMapInstanceId) {
+                return;
+            }
             if (activeModule === 'tabletop' && typeof triggerTabletopPingAt === 'function') {
                 const pingSender = typeof getPlayerDisplayName === 'function'
-                    ? getPlayerDisplayName(msg.ping.senderId, msg.ping.senderName)
-                    : msg.ping.senderName;
-                triggerTabletopPingAt(msg.ping.x, msg.ping.y, pingSender, false, msg.ping.color);
+                    ? getPlayerDisplayName(ping.senderId, ping.senderName)
+                    : ping.senderName;
+                triggerTabletopPingAt(ping.x, ping.y, pingSender, false, ping.color, {
+                    id: ping.id,
+                    mapInstanceId: ping.mapInstanceId || ''
+                });
             }
         } else if (msg.type === 'RULES_SYNC') {
             if (msg.rules) window.activeRulesConfig = msg.rules;
@@ -190,6 +209,17 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
 
     CompendioNetAdapter.applyServerSessionSnapshot = function(sess) {
         if (!sess || typeof sess !== 'object') return;
+        const isFirstSnapshot = !this._hasAppliedInitialSnapshot;
+        this._hasAppliedInitialSnapshot = true;
+        this._seenPingIds = this._seenPingIds || new Set();
+        if (sess.lastPing && sess.lastPing.id) {
+            const pAge = sess.lastPing.ts ? (Date.now() - Number(sess.lastPing.ts)) : Infinity;
+            if (isFirstSnapshot || pAge > 8000) {
+                this._seenPingIds.add(sess.lastPing.id);
+            } else {
+                this.handleIncomingRealtimeMessage({ type: 'MAP_PING', ping: sess.lastPing });
+            }
+        }
         if (typeof fetchCompendiumLocalAssets === 'function') fetchCompendiumLocalAssets();
         if (window.isHostClient === true && sess.hostInitialized === false && typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData()) {
             window.hasReceivedHostSessionSnapshot = true;
@@ -390,6 +420,13 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             CompendioRules.updateRulesSidebarBadge();
             if (!isTyping && !window.ttActiveInteraction && CompendioRules.refreshAllScreens) CompendioRules.refreshAllScreens();
         }
+        if (window.isHostClient === true && sess.wildMagic && typeof CompendioWildMagic !== 'undefined' && CompendioWildMagic.isAuthorized()) {
+            const nextWmJson = JSON.stringify(sess.wildMagic);
+            if (nextWmJson !== this._lastWildMagicJson) {
+                this._lastWildMagicJson = nextWmJson;
+                CompendioWildMagic.applyServerState(sess.wildMagic);
+            }
+        }
 
         if (typeof ensureSafeInitialProfileForClient === 'function') ensureSafeInitialProfileForClient();
         if (typeof updateSidebarIdentityAndRoomUI === 'function') updateSidebarIdentityAndRoomUI();
@@ -489,6 +526,7 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                             const hasHostLocalData = typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData();
                             if (window.isHostClient && data.session.hostInitialized === false) {
                                 window.hasReceivedHostSessionSnapshot = true;
+                                this._hasAppliedInitialSnapshot = true;
                                 if (!hasHostLocalData) {
                                     this.applyServerSessionSnapshot(data.session);
                                 }
@@ -671,6 +709,7 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
                             const hasHostLocalData = typeof this._hasLocalHostCampaignData === 'function' && this._hasLocalHostCampaignData();
                             if (isFirstPoll && window.isHostClient && d.session.hostInitialized === false) {
                                 window.hasReceivedHostSessionSnapshot = true;
+                                this._hasAppliedInitialSnapshot = true;
                                 this.lastServerUpdatedAt = d.session.updatedAt || Date.now();
                                 if (!hasHostLocalData) {
                                     this.applyServerSessionSnapshot(d.session);
@@ -1096,8 +1135,12 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
     };
 
     CompendioNetAdapter.sendMapPing = async function(pingObj) {
+        if (pingObj && pingObj.id) {
+            this._seenPingIds = this._seenPingIds || new Set();
+            this._seenPingIds.add(pingObj.id);
+        }
         if (this.channel) {
-            this.channel.postMessage({ type: 'MAP_PING', senderId: activePlayerId, ping: pingObj });
+            this.channel.postMessage({ type: 'MAP_PING', senderId: activePlayerId, senderClientId: window.localClientId, ping: pingObj });
         }
         await this.postSessionPayload({ delta: { type: 'MAP_PING', ping: pingObj } });
     };
@@ -1143,6 +1186,10 @@ window.activeTabletopRulers = window.activeTabletopRulers || {};
             if (typeof compendioData !== 'undefined') payload.compendioData = compendioData;
             if (typeof questsData !== 'undefined') payload.quests = questsData;
             if (typeof hitDiceData !== 'undefined') payload.hitDice = hitDiceData;
+            if (typeof CompendioWildMagic !== 'undefined' && CompendioWildMagic.isAuthorized()) {
+                payload.wildMagic = CompendioWildMagic.exportStateForBackup();
+                this._lastWildMagicJson = JSON.stringify(payload.wildMagic);
+            }
         }
         await this.postSessionPayload(payload);
     };

@@ -133,6 +133,7 @@ let sessionState = {
     diceLog: [],
     rules: null,
     activeMods: [],
+    wildMagic: null,
     lastPing: null,
     lastStudyRequest: null,
     roomConfig: {
@@ -197,6 +198,7 @@ function loadPersistedSession() {
                 if (parsed.combatTurn && typeof parsed.combatTurn === 'object') sessionState.combatTurn = parsed.combatTurn;
                 if (parsed.rules && typeof parsed.rules === 'object') sessionState.rules = parsed.rules;
                 if (Array.isArray(parsed.activeMods)) sessionState.activeMods = parsed.activeMods;
+                if (parsed.wildMagic && typeof parsed.wildMagic === 'object') sessionState.wildMagic = parsed.wildMagic;
                 sessionState.hostInitialized = parsed.hostInitialized !== false;
             }
         }
@@ -226,6 +228,7 @@ function schedulePersistSession() {
                 combatTurn: sessionState.combatTurn,
                 rules: sessionState.rules,
                 activeMods: sessionState.activeMods,
+                wildMagic: sessionState.wildMagic,
                 updatedAt: sessionState.updatedAt
             };
             fs.writeFileSync(SESSION_STATE_FILE, JSON.stringify(toSave, null, 2), 'utf8');
@@ -406,6 +409,7 @@ function sanitizeSessionForClient(isHost = false) {
         diceLog: sessionState.diceLog,
         rules: sessionState.rules,
         activeMods: sessionState.activeMods,
+        wildMagic: isHost ? sessionState.wildMagic : null,
         lastPing: sessionState.lastPing,
         lastStudyRequest: sessionState.lastStudyRequest,
         ephemeralCursors: Array.from(ephemeralCursors.values()),
@@ -2611,6 +2615,10 @@ const server = http.createServer((req, res) => {
                     } else if (d.type === 'DICE_CLEAR') {
                         sessionState.diceLog = [];
                     } else if (d.type === 'MAP_PING' && d.ping) {
+                        d.ping = Object.assign({}, d.ping, {
+                            ts: Number(d.ping.ts) || now,
+                            senderClientId: d.ping.senderClientId || senderClientId || ''
+                        });
                         sessionState.lastPing = d.ping;
                     } else if (d.type === 'STUDY_REQUEST') {
                         sessionState.lastStudyRequest = Object.assign({ id: 'study-' + now, at: now }, d);
@@ -2711,6 +2719,7 @@ const server = http.createServer((req, res) => {
                     if (Array.isArray(incoming.hitDice)) sessionState.hitDice = incoming.hitDice;
                     if (incoming.rules && typeof incoming.rules === 'object') sessionState.rules = incoming.rules;
                     if (Array.isArray(incoming.activeMods)) sessionState.activeMods = incoming.activeMods;
+                    if (incoming.wildMagic && typeof incoming.wildMagic === 'object') sessionState.wildMagic = incoming.wildMagic;
                 }
                 if (isEffectiveGm) {
                     if (Array.isArray(incoming.combatCards)) sessionState.combatCards = incoming.combatCards;

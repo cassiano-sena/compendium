@@ -125,12 +125,16 @@
         if (typeof activeModule !== 'undefined' && activeModule !== 'compendium') return;
 
         const isGm = _isImportEffectiveGm();
-        if (!isGm && currentCategory === 'session') {
+        if (!isGm && (currentCategory === 'session' || currentCategory === 'wildmagic')) {
             const mNav = document.querySelector('.sidebar .nav-item[data-cat="monsters"]');
             if (typeof navigateCategory === 'function') navigateCategory('monsters', mNav);
             return;
         }
 
+        if (currentCategory === 'wildmagic') {
+            if (typeof renderWildMagicScreen === 'function') renderWildMagicScreen();
+            return;
+        }
         if (currentCategory === 'quests') {
             if (typeof renderQuestsScreen === 'function') renderQuestsScreen();
             return;
